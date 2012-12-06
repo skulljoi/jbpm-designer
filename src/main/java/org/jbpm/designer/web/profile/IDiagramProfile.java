@@ -21,6 +21,8 @@ import org.eclipse.bpmn2.Definitions;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.jbpm.designer.repository.Repository;
 
+import javax.servlet.ServletContext;
+
 /**
  * A profile for the editor to choose which stencilset 
  * and which plugins should be loaded.
@@ -109,7 +111,7 @@ public interface IDiagramProfile {
     /**
      * @return the repository.
      */
-    public Repository getRepository();
+    public Repository getRepository(ServletContext context);
     
     /**
      * Parser to produce the final model to be saved.

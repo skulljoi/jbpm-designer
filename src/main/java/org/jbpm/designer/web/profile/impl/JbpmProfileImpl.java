@@ -23,6 +23,8 @@ import org.eclipse.bpmn2.Definitions;
 import org.eclipse.emf.common.util.URI;
 import org.jboss.drools.DroolsPackage;
 import org.jbpm.designer.repository.Repository;
+import org.jbpm.designer.repository.guvnor.GuvnorRepository;
+import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,12 +68,19 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private String _repositoryPwd;
 
     public JbpmProfileImpl(ServletContext servletContext) {
-        this(servletContext, true);
+        this(servletContext, true, true);
+    }
+
+    public JbpmProfileImpl() {
+        this(null, false, false);
     }
     
-    public JbpmProfileImpl(ServletContext servletContext, boolean initializeLocalPlugins) {
-        if (initializeLocalPlugins) {
+    public JbpmProfileImpl(ServletContext servletContext, boolean initializeLocalPlugins, boolean initializeRepository) {
+        if(initializeLocalPlugins) {
             initializeLocalPlugins(servletContext);
+        }
+        if(initializeRepository) {
+            initializeRepository(servletContext);
         }
     }
 
@@ -200,6 +209,20 @@ public class JbpmProfileImpl implements IDiagramProfile {
         }
     }
 
+    private void initializeRepository(ServletContext context) {
+        String repoKey = "repository-" + _repositoryId;
+        if(context.getAttribute(repoKey) == null) {
+            // TODO hard-coded for now - figure out where to put mapping should be
+            if(_repositoryId.equals("guvnor")) {
+                context.setAttribute(repoKey, new GuvnorRepository(this));
+            } else if(_repositoryId.equals("vfs")) {
+                context.setAttribute(repoKey, new VFSRepository(this));
+            } else {
+                _logger.warn("Invalid repository id: " + _repositoryId);
+            }
+        }
+    }
+
     public String getName() {
         return "jbpm";
     }
@@ -244,9 +267,36 @@ public class JbpmProfileImpl implements IDiagramProfile {
         return _localHistoryTimeout;
     }
 
-    public Repository getRepository() {
-        // TODO
-        return null;
+    public void setRepositoryId(String _repositoryId) {
+        this._repositoryId = _repositoryId;
+    }
+
+    public void setRepositoryRoot(String _repositoryRoot) {
+        this._repositoryRoot = _repositoryRoot;
+    }
+
+    public void setRepositoryHost(String _repositoryHost) {
+        this._repositoryHost = _repositoryHost;
+    }
+
+    public void setRepositoryProtocol(String _repositoryProtocol) {
+        this._repositoryProtocol = _repositoryProtocol;
+    }
+
+    public void setRepositorySubdomain(String _repositorySubdomain) {
+        this._repositorySubdomain = _repositorySubdomain;
+    }
+
+    public void setRepositoryUsr(String _repositoryUsr) {
+        this._repositoryUsr = _repositoryUsr;
+    }
+
+    public void setRepositoryPwd(String _repositoryPwd) {
+        this._repositoryPwd = _repositoryPwd;
+    }
+
+    public Repository getRepository(ServletContext context) {
+        return (Repository) context.getAttribute("repository-" + _repositoryId);
     }
     
     public IDiagramMarshaller createMarshaller() {

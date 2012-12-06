@@ -9,6 +9,7 @@ import java.util.*;
 
 import org.jbpm.designer.repository.impl.AbstractAsset;
 import org.jbpm.designer.repository.impl.AssetBuilder;
+import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.kie.commons.io.IOService;
 import org.kie.commons.io.impl.IOServiceDotFileImpl;
 import org.kie.commons.java.nio.IOException;
@@ -29,8 +30,10 @@ public class VFSRepository implements Repository {
     private URI repositoryRoot;
     private Path repositoryRootPath;
 
-    public VFSRepository(String root, Map<String, Object> env) {
-        this.repositoryRoot = URI.create(root);
+    public VFSRepository(IDiagramProfile profile) {
+        // TODO build env from profile params?
+        Map<String, Object> env = new HashMap<String, Object>();
+        this.repositoryRoot = URI.create(profile.getRepositoryRoot());
         this.repositoryRootPath = Paths.get(this.repositoryRoot);
 
         if ( ioService.getFileSystem( this.repositoryRoot ) == null ) {

@@ -2,6 +2,7 @@ package org.jbpm.designer.repository;
 
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
+import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,10 +19,14 @@ public class VFSRepositoryDefaultFileSystemTest {
     // TODO change it to generic independent path
     private static final String REPOSITORY_ROOT = System.getProperty("java.io.tmpdir")+"designer-repo";
     private static final String VFS_REPOSITORY_ROOT = "default://" + REPOSITORY_ROOT;
+    private JbpmProfileImpl profile;
 
     @Before
     public void setup() {
         new File(REPOSITORY_ROOT).mkdir();
+        profile = new JbpmProfileImpl();
+        profile.setRepositoryId("vfs");
+        profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
     }
 
     private void deleteFiles(File directory) {
@@ -46,7 +51,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     public void testCreateDefaultVFSRepository() {
 
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -58,7 +63,7 @@ public class VFSRepositoryDefaultFileSystemTest {
 
     @Test
     public void testCreateDirectory() {
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
@@ -72,7 +77,7 @@ public class VFSRepositoryDefaultFileSystemTest {
 
     @Test
     public void testDeleteDirectory() {
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
@@ -93,7 +98,7 @@ public class VFSRepositoryDefaultFileSystemTest {
 
     @Test
     public void testDeleteNonEmptyDirectory() {
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
@@ -118,7 +123,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testListAsset() {
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -142,7 +147,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testListSingleTextAsset() {
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -170,7 +175,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testListSingleBinaryAsset() {
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -199,7 +204,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testListNestedSingleTextAsset() {
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -230,7 +235,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testStoreSingleBinaryAsset() throws AssetNotFoundException{
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -260,7 +265,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testStoreSingleTextAsset() throws AssetNotFoundException{
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
@@ -290,7 +295,7 @@ public class VFSRepositoryDefaultFileSystemTest {
     @Test
     public void testAssetExists() throws AssetNotFoundException{
 
-        Repository repository = new VFSRepository(VFS_REPOSITORY_ROOT, new HashMap<String, Object>());
+        Repository repository = new VFSRepository(profile);
 
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);

@@ -317,7 +317,7 @@ public class EditorHandler extends HttpServlet {
                     "No profile with the name " + profileName + 
                         " was registered");
         }
-        
+
         IDiagramPreprocessingUnit preprocessingUnit = null;
         if(_preProcess) {
             if (_logger.isInfoEnabled()) {

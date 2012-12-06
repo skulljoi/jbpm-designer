@@ -296,8 +296,7 @@ public class EpnProfileImpl implements IDiagramProfile {
         return _localHistoryTimeout;
     }
 
-    public Repository getRepository() {
-        // TODO
+    public Repository getRepository(ServletContext context) {
         return null;
     }
 }

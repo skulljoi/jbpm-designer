@@ -1,6 +1,7 @@
 package org.jbpm.designer.repository.guvnor;
 
 import org.jbpm.designer.repository.*;
+import org.jbpm.designer.web.profile.IDiagramProfile;
 
 import java.util.Collection;
 import java.util.Map;
@@ -9,6 +10,10 @@ import java.util.Map;
  * Repository implementation that is using Guvnor as a storage
  */
 public class GuvnorRepository implements Repository {
+
+    public GuvnorRepository(IDiagramProfile profile) {
+
+    }
 
     public Collection<String> listDirectories(String startAt) {
         throw new UnsupportedOperationException();

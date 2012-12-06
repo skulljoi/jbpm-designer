@@ -24,6 +24,7 @@ import java.util.Set;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 
+import org.jbpm.designer.repository.guvnor.GuvnorRepository;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.IDiagramProfileFactory;
 import org.jbpm.designer.web.profile.IDiagramProfileService;
@@ -45,8 +46,7 @@ public class ProfileServiceImpl implements IDiagramProfileService {
     private Set<IDiagramProfileFactory> _factories = 
         new HashSet<IDiagramProfileFactory>();
     private IDiagramProfile userProfile;
-    private IDiagramProfile defaultUserProfile;
-    
+
     /**
      * Initialize the service with a context
      * @param context the servlet context to initialize the profile.
@@ -56,8 +56,6 @@ public class ProfileServiceImpl implements IDiagramProfileService {
         _registry.put("jbpm", new JbpmProfileImpl(context));
         _registry.put("drools", new JbpmProfileImpl(context));
         _registry.put("epn", new EpnProfileImpl(context));
-
-        defaultUserProfile = new JbpmProfileImpl((context));
     }
     
     private Map<String, IDiagramProfile> assembleProfiles(HttpServletRequest request) {
@@ -83,10 +81,6 @@ public class ProfileServiceImpl implements IDiagramProfileService {
 
     public Set<IDiagramProfileFactory> getFactories() {
     	return _factories;
-    }
-
-    public IDiagramProfile getUserProfile() {
-        return userProfile != null ? userProfile : defaultUserProfile;
     }
 
 }
