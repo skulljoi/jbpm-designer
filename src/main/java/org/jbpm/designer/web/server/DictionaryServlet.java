@@ -15,16 +15,12 @@
  */
 package org.jbpm.designer.web.server;
 
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
@@ -32,15 +28,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.apache.abdera.i18n.text.Sanitizer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.IDiagramProfileService;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
-import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
-
-import org.apache.commons.codec.binary.Base64;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /** 
  * Dictionary Servlet.
@@ -85,20 +76,20 @@ public class DictionaryServlet extends HttpServlet {
 	}
 	
 	private String getFromGuvnor(String uuid, IDiagramProfile profile) {
-		String dictionaryURL = ExternalInfo.getExternalProtocol(profile)
+		String dictionaryURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + DICTIONARY_FNAME;
 		
-		String dictionarySourceURL = ExternalInfo.getExternalProtocol(profile)
+		String dictionarySourceURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + DICTIONARY_FNAME
                 + "/source/";
 		try {
@@ -126,28 +117,28 @@ public class DictionaryServlet extends HttpServlet {
 	}
 	
 	private void storeToGuvnor(String uuid, IDiagramProfile profile, String dvalue) {
-		String dictionaryURL = ExternalInfo.getExternalProtocol(profile)
+		String dictionaryURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + DICTIONARY_FNAME;
 		
-		String dictionaryDeleteURL = ExternalInfo.getExternalProtocol(profile)
+		String dictionaryDeleteURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + DICTIONARY_FNAME;
 		
-		String dictionaryAssetsURL = ExternalInfo.getExternalProtocol(profile)
+		String dictionaryAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/";
 		try {
 			// check if the dictionary already exists

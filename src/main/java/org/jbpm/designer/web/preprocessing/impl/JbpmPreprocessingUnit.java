@@ -37,7 +37,7 @@ import org.drools.process.core.ParameterDefinition;
 import org.drools.process.core.impl.ParameterDefinitionImpl;
 import org.jbpm.designer.web.preprocessing.IDiagramPreprocessingUnit;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jbpm.designer.web.server.ServletUtil;
 import org.jbpm.process.workitem.WorkDefinitionImpl;
 import org.json.JSONArray;
@@ -253,8 +253,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
                 	for(Map.Entry<String, List<String>> entry : configInfo.entrySet()) {
                         packageName = entry.getKey();
                 	}
-                	icon = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-                            "/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+                	icon = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+                            "/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
                             "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/defaultservicenodeicon/binary/";
                 }
                 workDefinition.setIcon(icon);
@@ -304,8 +304,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
                 if(configNames != null) {
                     for(String configName : configNames) {
                     	try {
-	                    	String configURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-	                        "/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+	                    	String configURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+	                        "/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
 	                        "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + configName + "/source/";
                 
                             InputStream in =  ServletUtil.getInputStreamForURL(configURL, "GET", profile);
@@ -324,23 +324,23 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     }
     
     private void setupFormWidgets(IDiagramProfile profile, HttpServletRequest req) {
-    	String formWidgetsPackageURL = ExternalInfo.getExternalProtocol(profile)
+    	String formWidgetsPackageURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/";
     	File[] allFormWidgets = new File(formWidgetsDir).listFiles();
     	for(File formWidget : allFormWidgets) {
     		int extPosition = formWidget.getName().lastIndexOf(".");
     		String widgetNameOnly = formWidget.getName().substring(0,extPosition);
-    		String widgetURL = ExternalInfo.getExternalProtocol(profile)
+    		String widgetURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/rest/packages/globalArea/assets/" + widgetNameOnly;
     		try {
 	    		URL checkURL = new URL(widgetURL);
@@ -375,19 +375,19 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     }
     
     private void setupCustomEditors(IDiagramProfile profile, HttpServletRequest req) {
-    	String customEditorsURL = ExternalInfo.getExternalProtocol(profile)
+    	String customEditorsURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + CUSTOMEDITORS_NAME;
-		String customEditorsAssetsURL = ExternalInfo.getExternalProtocol(profile)
+		String customEditorsAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/";
 		
 		try {
@@ -425,28 +425,28 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     
     private Map<String, ThemeInfo> setupThemes(IDiagramProfile profile, HttpServletRequest req) {
     	Map<String, ThemeInfo> themeData = new HashMap<String, JbpmPreprocessingUnit.ThemeInfo>();
-    	String themesURL = ExternalInfo.getExternalProtocol(profile)
+    	String themesURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME;
     	
-    	String themesSourceURL = ExternalInfo.getExternalProtocol(profile)
+    	String themesSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME + "/source";
 		
-		String themesAssetsURL = ExternalInfo.getExternalProtocol(profile)
+		String themesAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/";
 		try {
 	        URL checkURL = new URL(themesURL);
@@ -527,38 +527,38 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     		try {
 	    		String pkg = URLEncoder.encode(info[0], "UTF-8");
 	    		
-	    		String emailIconURL = ExternalInfo.getExternalProtocol(profile)
+	    		String emailIconURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                    + "://"
-	                    + ExternalInfo.getExternalHost(profile)
+	                    + RepositoryInfo.getRepositoryHost(profile)
 	                    + "/"
-	                    + profile.getExternalLoadURLSubdomain().substring(0,
-	                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                    + "/rest/packages/" + pkg + "/assets/" + "defaultemailicon"
 	                    + ".gif";
-	    		String logIconURL = ExternalInfo.getExternalProtocol(profile)
+	    		String logIconURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                    + "://"
-	                    + ExternalInfo.getExternalHost(profile)
+	                    + RepositoryInfo.getRepositoryHost(profile)
 	                    + "/"
-	                    + profile.getExternalLoadURLSubdomain().substring(0,
-	                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                    + "/rest/packages/" + pkg + "/assets/" + "defaultlogicon"
 	                    + ".gif";
 	    		
-	    		String serviceNodeIconURL = ExternalInfo.getExternalProtocol(profile)
+	    		String serviceNodeIconURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                    + "://"
-	                    + ExternalInfo.getExternalHost(profile)
+	                    + RepositoryInfo.getRepositoryHost(profile)
 	                    + "/"
-	                    + profile.getExternalLoadURLSubdomain().substring(0,
-	                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                    + "/rest/packages/" + pkg + "/assets/" + "defaultservicenodeicon"
 	                    + ".png";
 	    		
-	    		String packageAssetsURL = ExternalInfo.getExternalProtocol(profile)
+	    		String packageAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                    + "://"
-	                    + ExternalInfo.getExternalHost(profile)
+	                    + RepositoryInfo.getRepositoryHost(profile)
 	                    + "/"
-	                    + profile.getExternalLoadURLSubdomain().substring(0,
-	                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                    + "/rest/packages/" + pkg + "/assets/";
 	    		
 				// check if the images already exists
@@ -656,8 +656,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     	String pkg = "";
     	for(String nextPackage : packageNames) {
     		try {	
-	    		String packageAssetURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-	            "/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+	    		String packageAssetURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+	            "/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
 	            "/rest/packages/" + URLEncoder.encode(nextPackage, "UTF-8") + "/assets/";
             
                 XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -686,20 +686,20 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     	
     	if(gotPackage) {
     		// push the default workitem config
-    		String packageAssetsURL = ExternalInfo.getExternalProtocol(profile)
+    		String packageAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/rest/packages/" + pkg + "/assets/";
     		try {
 				// push default configuration wid
 	            StringTemplate widConfigTemplate = new StringTemplate(readFile(default_widconfigtemplate));
-	            widConfigTemplate.setAttribute("protocol", ExternalInfo.getExternalProtocol(profile));
-	            widConfigTemplate.setAttribute("host", ExternalInfo.getExternalHost(profile));
-	            widConfigTemplate.setAttribute("subdomain", profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/")));
+	            widConfigTemplate.setAttribute("protocol", RepositoryInfo.getRepositoryProtocol(profile));
+	            widConfigTemplate.setAttribute("host", RepositoryInfo.getRepositoryHost(profile));
+	            widConfigTemplate.setAttribute("subdomain", RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")));
 	            widConfigTemplate.setAttribute("pkgName", pkg);
 	            
 	            URL createWidURL = new URL(packageAssetsURL);
@@ -730,8 +730,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
         Map<String, List<String>> packageConfigs = new HashMap<String, List<String>>();
         for(String nextPackage : packageNames) {
         	try {
-	        	String packageAssetURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-	            "/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+	        	String packageAssetURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+	            "/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
 	            "/rest/packages/" + URLEncoder.encode(nextPackage, "UTF-8") + "/assets/";
 	            packageConfigs.put(nextPackage, new ArrayList<String>());
 	            
@@ -787,8 +787,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     
     private List<String> findPackages(String uuid, IDiagramProfile profile) {
         List<String> packages = new ArrayList<String>();
-        String packagesURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-        "/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+        String packagesURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+        "/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
         "/rest/packages/";
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -852,10 +852,10 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     }
     
     private void applyAuth(IDiagramProfile profile, HttpURLConnection connection) {
-        if (profile.getUsr() != null && profile.getUsr().trim().length() > 0
-                && profile.getPwd() != null
-                && profile.getPwd().trim().length() > 0) {
-            String userpassword = profile.getUsr() + ":" + profile.getPwd();
+        if (RepositoryInfo.getRepositoryUsr(profile) != null && RepositoryInfo.getRepositoryUsr(profile).trim().length() > 0
+                && RepositoryInfo.getRepositoryPwd(profile) != null
+                && RepositoryInfo.getRepositoryPwd(profile).trim().length() > 0) {
+            String userpassword = RepositoryInfo.getRepositoryUsr(profile) + ":" + RepositoryInfo.getRepositoryPwd(profile);
             String encodedAuthorization = Base64.encodeBase64String(userpassword.getBytes());
             connection.setRequestProperty("Authorization", "Basic "
                     + encodedAuthorization);

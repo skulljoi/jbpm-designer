@@ -30,7 +30,6 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.abdera.i18n.text.Sanitizer;
 import org.apache.batik.transcoder.TranscoderException;
 import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
@@ -40,9 +39,7 @@ import org.apache.batik.util.ParsedURL;
 import org.apache.commons.io.IOUtils;
 import org.apache.fop.svg.PDFTranscoder;
 import org.apache.log4j.Logger;
-import org.eclipse.bpmn2.Bpmn2Package;
 import org.eclipse.bpmn2.Definitions;
-import org.eclipse.bpmn2.DocumentRoot;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Process;
@@ -57,24 +54,19 @@ import org.eclipse.dd.dc.Bounds;
 import org.eclipse.dd.dc.DcFactory;
 import org.eclipse.dd.dc.Point;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.impl.EAttributeImpl;
 import org.eclipse.emf.ecore.impl.EStructuralFeatureImpl;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.util.ExtendedMetaData;
 import org.eclipse.emf.ecore.util.FeatureMap;
-import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.jboss.drools.impl.DroolsFactoryImpl;
 import org.jbpm.designer.bpmn2.resource.JBPMBpmn2ResourceFactoryImpl;
 import org.jbpm.designer.bpmn2.resource.JBPMBpmn2ResourceImpl;
 import org.jbpm.designer.web.batikprotocolhandler.GuvnorParsedURLProtocolHandler;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.IDiagramProfileService;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
-import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jbpm.migration.JbpmMigration;
 
 import org.apache.commons.codec.binary.Base64;
@@ -266,12 +258,12 @@ public class TransformerServlet extends HttpServlet {
         } else if(transformto == null && respaction != null && respaction.equals(RESPACTION_SHOWEMBEDDABLE)) {
         	resp.setCharacterEncoding("UTF-8");
         	resp.setContentType("text/plain");
-        	String editorURL = ExternalInfo.getExternalProtocol(profile)
+        	String editorURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/org.drools.guvnor.Guvnor/standaloneEditorServlet?assetsUUIDs="
                     + uuid
                     + "&client=oryx";
@@ -488,29 +480,29 @@ public class TransformerServlet extends HttpServlet {
                 assetFileExt = ".svg";
             }
 
-            String pngURL = ExternalInfo.getExternalProtocol(profile)
+            String pngURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + assetName
                     + assetExt;
 
-            String packageAssetsURL = ExternalInfo.getExternalProtocol(profile)
+            String packageAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/";
 
-            String deleteURL = ExternalInfo.getExternalProtocol(profile)
+            String deleteURL = RepositoryInfo.getRepositoryProtocol(profile)
                     + "://"
-                    + ExternalInfo.getExternalHost(profile)
+                    + RepositoryInfo.getRepositoryHost(profile)
                     + "/"
-                    + profile.getExternalLoadURLSubdomain().substring(0,
-                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                     + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + assetName
                     + assetExt;
 
@@ -585,12 +577,12 @@ public class TransformerServlet extends HttpServlet {
     private String getProcessContent(String packageName, String assetName,
             String uuid, IDiagramProfile profile) {
     	try {
-	    	String assetSourceURL = ExternalInfo.getExternalProtocol(profile)
+	    	String assetSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                + "://"
-	                + ExternalInfo.getExternalHost(profile)
+	                + RepositoryInfo.getRepositoryHost(profile)
 	                + "/"
-	                + profile.getExternalLoadURLSubdomain().substring(0,
-	                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + assetName
 	                + "/source/";
 	        

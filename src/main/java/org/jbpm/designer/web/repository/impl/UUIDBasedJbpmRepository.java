@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.apache.log4j.Logger;
 import org.jboss.drools.impl.DroolsPackageImpl;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jbpm.designer.web.repository.IUUIDBasedRepository;
 
 
@@ -48,15 +48,15 @@ public class UUIDBasedJbpmRepository implements IUUIDBasedRepository {
     
     private String buildExternalLoadURL(IDiagramProfile profile, String uuid) {
         StringBuffer buff = new StringBuffer();
-        buff.append(ExternalInfo.getExternalProtocol(profile));
+        buff.append(RepositoryInfo.getRepositoryProtocol(profile));
         
         buff.append("://");
-        buff.append(ExternalInfo.getExternalHost(profile));
+        buff.append(RepositoryInfo.getRepositoryHost(profile));
         buff.append("/");
-        buff.append(profile.getExternalLoadURLSubdomain());
+        buff.append(RepositoryInfo.getRepositorySubdomain(profile));
         buff.append("?uuid=").append(uuid);
-        buff.append("&usr=").append(profile.getUsr());
-        buff.append("&pwd=").append(profile.getPwd());
+        buff.append("&usr=").append(RepositoryInfo.getRepositoryUsr(profile));
+        buff.append("&pwd=").append(RepositoryInfo.getRepositoryPwd(profile));
         
         return buff.toString();
     }

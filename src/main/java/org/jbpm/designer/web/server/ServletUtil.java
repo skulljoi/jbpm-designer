@@ -21,9 +21,9 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.IDiagramProfileService;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
 import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
 import org.apache.commons.codec.binary.Base64;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /**
  * Utility class for web servlets.
@@ -53,12 +53,12 @@ public class ServletUtil {
 	
 	public static List<String> getFormWidgetList(IDiagramProfile profile) {
 		List<String> widgets = new ArrayList<String>();
-		String globalAreaURL = ExternalInfo.getExternalProtocol(profile)
+		String globalAreaURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets";
 		try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -97,12 +97,12 @@ public class ServletUtil {
 	public static String[] findPackageAndAssetInfo(String uuid,
             IDiagramProfile profile) {
         List<String> packages = new ArrayList<String>();
-        String packagesURL = ExternalInfo.getExternalProtocol(profile)
+        String packagesURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/";
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -125,12 +125,12 @@ public class ServletUtil {
         String[] pkgassetinfo = new String[2];
         for (String nextPackage : packages) {
         	try {
-	        	String packageAssetURL = ExternalInfo.getExternalProtocol(profile)
+	        	String packageAssetURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                    + "://"
-	                    + ExternalInfo.getExternalHost(profile)
+	                    + RepositoryInfo.getRepositoryHost(profile)
 	                    + "/"
-	                    + profile.getExternalLoadURLSubdomain().substring(0,
-	                            profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                    + "/rest/packages/" + URLEncoder.encode(nextPackage, "UTF-8") + "/assets/";
                 XMLInputFactory factory = XMLInputFactory.newInstance();
                 XMLStreamReader reader = factory
@@ -201,10 +201,10 @@ public class ServletUtil {
     }
 	
 	public static void applyAuth(IDiagramProfile profile, HttpURLConnection connection) {
-		if (profile.getUsr() != null && profile.getUsr().trim().length() > 0
-				&& profile.getPwd() != null
-				&& profile.getPwd().trim().length() > 0) {
-			String auth = profile.getUsr() + ":" + profile.getPwd();
+		if (RepositoryInfo.getRepositoryUsr(profile) != null && RepositoryInfo.getRepositoryUsr(profile).trim().length() > 0
+				&& RepositoryInfo.getRepositoryPwd(profile) != null
+				&& RepositoryInfo.getRepositoryPwd(profile).trim().length() > 0) {
+			String auth = RepositoryInfo.getRepositoryUsr(profile) + ":" + RepositoryInfo.getRepositoryPwd(profile);
 	        connection.setRequestProperty("Authorization", "Basic "
 	                + Base64.encodeBase64String(auth.getBytes()));
 		}
@@ -212,12 +212,12 @@ public class ServletUtil {
 	
 	public static boolean assetExistsInGuvnor(String packageName, String assetName, IDiagramProfile profile) {
     	try {	
-    		String formURL = ExternalInfo.getExternalProtocol(profile)
+    		String formURL = RepositoryInfo.getRepositoryProtocol(profile)
     	        + "://"
-    	        + ExternalInfo.getExternalHost(profile)
+    	        + RepositoryInfo.getRepositoryHost(profile)
     	        + "/"
-    	        + profile.getExternalLoadURLSubdomain().substring(0,
-    	                profile.getExternalLoadURLSubdomain().indexOf("/"))
+    	        + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
     	        + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + URLEncoder.encode(assetName, "UTF-8");
     	
     	
@@ -265,12 +265,12 @@ public class ServletUtil {
 	
 	public static List<String> getPackageNamesFromGuvnor(IDiagramProfile profile) {
         List<String> packages = new ArrayList<String>();
-        String packagesURL = ExternalInfo.getExternalProtocol(profile)
+        String packagesURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-    	                profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/";
         try {
             XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -295,12 +295,12 @@ public class ServletUtil {
 	public static List<String> getAllProcessesInPackage(String pkgName, IDiagramProfile profile) {
         List<String> processes = new ArrayList<String>();
         try {
-	        String assetsURL = ExternalInfo.getExternalProtocol(profile)
+	        String assetsURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                + "://"
-	                + ExternalInfo.getExternalHost(profile)
+	                + RepositoryInfo.getRepositoryHost(profile)
 	                + "/"
-	                + profile.getExternalLoadURLSubdomain().substring(0,
-	    	                profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                + "/rest/packages/"
 	                + URLEncoder.encode(pkgName, "UTF-8")
 	                + "/assets/";
@@ -340,12 +340,12 @@ public class ServletUtil {
 	
 	public static String getProcessImagePath(String packageName, String processid, IDiagramProfile profile) {
 		try {
-			return ExternalInfo.getExternalProtocol(profile)
+			return RepositoryInfo.getRepositoryProtocol(profile)
 			        + "://"
-			        + ExternalInfo.getExternalHost(profile)
+			        + RepositoryInfo.getRepositoryHost(profile)
 			        + "/"
-			        + profile.getExternalLoadURLSubdomain().substring(0,
-			                profile.getExternalLoadURLSubdomain().indexOf("/"))
+			        + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+			                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 			        + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + processid + "-image"
 			        + "/binary/";
 		} catch (UnsupportedEncodingException e) {
@@ -355,24 +355,24 @@ public class ServletUtil {
 	}
 	
 	public static String getProcessImageSourcePath(String packageName, String processid, IDiagramProfile profile) {
-		return ExternalInfo.getExternalProtocol(profile)
+		return RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-    	                profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/" + packageName + "/assets/" + processid + "-image"
                 + "/source/";
 	}
 	
 	public static String getProcessSourceContent(String packageName, String assetName, IDiagramProfile profile) {
 		try {	
-			String assetSourceURL = ExternalInfo.getExternalProtocol(profile)
+			String assetSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                + "://"
-	                + ExternalInfo.getExternalHost(profile)
+	                + RepositoryInfo.getRepositoryHost(profile)
 	                + "/"
-	                + profile.getExternalLoadURLSubdomain().substring(0,
-	    	                profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + assetName
 	                + "/source/";
 

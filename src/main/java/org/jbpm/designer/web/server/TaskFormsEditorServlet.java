@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /** 
  * 
@@ -69,20 +69,20 @@ public class TaskFormsEditorServlet extends HttpServlet {
 	 }
 	 
 	 private String storeTaskFormToGuvnor(String taskName, String packageName, IDiagramProfile profile, String formValue) throws Exception{
-		 String taskFormURL = ExternalInfo.getExternalProtocol(profile)
+		 String taskFormURL = RepositoryInfo.getRepositoryProtocol(profile)
 	                + "://"
-	                + ExternalInfo.getExternalHost(profile)
+	                + RepositoryInfo.getRepositoryHost(profile)
 	                + "/"
-	                + profile.getExternalLoadURLSubdomain().substring(0,
-	                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + URLEncoder.encode(taskName, "UTF-8") + TASKFORM_NAME_EXTENSION;
 
-		String createNewURL = ExternalInfo.getExternalProtocol(profile)
+		String createNewURL = RepositoryInfo.getRepositoryProtocol(profile)
 				+ "://"
-				+ ExternalInfo.getExternalHost(profile)
+				+ RepositoryInfo.getRepositoryHost(profile)
 				+ "/"
-				+ profile.getExternalLoadURLSubdomain().substring(0,
-						profile.getExternalLoadURLSubdomain().indexOf("/"))
+				+ RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+						RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 				+ "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/";
 		
         URL checkURL = new URL(taskFormURL);
@@ -125,20 +125,20 @@ public class TaskFormsEditorServlet extends HttpServlet {
 	 
 	 private String getTaskFormFromGuvnor(String taskName, String packageName, IDiagramProfile profile) {
 		 try {
-			 	String taskFormURL = ExternalInfo.getExternalProtocol(profile)
+			 	String taskFormURL = RepositoryInfo.getRepositoryProtocol(profile)
 		                + "://"
-		                + ExternalInfo.getExternalHost(profile)
+		                + RepositoryInfo.getRepositoryHost(profile)
 		                + "/"
-		                + profile.getExternalLoadURLSubdomain().substring(0,
-		                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+		                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+		                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 		                + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + URLEncoder.encode(taskName, "UTF-8") + TASKFORM_NAME_EXTENSION;
 				
-				String taskFormSourceURL = ExternalInfo.getExternalProtocol(profile)
+				String taskFormSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
 		                + "://"
-		                + ExternalInfo.getExternalHost(profile)
+		                + RepositoryInfo.getRepositoryHost(profile)
 		                + "/"
-		                + profile.getExternalLoadURLSubdomain().substring(0,
-		                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+		                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+		                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 		                + "/rest/packages/"+ URLEncoder.encode(packageName, "UTF-8") + "/assets/" + URLEncoder.encode(taskName, "UTF-8") + TASKFORM_NAME_EXTENSION
 		                + "/source/";
 				

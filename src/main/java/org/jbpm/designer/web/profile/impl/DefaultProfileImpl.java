@@ -39,6 +39,7 @@ import org.eclipse.emf.ecore.resource.ResourceSet;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.ecore.xmi.XMLResource;
 import org.jboss.drools.impl.DroolsFactoryImpl;
+import org.jbpm.designer.repository.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,13 +69,15 @@ public class DefaultProfileImpl implements IDiagramProfile {
 
 
     private String _stencilSet;
-    private String _externalLoadHost;
-    private String _externalLoadProtocol;
-    private String _externalLoadSubdomain;
-    private String _usr;
-    private String _pwd;
     private String _localHistoryEnabled;
     private String _localHistoryTimeout;
+    private String _repositoryId;
+    private String _repositoryRoot;
+    private String _repositoryHost;
+    private String _repositoryProtocol;
+    private String _repositorySubdomain;
+    private String _repositoryUsr;
+    private String _repositoryPwd;
     
     public DefaultProfileImpl(ServletContext servletContext) {
         this(servletContext, true);
@@ -149,25 +152,33 @@ public class DefaultProfileImpl implements IDiagramProfile {
     public String getSerializedModelExtension() {
         return "bpmn";
     }
-    
-    public String getExternalLoadURLProtocol() {
-        return _externalLoadProtocol;
+
+    public String getRepositoryId() {
+        return _repositoryId;
     }
 
-    public String getExternalLoadURLHostname() {
-        return _externalLoadHost;
+    public String getRepositoryRoot() {
+        return _repositoryRoot;
     }
 
-    public String getExternalLoadURLSubdomain() {
-        return _externalLoadSubdomain;
-    }
-    
-    public String getUsr() {
-        return _usr;
+    public String getRepositoryHost() {
+        return _repositoryHost;
     }
 
-    public String getPwd() {
-        return _pwd;
+    public String getRepositoryProtocol() {
+        return _repositoryProtocol;
+    }
+
+    public String getRepositorySubdomain() {
+        return _repositorySubdomain;
+    }
+
+    public String getRepositoryUsr() {
+        return _repositoryUsr;
+    }
+
+    public String getRepositoryPwd() {
+        return _repositoryPwd;
     }
 
     public String getLocalHistoryEnabled() {
@@ -176,6 +187,11 @@ public class DefaultProfileImpl implements IDiagramProfile {
 
     public String getLocalHistoryTimeout() {
         return _localHistoryTimeout;
+    }
+
+    public Repository getRepository() {
+        // TODO
+        return null;
     }
     
     public IDiagramMarshaller createMarshaller() {

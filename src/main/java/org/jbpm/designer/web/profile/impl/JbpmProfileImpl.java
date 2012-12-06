@@ -22,6 +22,7 @@ import org.codehaus.jackson.JsonParseException;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.emf.common.util.URI;
 import org.jboss.drools.DroolsPackage;
+import org.jbpm.designer.repository.Repository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,14 +55,16 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private Map<String, IDiagramPlugin> _plugins = new LinkedHashMap<String, IDiagramPlugin>();
 
     private String _stencilSet;
-    private String _externalLoadHost;
-    private String _externalLoadProtocol;
-    private String _externalLoadSubdomain;
-    private String _usr;
-    private String _pwd;
     private String _localHistoryEnabled;
     private String _localHistoryTimeout;
-    
+    private String _repositoryId;
+    private String _repositoryRoot;
+    private String _repositoryHost;
+    private String _repositoryProtocol;
+    private String _repositorySubdomain;
+    private String _repositoryUsr;
+    private String _repositoryPwd;
+
     public JbpmProfileImpl(ServletContext servletContext) {
         this(servletContext, true);
     }
@@ -116,53 +119,58 @@ public class JbpmProfileImpl implements IDiagramProfile {
                             }
                         }
                         _plugins.put(name, registry.get(name));
-                    } else if ("externalloadurl".equals(reader.getLocalName())) {
+                    } else if ("repository".equals(reader.getLocalName())) {
                         for (int i = 0 ; i < reader.getAttributeCount() ; i++) {
-                            if ("protocol".equals(reader.getAttributeLocalName(i))) {
-                                String extProtocol = reader.getAttributeValue(i);
-                                if(!isEmpty(extProtocol)) {
-                                    _externalLoadProtocol = extProtocol;
+                            if ("id".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryId = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryId)) {
+                                    _repositoryId = repositoryId;
                                 } else {
-                                    _logger.info("Invalid protocol specified");
+                                    _logger.info("Invalid repository id specified");
                                 }
-                                _externalLoadProtocol = reader.getAttributeValue(i);
+                            }
+                            if ("root".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryRoot = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryRoot)) {
+                                    _repositoryRoot = repositoryRoot;
+                                }
+                            }
+                            if ("protocol".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryProtocol = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryProtocol)) {
+                                    _repositoryProtocol = repositoryProtocol;
+                                }
                             }
                             if ("host".equals(reader.getAttributeLocalName(i))) {
-                                String exthost = reader.getAttributeValue(i);
-                                if(!isEmpty(exthost)) {
-                                    _externalLoadHost = exthost;
-                                } else {
-                                   _logger.info("Invalid host specified");
+                                String repositoryHost = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryHost)) {
+                                    _repositoryHost = repositoryHost;
                                 }
                             }
                             if ("subdomain".equals(reader.getAttributeLocalName(i))) {
-                                String extsub = reader.getAttributeValue(i);
-                                if(!isEmpty(extsub)) {
-                                    if(extsub.startsWith("/")) {
-                                        extsub = extsub.substring(1);
+                                String repositorySubdomain = reader.getAttributeValue(i);
+                                if(!isEmpty(repositorySubdomain)) {
+                                    if(repositorySubdomain.startsWith("/")) {
+                                        repositorySubdomain = repositorySubdomain.substring(1);
                                     } 
-                                    if(extsub.endsWith("/")) {
-                                        extsub = extsub.substring(0,extsub.length() - 1);
+                                    if(repositorySubdomain.endsWith("/")) {
+                                        repositorySubdomain = repositorySubdomain.substring(0, repositorySubdomain.length() - 1);
                                     }
-                                    _externalLoadSubdomain = extsub;
-                                } else {
-                                    _logger.info("Invalid subdomain specified");
+                                    _repositorySubdomain = repositorySubdomain;
                                 }
                             }
                             if ("usr".equals(reader.getAttributeLocalName(i))) {
-                                String extUsr = reader.getAttributeValue(i);
-                                if(!isEmpty(extUsr)) {
-                                    _usr = extUsr;
-                                } else {
-                                    _logger.info("Invalid usr specified");
+                                String repositoryUsr = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryUsr)) {
+                                    _repositoryUsr = repositoryUsr;
                                 }
                             }
                             if ("pwd".equals(reader.getAttributeLocalName(i))) {
                                 // allow any value for pwd
-                                _pwd = reader.getAttributeValue(i);
+                                _repositoryPwd = reader.getAttributeValue(i);
                             }
                         }
-                    } else if ("localhostory".equals(reader.getLocalName())) {
+                    } else if ("localhistory".equals(reader.getLocalName())) {
                         for (int i = 0 ; i < reader.getAttributeCount() ; i++) {
                             if ("enabled".equals(reader.getAttributeLocalName(i))) {
                                 String localhistoryenabled = reader.getAttributeValue(i);
@@ -199,25 +207,33 @@ public class JbpmProfileImpl implements IDiagramProfile {
     public String getSerializedModelExtension() {
         return "bpmn";
     }
-      
-    public String getExternalLoadURLProtocol() {
-        return _externalLoadProtocol;
+
+    public String getRepositoryId() {
+        return _repositoryId;
     }
 
-    public String getExternalLoadURLHostname() {
-        return _externalLoadHost;
+    public String getRepositoryRoot() {
+        return _repositoryRoot;
     }
 
-    public String getExternalLoadURLSubdomain() {
-        return _externalLoadSubdomain;
+    public String getRepositoryHost() {
+        return _repositoryHost;
     }
 
-    public String getUsr() {
-        return _usr;
+    public String getRepositoryProtocol() {
+        return _repositoryProtocol;
     }
 
-    public String getPwd() {
-        return _pwd;
+    public String getRepositorySubdomain() {
+        return _repositorySubdomain;
+    }
+
+    public String getRepositoryUsr() {
+        return _repositoryUsr;
+    }
+
+    public String getRepositoryPwd() {
+        return _repositoryPwd;
     }
 
     public String getLocalHistoryEnabled() {
@@ -226,6 +242,11 @@ public class JbpmProfileImpl implements IDiagramProfile {
 
     public String getLocalHistoryTimeout() {
         return _localHistoryTimeout;
+    }
+
+    public Repository getRepository() {
+        // TODO
+        return null;
     }
     
     public IDiagramMarshaller createMarshaller() {

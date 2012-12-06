@@ -19,17 +19,14 @@ import javax.servlet.http.HttpServletResponse;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.apache.abdera.i18n.text.Sanitizer;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.drools.core.util.ConfFileUtils;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jbpm.process.workitem.WorkDefinitionImpl;
 import org.jbpm.process.workitem.WorkItemRepository;
 import org.json.JSONObject;
-
-import org.apache.commons.codec.binary.Base64;
 
 /**
  * Servlet for interaction with the jbpm service repository.
@@ -163,8 +160,8 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
 						List<String> packageNames = findPackages(uuid, profile);
 						
 						for(String nextPackage : packageNames) {
-							String packageAssetURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-									"/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+							String packageAssetURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+									"/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
 									"/rest/packages/" + URLEncoder.encode(nextPackage, "UTF-8") + "/assets/";
 							try {
 								XMLInputFactory factory = XMLInputFactory.newInstance();
@@ -189,27 +186,27 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
 							} 
 						}
 						if(gotPackage) {
-							String widURL = ExternalInfo.getExternalProtocol(profile)
+							String widURL = RepositoryInfo.getRepositoryProtocol(profile)
 						               + "://"
-						               + ExternalInfo.getExternalHost(profile)
+						               + RepositoryInfo.getRepositoryHost(profile)
 						               + "/"
-						               + profile.getExternalLoadURLSubdomain().substring(0,
-						                       profile.getExternalLoadURLSubdomain().indexOf("/"))
+						               + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+						                       RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 						               + "/rest/packages/" + URLEncoder.encode(pkg, "UTF-8") + "/assets/" + widName + ".wid";
-							String iconURL = ExternalInfo.getExternalProtocol(profile)
+							String iconURL = RepositoryInfo.getRepositoryProtocol(profile)
 						               + "://"
-						               + ExternalInfo.getExternalHost(profile)
+						               + RepositoryInfo.getRepositoryHost(profile)
 						               + "/"
-						               + profile.getExternalLoadURLSubdomain().substring(0,
-						                       profile.getExternalLoadURLSubdomain().indexOf("/"))
+						               + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+						                       RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 						               + "/rest/packages/" + URLEncoder.encode(pkg, "UTF-8") + "/assets/" + iconName;
 							
-							String packageAssetsURL = ExternalInfo.getExternalProtocol(profile)
+							String packageAssetsURL = RepositoryInfo.getRepositoryProtocol(profile)
 					                   + "://"
-					                   + ExternalInfo.getExternalHost(profile)
+					                   + RepositoryInfo.getRepositoryHost(profile)
 					                   + "/"
-					                   + profile.getExternalLoadURLSubdomain().substring(0,
-					                           profile.getExternalLoadURLSubdomain().indexOf("/"))
+					                   + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+					                           RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 					                   + "/rest/packages/" + URLEncoder.encode(pkg, "UTF-8") + "/assets/";
 								
 								
@@ -323,8 +320,8 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
 
 	private List<String> findPackages(String uuid, IDiagramProfile profile) {
 		List<String> packages = new ArrayList<String>();
-		String packagesURL = ExternalInfo.getExternalProtocol(profile) + "://" + ExternalInfo.getExternalHost(profile) +
-				"/" + profile.getExternalLoadURLSubdomain().substring(0, profile.getExternalLoadURLSubdomain().indexOf("/")) +
+		String packagesURL = RepositoryInfo.getRepositoryProtocol(profile) + "://" + RepositoryInfo.getRepositoryHost(profile) +
+				"/" + RepositoryInfo.getRepositorySubdomain(profile).substring(0, RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) +
 				"/rest/packages/";
 		try {
 			XMLInputFactory factory = XMLInputFactory.newInstance();

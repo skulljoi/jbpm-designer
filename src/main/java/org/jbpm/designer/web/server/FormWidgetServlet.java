@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.json.JSONObject;
 
 public class FormWidgetServlet extends HttpServlet {
@@ -56,12 +56,12 @@ public class FormWidgetServlet extends HttpServlet {
 			resp.setContentType("application/json");
 			resp.getWriter().write(jsonObject.toString());
 		} else if(action != null && action.equals("getwidgetsource")) {
-			String widgetSourceURL = ExternalInfo.getExternalProtocol(profile)
+			String widgetSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
 					+ "://"
-	                + ExternalInfo.getExternalHost(profile)
+	                + RepositoryInfo.getRepositoryHost(profile)
 	                + "/"
-	                + profile.getExternalLoadURLSubdomain().substring(0,
-	                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+	                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 	                + "/rest/packages/globalArea/assets/" + widgetName 
 	                + "/source/";
 			resp.setCharacterEncoding("UTF-8");

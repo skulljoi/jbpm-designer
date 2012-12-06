@@ -22,7 +22,7 @@ import org.jbpm.designer.bpmn2.impl.Bpmn2JsonUnmarshaller;
 import org.jbpm.designer.taskforms.TaskFormInfo;
 import org.jbpm.designer.taskforms.TaskFormTemplateManager;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /** 
  * 
@@ -79,10 +79,10 @@ public class TaskFormsServlet extends HttpServlet {
             StringTemplateGroup templates = new StringTemplateGroup("resultsgroup", templateManager.getTemplatesPath());
             StringTemplate resultsForm = templates.getInstanceOf("resultsform");
             resultsForm.setAttribute("manager", templateManager);
-            resultsForm.setAttribute("profile", ExternalInfo.getExternalProtocol(profile));
-            resultsForm.setAttribute("host", ExternalInfo.getExternalHost(profile));
-            resultsForm.setAttribute("subdomain", profile.getExternalLoadURLSubdomain().substring(0,
-                profile.getExternalLoadURLSubdomain().indexOf("/")));
+            resultsForm.setAttribute("profile", RepositoryInfo.getRepositoryProtocol(profile));
+            resultsForm.setAttribute("host", RepositoryInfo.getRepositoryHost(profile));
+            resultsForm.setAttribute("subdomain", RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")));
             ServletOutputStream outstr = resp.getOutputStream();
             resp.setContentType("text/html");
             outstr.write(resultsForm.toString().getBytes("UTF-8"));
@@ -114,20 +114,20 @@ public class TaskFormsServlet extends HttpServlet {
     
     public void storeTaskForm(TaskFormInfo taskForm, IDiagramProfile profile) throws Exception {
         try {
-			String formURL = ExternalInfo.getExternalProtocol(profile)
+			String formURL = RepositoryInfo.getRepositoryProtocol(profile)
 			+ "://"
-			+ ExternalInfo.getExternalHost(profile)
+			+ RepositoryInfo.getRepositoryHost(profile)
 			+ "/"
-			+ profile.getExternalLoadURLSubdomain().substring(0,
-			        profile.getExternalLoadURLSubdomain().indexOf("/"))
+			+ RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+			        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 			+ "/rest/packages/" + URLEncoder.encode(taskForm.getPkgName(), "UTF-8") + "/assets/" + URLEncoder.encode(taskForm.getId(), "UTF-8");
 			
-			String createNewURL = ExternalInfo.getExternalProtocol(profile)
+			String createNewURL = RepositoryInfo.getRepositoryProtocol(profile)
 			+ "://"
-			+ ExternalInfo.getExternalHost(profile)
+			+ RepositoryInfo.getRepositoryHost(profile)
 			+ "/"
-			+ profile.getExternalLoadURLSubdomain().substring(0,
-			        profile.getExternalLoadURLSubdomain().indexOf("/"))
+			+ RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+			        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
 			+ "/rest/packages/" + URLEncoder.encode(taskForm.getPkgName(), "UTF-8") + "/assets/";
 			
 			// check if the task form already exists

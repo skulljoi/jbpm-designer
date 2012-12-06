@@ -16,7 +16,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.log4j.Logger;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.json.JSONObject;
 
 /**
@@ -65,20 +65,20 @@ public class ThemeServlet extends HttpServlet {
 	
 	private String getThemeJson(IDiagramProfile profile, ServletContext servletContext) {
 		String retStr = "";
-		String themesURL = ExternalInfo.getExternalProtocol(profile)
+		String themesURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME;
     	
-    	String themesSourceURL = ExternalInfo.getExternalProtocol(profile)
+    	String themesSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME + "/source";
     	
     	
@@ -105,20 +105,20 @@ public class ThemeServlet extends HttpServlet {
 	
 	private String getThemeNames(IDiagramProfile profile) {
 		String themesStr = "";
-		String themesURL = ExternalInfo.getExternalProtocol(profile)
+		String themesURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME;
     	
-    	String themesSourceURL = ExternalInfo.getExternalProtocol(profile)
+    	String themesSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
                 + "://"
-                + ExternalInfo.getExternalHost(profile)
+                + RepositoryInfo.getRepositoryHost(profile)
                 + "/"
-                + profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/"))
+                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
                 + "/rest/packages/globalArea/assets/" + THEME_NAME + "/source";
     	
         try {

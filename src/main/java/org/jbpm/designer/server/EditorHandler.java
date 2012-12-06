@@ -51,8 +51,8 @@ import org.jbpm.designer.web.preprocessing.IDiagramPreprocessingUnit;
 import org.jbpm.designer.web.preprocessing.impl.PreprocessingServiceImpl;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.IDiagramProfileService;
-import org.jbpm.designer.web.profile.impl.ExternalInfo;
 import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jdom.Document;
 import org.jdom.Element;
 import org.jdom.JDOMException;
@@ -433,14 +433,14 @@ public class EditorHandler extends HttpServlet {
                 resultHtml.append(preprocessingUnit == null ? "" : preprocessingUnit.getOutData());
                 replacementMade = true;    
             } else if ("externalprotocol".equals(elt)) {
-                resultHtml.append(ExternalInfo.getExternalProtocol(profile));
+                resultHtml.append(RepositoryInfo.getRepositoryProtocol(profile));
                 replacementMade = true;    
             } else if ("externalhost".equals(elt)) {
-                resultHtml.append(ExternalInfo.getExternalHost(profile));
+                resultHtml.append(RepositoryInfo.getRepositoryHost(profile));
                 replacementMade = true;    
             } else if ("externalsubdomain".equals(elt)) {
-                resultHtml.append(profile.getExternalLoadURLSubdomain().substring(0,
-                        profile.getExternalLoadURLSubdomain().indexOf("/")));
+                resultHtml.append(RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")));
                 replacementMade = true;    
             } else if ("localhistoryenabled".equals(elt)) {
                 resultHtml.append(profile.getLocalHistoryEnabled());
@@ -585,7 +585,7 @@ public class EditorHandler extends HttpServlet {
     
     /**
      * Compress a list of js files into one combined string
-     * @param a list of js files
+     * @param plugins list of js files
      * @return a string that contains all the compressed data
      * @throws EvaluatorException
      * @throws IOException

@@ -47,8 +47,9 @@
         <plugin name="ORYX.Plugins.PatternCreator"/>
         <plugin name="ORYX.Plugins.LocalHistory"/>
         <plugin name="ORYX.Plugins.NotificationsPlugin"/>
-        <externalloadurl protocol="http" host="localhost:8080"
-                         subdomain="drools-guvnor/org.drools.guvnor.Guvnor/oryxeditor" usr="admin" pwd="admin"/>
-        <localhostory enabled="true" timeout="60000"/>
+        <localhistory enabled="true" timeout="60000"/>
+        <!-- <repository id="vfs" root="/tmp/"/>  -->
+        <repository id="guvnor" protocol="http" host="localhost:8080"
+                    subdomain="drools-guvnor/org.drools.guvnor.Guvnor/oryxeditor" usr="admin" pwd="admin"/>
     </profile>
 </profiles>
