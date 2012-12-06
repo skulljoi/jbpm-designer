@@ -33,6 +33,7 @@ import org.jbpm.designer.web.profile.IDiagramProfileService;
  * a service to register profiles.
  * 
  * @author Antoine Toulme
+ * @author Tihomir Surdilovic
  * 
  */
 public class ProfileServiceImpl implements IDiagramProfileService {
@@ -43,6 +44,8 @@ public class ProfileServiceImpl implements IDiagramProfileService {
         new HashMap<String, IDiagramProfile>();
     private Set<IDiagramProfileFactory> _factories = 
         new HashSet<IDiagramProfileFactory>();
+    private IDiagramProfile userProfile;
+    private IDiagramProfile defaultUserProfile;
     
     /**
      * Initialize the service with a context
@@ -53,7 +56,8 @@ public class ProfileServiceImpl implements IDiagramProfileService {
         _registry.put("jbpm", new JbpmProfileImpl(context));
         _registry.put("drools", new JbpmProfileImpl(context));
         _registry.put("epn", new EpnProfileImpl(context));
-        
+
+        defaultUserProfile = new JbpmProfileImpl((context));
     }
     
     private Map<String, IDiagramProfile> assembleProfiles(HttpServletRequest request) {
@@ -69,7 +73,8 @@ public class ProfileServiceImpl implements IDiagramProfileService {
     }
     
     public IDiagramProfile findProfile(HttpServletRequest request, String name) {
-        return assembleProfiles(request).get(name);
+        userProfile =  assembleProfiles(request).get(name);
+        return userProfile;
     }
 
     public Collection<IDiagramProfile> getProfiles(HttpServletRequest request) {
@@ -80,5 +85,8 @@ public class ProfileServiceImpl implements IDiagramProfileService {
     	return _factories;
     }
 
-    
+    public IDiagramProfile getUserProfile() {
+        return userProfile != null ? userProfile : defaultUserProfile;
+    }
+
 }
