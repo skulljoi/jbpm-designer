@@ -5,6 +5,12 @@ package org.jbpm.designer.repository;
  */
 public interface Asset<T> extends Item {
 
+
+    public enum AssetType {
+        Text,
+        Byte;
+    }
+
     /**
      * Returns location in the repository where this asset is stored
      * @return - asset location

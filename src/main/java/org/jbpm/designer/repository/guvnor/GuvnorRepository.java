@@ -18,6 +18,18 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
+    public String storeDirectory(String location) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean directoryExists(String directory) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean deleteDirectory(String directory, boolean failIfNotEmpty) {
+        throw new UnsupportedOperationException();
+    }
+
     public Collection<Asset> listAssets(String location) {
         throw new UnsupportedOperationException();
     }

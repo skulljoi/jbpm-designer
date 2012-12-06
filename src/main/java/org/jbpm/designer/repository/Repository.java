@@ -14,6 +14,7 @@ public interface Repository {
 
     /**
      * Retrieves all directories stored under <code>startAt</code> location.
+     * NOTE: Directory should be always relative to the repository root
      * @param startAt - location where directories should be fetched from
      * @return - list of directories
      */
@@ -21,10 +22,36 @@ public interface Repository {
 
     /**
      * Retrieves all directories stored under <code>startAt</code> location including all sub folders.
+     * NOTE: Directory should be always relative to the repository root
      * @param startAt - location where directories should be fetched from
      * @return - list of directories
      */
     Map<String, Collection<Asset>> listDirectoriesRecursively(String startAt);
+
+    /**
+     * Stores new directory in given location, in case of sub folders existence in the location
+     * all sub folders are created as well.
+     * @param location - location in the repository to be created
+     * @return - returns identifier of the new directory
+     */
+    String storeDirectory(String location);
+
+    /**
+     * Examines repository if given directory exists in the repository
+     * NOTE: Directory should be always relative to the repository root
+     * @param directory - directory to check
+     * @return - true if and only if given directory exists
+     */
+    boolean directoryExists(String directory);
+
+    /**
+     * Deletes directory from repository including its content
+     * NOTE: Directory should be always relative to the repository root
+     * @param directory - directory to be deleted
+     * @param failIfNotEmpty - indicates if delete operation should fail in case given directory is not empty
+     * @return
+     */
+    boolean deleteDirectory(String directory, boolean failIfNotEmpty);
 
     /**
      * Retrieves all assets stored in the given location.
