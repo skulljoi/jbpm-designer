@@ -58,28 +58,4 @@ public class GuvnorRepository implements Repository {
     public boolean assetExists(String assetUniqueId) {
         throw new UnsupportedOperationException();
     }
-
-    public Collection<Widget> listWidgets() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Collection<Widget> listWidgets(Filter filter) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Widget loadWidget(String widgetUniqueId) throws WidgetNotFoundException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String storeWidget(Widget widget) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean deleteWidget(String widgetUniqueId) throws WidgetNotFoundException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean widgetExists(String widgetUniqueId) {
-        throw new UnsupportedOperationException();
-    }
 }

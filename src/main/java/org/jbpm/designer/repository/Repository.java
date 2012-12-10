@@ -7,7 +7,6 @@ import java.util.Map;
  * Repository is responsible for managing its components that are as follows:
  * <ul>
  *     <li>Asset - component that can be of any type and is stored in a custom location</li>
- *     <li>Widget - component that is considered global and usually with reusable and is stored in predefined location</li>
  * </ul>
  */
 public interface Repository {
@@ -101,49 +100,4 @@ public interface Repository {
      */
     boolean assetExists(String assetUniqueId);
 
-    /**
-     * Retrieves all widgets
-     * NOTE: this will not fetch the actual content of the widget but only its meta data
-     * @return - returns list of available widgets in the repository
-     */
-    Collection<Widget> listWidgets();
-
-    /**
-     * Retrieves all widgets filtered by the given filter
-     * NOTE: this will not fetch the actual content of the widget but only its meta data
-     * @param filter -  allows to defined filter criteria to fetch only widgets of interest
-     * @return - returns list of available widgets in the repository
-     */
-    Collection<Widget> listWidgets(Filter filter);
-
-    /**
-     * Loads widget given by <code>widgetUniqueId</code> including its content
-     * @param widgetUniqueId - unique identifier of the widget
-     * @return - loaded widget including its content
-     * @throws WidgetNotFoundException - thrown in case Widget given by widgetUniqueId was not found
-     */
-    Widget loadWidget(String widgetUniqueId) throws WidgetNotFoundException;
-
-    /**
-     * Stores given widget in the repository. <code>widget</code> need to have all meta data and content available
-     * for the operation to successfully complete.
-     * @param widget - widget to be stored
-     * @return - return unique widget identifier that can be used to locate it
-     */
-    String storeWidget(Widget widget);
-
-    /**
-     * Deletes widget from repository identified by <code>widgetUniqueId</code>
-     * @param widgetUniqueId - unique identifier of the widget
-     * @return - true if and only if operation was successful otherwise false
-     * @throws WidgetNotFoundException - thrown in case widget given by widgetUniqueId was not found
-     */
-    boolean deleteWidget(String widgetUniqueId) throws WidgetNotFoundException;
-
-    /**
-     * Examines repository if widget given by <code>widgetUniqueId</code> exists
-     * @param widgetUniqueId - unique identifier of the widget
-     * @return true if and only if widget exists otherwise false
-     */
-    boolean widgetExists(String widgetUniqueId);
 }

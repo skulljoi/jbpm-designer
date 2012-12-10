@@ -13,10 +13,7 @@ import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.kie.commons.io.IOService;
 import org.kie.commons.io.impl.IOServiceDotFileImpl;
 import org.kie.commons.java.nio.IOException;
-import org.kie.commons.java.nio.file.DirectoryStream;
-import org.kie.commons.java.nio.file.NoSuchFileException;
-import org.kie.commons.java.nio.file.Path;
-import org.kie.commons.java.nio.file.Paths;
+import org.kie.commons.java.nio.file.*;
 import org.kie.commons.java.nio.file.attribute.BasicFileAttributes;
 import org.kie.commons.java.nio.file.attribute.FileAttribute;
 
@@ -48,7 +45,7 @@ public class VFSRepository implements Repository {
         DirectoryStream<Path> directories = ioService.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
 
             public boolean accept( final Path entry ) throws IOException {
-                if ( entry.toFile().isDirectory() ) {
+                if ( Files.isDirectory(entry) ) {
                     return true;
                 }
                 return false;
@@ -108,7 +105,7 @@ public class VFSRepository implements Repository {
         DirectoryStream<Path> directories = ioService.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
 
             public boolean accept( final Path entry ) throws IOException {
-                if ( entry.toFile().isFile() ) {
+                if (!Files.isDirectory(entry)) {
                     return true;
                 }
                 return false;
@@ -139,7 +136,7 @@ public class VFSRepository implements Repository {
 
     public String storeAsset(Asset asset) {
         Path filePath = Paths.get(repositoryRootPath.toString() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()), asset.getName());
-        System.out.println(filePath.toString());
+
         filePath = ioService.createFile(filePath, null);
         if(((AbstractAsset)asset).acceptBytes()) {
             ioService.write(filePath, ((Asset<byte[]>)asset).getAssetContent(), null);
@@ -164,30 +161,6 @@ public class VFSRepository implements Repository {
 
     public boolean assetExists(String assetUniqueId) {
         return ioService.exists(Paths.get(URI.create(assetUniqueId)));
-    }
-
-    public Collection<Widget> listWidgets() {
-        throw new UnsupportedOperationException();
-    }
-
-    public Collection<Widget> listWidgets(Filter filter) {
-        throw new UnsupportedOperationException();
-    }
-
-    public Widget loadWidget(String widgetUniqueId) throws WidgetNotFoundException {
-        throw new UnsupportedOperationException();
-    }
-
-    public String storeWidget(Widget widget) {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean deleteWidget(String widgetUniqueId) throws WidgetNotFoundException {
-        throw new UnsupportedOperationException();
-    }
-
-    public boolean widgetExists(String widgetUniqueId) {
-        throw new UnsupportedOperationException();
     }
 
     protected Asset buildAsset(Path file, boolean loadContent) {
