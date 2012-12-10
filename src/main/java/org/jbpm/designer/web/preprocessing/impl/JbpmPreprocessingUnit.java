@@ -107,7 +107,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
         return outData;
     }
     
-    public void preprocess(HttpServletRequest req, HttpServletResponse res, IDiagramProfile profile) {
+    public void preprocess(HttpServletRequest req, HttpServletResponse res, IDiagramProfile profile, ServletContext serlvetContext) {
         String uuid = req.getParameter("uuid");
         outData = "";
         Map<String, ThemeInfo> themeData = setupThemes(profile, req);

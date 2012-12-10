@@ -325,7 +325,7 @@ public class EditorHandler extends HttpServlet {
                     "Performing diagram information pre-processing steps. ");
             }
             preprocessingUnit = _preProcessingService.findPreprocessingUnit(request, profile);
-            preprocessingUnit.preprocess(request, response, profile);
+            preprocessingUnit.preprocess(request, response, profile, getServletContext());
         }
 
         //output env javascript files

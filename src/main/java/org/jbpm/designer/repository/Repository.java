@@ -78,6 +78,14 @@ public interface Repository {
     Asset loadAsset(String assetUniqueId) throws AssetNotFoundException;
 
     /**
+     * Loads an asset given by the <code>path</code> including actual content of the asset.
+     * @param path - complete path of the asset to load (relative to the repository root)
+     * @return return loaded asset including content
+     * @throws AssetNotFoundException - throws in case of asset given by id does not exist
+     */
+    Asset loadAssetFromPath(String path) throws AssetNotFoundException;
+
+    /**
      * Stores given asset in the repository. <code>asset</code> need to have all meta data and content available
      * for the operation to successfully complete.
      * @param asset - asset to be stored

@@ -47,6 +47,10 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
+    public Asset loadAssetFromPath(String path) throws AssetNotFoundException {
+        throw new UnsupportedOperationException();
+    }
+
     public String storeAsset(Asset asset) {
         throw new UnsupportedOperationException();
     }

@@ -1,12 +1,6 @@
 package org.jbpm.designer.repository.vfs;
 
 import org.jbpm.designer.repository.*;
-
-import java.io.File;
-import java.net.URI;
-import java.nio.charset.Charset;
-import java.util.*;
-
 import org.jbpm.designer.repository.impl.AbstractAsset;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
@@ -15,10 +9,13 @@ import org.kie.commons.io.impl.IOServiceDotFileImpl;
 import org.kie.commons.java.nio.IOException;
 import org.kie.commons.java.nio.file.*;
 import org.kie.commons.java.nio.file.attribute.BasicFileAttributes;
-import org.kie.commons.java.nio.file.attribute.FileAttribute;
 
-import static org.kie.commons.io.FileSystemType.Bootstrap.*;
-import static org.kie.commons.validation.PortablePreconditions.*;
+import java.io.File;
+import java.net.URI;
+import java.nio.charset.Charset;
+import java.util.*;
+
+import static org.kie.commons.io.FileSystemType.Bootstrap.BOOTSTRAP_INSTANCE;
 
 public class VFSRepository implements Repository {
 
@@ -121,8 +118,23 @@ public class VFSRepository implements Repository {
         return foundDirectories;
     }
 
-    public Collection<Asset> listAssets(String location, Filter filter) {
-        throw new UnsupportedOperationException();
+    public Collection<Asset> listAssets(String location, final Filter filter) {
+        Path path = Paths.get(repositoryRoot.toString() + location);
+        DirectoryStream<Path> directories = ioService.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
+
+            public boolean accept( final Path entry ) throws IOException {
+
+                return filter.accept(entry);
+            }
+        });
+        Collection<Asset> foundDirectories = new ArrayList<Asset>();
+        Iterator<Path> it = directories.iterator();
+        while (it.hasNext()) {
+            Asset asset = buildAsset(it.next(), false);
+            foundDirectories.add(asset);
+        }
+
+        return foundDirectories;
     }
 
     public Asset loadAsset(String assetUniqueId) throws AssetNotFoundException {
@@ -132,6 +144,17 @@ public class VFSRepository implements Repository {
         Asset asset = buildAsset(assetPath, true);
 
         return asset;
+    }
+
+    public Asset loadAssetFromPath(String location) throws AssetNotFoundException {
+        Path path = Paths.get(repositoryRoot.toString() + location);
+
+        if (ioService.exists(path)) {
+            return loadAsset(path.toUri().toString());
+        } else {
+            throw new AssetNotFoundException();
+        }
+
     }
 
     public String storeAsset(Asset asset) {
