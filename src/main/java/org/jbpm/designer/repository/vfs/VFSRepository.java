@@ -158,7 +158,7 @@ public class VFSRepository implements Repository {
     }
 
     public String storeAsset(Asset asset) {
-        Path filePath = Paths.get(repositoryRootPath.toString() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()), asset.getName());
+        Path filePath = Paths.get(repositoryRootPath.toString() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()), asset.getFullName());
 
         filePath = ioService.createFile(filePath, null);
         if(((AbstractAsset)asset).acceptBytes()) {
@@ -183,7 +183,11 @@ public class VFSRepository implements Repository {
     }
 
     public boolean assetExists(String assetUniqueId) {
-        return ioService.exists(Paths.get(URI.create(assetUniqueId)));
+        try {
+            return ioService.exists(Paths.get(URI.create(assetUniqueId)));
+        } catch (Exception e) {
+            return ioService.exists(Paths.get(this.repositoryRoot.toString() + assetUniqueId));
+        }
     }
 
     protected Asset buildAsset(Path file, boolean loadContent) {
@@ -194,7 +198,6 @@ public class VFSRepository implements Repository {
         AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(file.getFileName().toString());
         BasicFileAttributes attrs = ioService.readAttributes(file, BasicFileAttributes.class);
         assetBuilder.uniqueId(file.toUri().toString())
-                    .name(name)
                     .location(location)
                     .creationDate(attrs.creationTime() == null ? "" : attrs.creationTime().toString())
                     .lastModificationDate(attrs.lastModifiedTime() == null ? "" : attrs.lastModifiedTime().toString())

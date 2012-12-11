@@ -35,11 +35,12 @@ public class AssetBuilderFactory {
 
     public static AssetBuilder getAssetBuilder(String fileName) {
         String extension = fileName.substring(fileName.lastIndexOf(".")+1);
+        String nameOnly = fileName.substring(0, fileName.lastIndexOf("."));
 
         if(binaryFormats.contains(extension)) {
-            return getAssetBuilder(Asset.AssetType.Byte).type(extension);
+            return getAssetBuilder(Asset.AssetType.Byte).type(extension).name(nameOnly);
         } else {
-            return getAssetBuilder(Asset.AssetType.Text).type(extension);
+            return getAssetBuilder(Asset.AssetType.Text).type(extension).name(nameOnly);
         }
     }
 }

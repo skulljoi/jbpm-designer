@@ -168,7 +168,8 @@ public class VFSRepositoryDefaultFileSystemTest {
         Asset<String> asset = assets.iterator().next();
 
         assertEquals("txt", asset.getAssetType());
-        assertEquals("test.txt", asset.getName());
+        assertEquals("test.txt", asset.getFullName());
+        assertEquals("test", asset.getName());
         assertEquals("/", asset.getAssetLocation());
     }
 
@@ -197,7 +198,8 @@ public class VFSRepositoryDefaultFileSystemTest {
         Asset<byte[]> asset = assets.iterator().next();
 
         assertEquals("png", asset.getAssetType());
-        assertEquals("test.png", asset.getName());
+        assertEquals("test.png", asset.getFullName());
+        assertEquals("test", asset.getName());
         assertEquals("/", asset.getAssetLocation());
     }
 
@@ -228,7 +230,8 @@ public class VFSRepositoryDefaultFileSystemTest {
         Asset<String> asset = assets.iterator().next();
 
         assertEquals("txt", asset.getAssetType());
-        assertEquals("test.txt", asset.getName());
+        assertEquals("test", asset.getName());
+        assertEquals("test.txt", asset.getFullName());
         assertEquals("/test/nested/", asset.getAssetLocation());
     }
 
@@ -247,7 +250,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
         builder.content("simple content".getBytes())
                 .type("png")
-                .name("test.png")
+                .name("test")
                 .location("/");
 
         String id = repository.storeAsset(builder.getAsset());
@@ -257,7 +260,8 @@ public class VFSRepositoryDefaultFileSystemTest {
         Asset<byte[]> asset = repository.loadAsset(id);
 
         assertEquals("png", asset.getAssetType());
-        assertEquals("test.png", asset.getName());
+        assertEquals("test", asset.getName());
+        assertEquals("test.png", asset.getFullName());
         assertEquals("/", asset.getAssetLocation());
         assertFalse(asset.getAssetContent().length == 0);
     }
@@ -277,7 +281,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
         builder.content("simple content")
                 .type("txt")
-                .name("test.txt")
+                .name("test")
                 .location("/");
 
         String id = repository.storeAsset(builder.getAsset());
@@ -287,7 +291,8 @@ public class VFSRepositoryDefaultFileSystemTest {
         Asset<String> asset = repository.loadAsset(id);
 
         assertEquals("txt", asset.getAssetType());
-        assertEquals("test.txt", asset.getName());
+        assertEquals("test", asset.getName());
+        assertEquals("test.txt", asset.getFullName());
         assertEquals("/", asset.getAssetLocation());
         assertEquals("simple content\n", asset.getAssetContent());
     }
@@ -307,7 +312,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
         builder.content("simple content")
                 .type("txt")
-                .name("test.txt")
+                .name("test")
                 .location("/");
 
         String id = repository.storeAsset(builder.getAsset());

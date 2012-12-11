@@ -291,8 +291,8 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
             try {
             int extPosition = formWidget.getName().lastIndexOf(".");
     		String extension = formWidget.getName().substring(extPosition + 1);
-
-            createAssetIfNotExisting(repository, "/global/", formWidget.getName(), extension,
+            String name = formWidget.getName().substring(0, extPosition);
+            createAssetIfNotExisting(repository, "/global/", name, extension,
                     getBytesFromFile(formWidget));
 
 
@@ -305,7 +305,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
     private void setupCustomEditors(Repository repository) {
 
         try {
-            createAssetIfNotExisting(repository, "/global/", CUSTOMEDITORS_NAME + CUSTOMEDITORS_EXT, "json",
+            createAssetIfNotExisting(repository, "/global/", CUSTOMEDITORS_NAME, "json",
                     getBytesFromFile(new File(customEditorsInfo)));
 
 		} catch (Exception e) {
@@ -323,7 +323,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
                 AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
                 assetBuilder.content(getBytesFromFile(new File(themeInfo)))
                         .location("/global/")
-                        .name(THEME_NAME + THEME_EXT)
+                        .name(THEME_NAME)
                         .type("json")
                         .version("1.0");
 
@@ -378,13 +378,13 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
 
         try {
 
-            createAssetIfNotExisting(repository, location, "defaultemailicon.gif", "gif",
+            createAssetIfNotExisting(repository, location, "defaultemailicon", "gif",
                     getBytesFromFile(new File(default_emailicon)));
 
-            createAssetIfNotExisting(repository, location, "defaultlogicon.gif", "gif",
+            createAssetIfNotExisting(repository, location, "defaultlogicon", "gif",
                     getBytesFromFile(new File(default_logicon)));
 
-            createAssetIfNotExisting(repository, location, "defaultservicenodeicon.png", "png",
+            createAssetIfNotExisting(repository, location, "defaultservicenodeicon", "png",
                     getBytesFromFile(new File(default_servicenodeicon)));
 
         } catch (Exception e) {
@@ -399,7 +399,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
             // push default configuration wid
             StringTemplate widConfigTemplate = new StringTemplate(readFile(default_widconfigtemplate));
 
-            createAssetIfNotExisting(repository, location, "WorkDefinitions.wid", "wid",
+            createAssetIfNotExisting(repository, location, "WorkDefinitions", "wid",
                     widConfigTemplate.toString().getBytes("UTF-8"));
 
         } catch (Exception e) {

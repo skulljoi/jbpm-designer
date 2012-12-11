@@ -89,6 +89,10 @@ public abstract class AbstractAsset<T> implements Asset<T> {
         this.lastModificationDate = lastModificationDate;
     }
 
+    public String getFullName() {
+        return name + "." + assetTpe;
+    }
+
     public abstract void setAssetContent(T content);
 
     public abstract boolean acceptBytes();

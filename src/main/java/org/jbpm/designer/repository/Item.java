@@ -18,6 +18,13 @@ public interface Item {
     String getName();
 
     /**
+     * Returns full name of the asset that usually is name and type.
+     * e.g. in case of files it's file name and extension.
+     * @return - returns full asset name
+     */
+    String getFullName();
+
+    /**
      * Returns description of the item if present
      * @return - item description
      */
