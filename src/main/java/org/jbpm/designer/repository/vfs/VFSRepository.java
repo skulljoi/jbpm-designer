@@ -159,7 +159,9 @@ public class VFSRepository implements Repository {
 
     public String storeAsset(Asset asset) {
         Path filePath = Paths.get(repositoryRootPath.toString() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()), asset.getFullName());
-
+        if (!ioService.exists(filePath.getParent())) {
+            ioService.createDirectories(filePath.getParent());
+        }
         filePath = ioService.createFile(filePath, null);
         if(((AbstractAsset)asset).acceptBytes()) {
             ioService.write(filePath, ((Asset<byte[]>)asset).getAssetContent(), null);
@@ -170,14 +172,11 @@ public class VFSRepository implements Repository {
         return filePath.toUri().toString();
     }
 
-    public boolean deleteAsset(String assetUniqueId) throws AssetNotFoundException {
+    public boolean deleteAsset(String assetUniqueId) {
 
         try {
-            ioService.delete(Paths.get(URI.create(assetUniqueId)));
-            return true;
-        } catch (NoSuchFileException fe) {
-            throw new AssetNotFoundException();
-        }   catch (Exception e) {
+            return ioService.deleteIfExists(Paths.get(URI.create(assetUniqueId)));
+        } catch (Exception e) {
             return false;
         }
     }

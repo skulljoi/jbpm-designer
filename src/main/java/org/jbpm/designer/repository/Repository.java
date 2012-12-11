@@ -94,12 +94,11 @@ public interface Repository {
     String storeAsset(Asset asset);
 
     /**
-     * Deletes asset from repository identified by <code>assetUniqueId</code>
+     * Deletes asset from repository identified by <code>assetUniqueId</code> if exists
      * @param assetUniqueId - unique identifier of the asset
      * @return return true if and only if operation completed successfully otherwise false
-     * @throws AssetNotFoundException - throws in case of asset with given assetUniqueId does not exist
      */
-    boolean deleteAsset(String assetUniqueId) throws AssetNotFoundException;
+    boolean deleteAsset(String assetUniqueId);
 
     /**
      * Examines repository if asset given by the <code>assetUniqueId</code> exists
