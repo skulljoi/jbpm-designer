@@ -8,7 +8,7 @@
         <plugin name="ORYX.Plugins.JPDLMigration"/>
         <plugin name="ORYX.Plugins.ServiceRepoIntegration"/>
         <plugin name="ORYX.Plugins.Footer"/>
-        <plugin name="ORYX.Plugins.UUIDRepositoryDummySave"/>
+        <plugin name="ORYX.Plugins.SavePlugin"/>
         <plugin name="ORYX.Plugins.ShapeMenuPlugin"/>
         <plugin name="ORYX.Plugins.ShapeRepository"/>
         <plugin name="ORYX.Plugins.PropertyWindow"/>
