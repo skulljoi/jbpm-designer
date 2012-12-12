@@ -39,6 +39,7 @@ public class JbpmServiceRepositoryServletTest {
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
+        profile.setREpositoryGlobalDir("/global");
     }
 
     private void deleteFiles(File directory) {

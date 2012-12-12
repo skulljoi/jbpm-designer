@@ -94,11 +94,11 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
         try {
             Asset<String> asset = repository.loadAsset(uuid);
             outData = "";
-            Map<String, ThemeInfo> themeData = setupThemes(req, repository);
-            setupCustomEditors(repository);
+            Map<String, ThemeInfo> themeData = setupThemes(req, repository, profile);
+            setupCustomEditors(repository, profile);
 
 
-            setupFormWidgets(repository);
+            setupFormWidgets(repository, profile);
             setupDefaultIcons(asset.getAssetLocation(), repository);
 
             // figure out which package our uuid belongs in and get back the list of configs
@@ -118,7 +118,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
         	for(Asset entry : workItemsContent) {
 
                 try {
-                    evaluateWorkDefinitions(workDefinitions, entry, repository);
+                    evaluateWorkDefinitions(workDefinitions, entry, repository, profile);
                 } catch(Exception e) {
                     // log and continue
                     _logger.error("Unable to parse a workitem definition: " + e.getMessage());
@@ -202,7 +202,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    private void evaluateWorkDefinitions(Map<String, WorkDefinitionImpl> workDefinitions, Asset<String> widAsset, Repository repository) throws Exception {
+    private void evaluateWorkDefinitions(Map<String, WorkDefinitionImpl> workDefinitions, Asset<String> widAsset, Repository repository, IDiagramProfile profile) throws Exception {
     	List<Map<String, Object>> workDefinitionsMaps;
 
         try {
@@ -227,7 +227,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
                 Asset<byte[]> iconAsset = null;
 
                 if (!repository.assetExists(icon)) {
-                    icon = "/global/defaultservicenodeicon.png";
+                    icon = profile.getRepositoryGlobalDir() + "/defaultservicenodeicon.png";
                 }
 
                 iconAsset = repository.loadAssetFromPath(icon);
@@ -284,7 +284,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
         return loadedAssets;
     }
 
-    private void setupFormWidgets(Repository repository) {
+    private void setupFormWidgets(Repository repository, IDiagramProfile profile) {
 
     	File[] allFormWidgets = new File(formWidgetsDir).listFiles();
     	for(File formWidget : allFormWidgets) {
@@ -292,7 +292,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
             int extPosition = formWidget.getName().lastIndexOf(".");
     		String extension = formWidget.getName().substring(extPosition + 1);
             String name = formWidget.getName().substring(0, extPosition);
-            createAssetIfNotExisting(repository, "/global/", name, extension,
+            createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir() + "/", name, extension,
                     getBytesFromFile(formWidget));
 
 
@@ -302,10 +302,10 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
     	}
     }
 
-    private void setupCustomEditors(Repository repository) {
+    private void setupCustomEditors(Repository repository, IDiagramProfile profile) {
 
         try {
-            createAssetIfNotExisting(repository, "/global/", CUSTOMEDITORS_NAME, "json",
+            createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir() + "/", CUSTOMEDITORS_NAME, "json",
                     getBytesFromFile(new File(customEditorsInfo)));
 
 		} catch (Exception e) {
@@ -313,16 +313,16 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
         }
     }
 
-    private Map<String, ThemeInfo> setupThemes(HttpServletRequest req, Repository repository) {
+    private Map<String, ThemeInfo> setupThemes(HttpServletRequest req, Repository repository, IDiagramProfile profile) {
     	Map<String, ThemeInfo> themeData = new HashMap<String, JbpmPreprocessingUnitVFS.ThemeInfo>();
         Asset<byte[]> themeAsset = null;
         try {
-            boolean themeExists = repository.assetExists("/global/" + THEME_NAME + THEME_EXT);
+            boolean themeExists = repository.assetExists(profile.getRepositoryGlobalDir() + "/" + THEME_NAME + THEME_EXT);
             if (!themeExists) {
                 // create theme asset
                 AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
                 assetBuilder.content(getBytesFromFile(new File(themeInfo)))
-                        .location("/global/")
+                        .location(profile.getRepositoryGlobalDir())
                         .name(THEME_NAME)
                         .type("json")
                         .version("1.0");
@@ -332,7 +332,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
                 repository.storeAsset(themeAsset);
 
             } else {
-                themeAsset = repository.loadAssetFromPath("/global/" + THEME_NAME + THEME_EXT);
+                themeAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir() + "/" + THEME_NAME + THEME_EXT);
             }
 
 	        

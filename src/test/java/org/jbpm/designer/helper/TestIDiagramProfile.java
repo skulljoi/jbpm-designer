@@ -86,6 +86,10 @@ public class TestIDiagramProfile implements IDiagramProfile {
         return null;
     }
 
+    public String getRepositoryGlobalDir() {
+        return "/global";
+    }
+
     public String getLocalHistoryEnabled() {
         return null;
     }

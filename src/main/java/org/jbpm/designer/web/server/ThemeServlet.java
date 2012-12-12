@@ -72,7 +72,7 @@ public class ThemeServlet extends HttpServlet {
 		String retStr = "";
 
     	try {
-            Asset<String> themeAsset = repository.loadAssetFromPath("/global/" + THEME_NAME+THEME_EXT);
+            Asset<String> themeAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir() + "/" + THEME_NAME+THEME_EXT);
 
             retStr = themeAsset.getAssetContent();
 
@@ -104,7 +104,7 @@ public class ThemeServlet extends HttpServlet {
     	
         try {
 
-            Asset<String> themeAsset = repository.loadAssetFromPath("/global/" + THEME_NAME+THEME_EXT);
+            Asset<String> themeAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir() + "/" + THEME_NAME+THEME_EXT);
 
             JSONObject themesObject =  new JSONObject(themeAsset.getAssetContent());
             JSONObject themes = (JSONObject) themesObject.get("themes");

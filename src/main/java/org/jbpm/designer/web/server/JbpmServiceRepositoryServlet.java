@@ -168,11 +168,11 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
 						}
 						// install wid and icon to guvnor
 
-                        repository.deleteAsset("/global/" +  widName + ".wid");
+                        repository.deleteAsset(profile.getRepositoryGlobalDir() + "/" +  widName + ".wid");
 
                         AssetBuilder widAssetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
                         widAssetBuilder.name(widName)
-                                       .location("/global/")
+                                       .location(profile.getRepositoryGlobalDir() + "/")
                                        .type("wid")
                                        .content(workItemDefinitionContent);
 
@@ -182,7 +182,7 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
                         String iconExtension = iconName.substring(iconName.lastIndexOf(".") + 1);
                         String iconFileName = iconName.substring(0, iconName.lastIndexOf("."));
                         iconAssetBuilder.name(iconFileName)
-                                .location("/global/")
+                                .location(profile.getRepositoryGlobalDir() + "/")
                                 .type(iconExtension)
                                 .content(iconContent);
 
