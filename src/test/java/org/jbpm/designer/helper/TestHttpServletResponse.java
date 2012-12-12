@@ -10,9 +10,28 @@ import java.util.Locale;
 
 public class TestHttpServletResponse  implements HttpServletResponse {
 
-    final private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    private ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+
+    private PrintWriter printWriter;
+    private ServletOutputStream servletOutputStream;
+
+    public TestHttpServletResponse() {
+        this.printWriter = new PrintWriter(outputStream);
+        this.servletOutputStream = new ServletOutputStream() {
+            @Override
+            public void write(int i) throws IOException {
+                outputStream.write(i);
+            }
+        };
+    }
 
     public byte[] getContent() {
+        this.printWriter.flush();
+        try {
+            this.servletOutputStream.flush();
+        } catch (IOException e) {
+
+        }
         return this.outputStream.toByteArray();
     }
 
@@ -93,16 +112,11 @@ public class TestHttpServletResponse  implements HttpServletResponse {
     }
 
     public ServletOutputStream getOutputStream() throws IOException {
-        return new ServletOutputStream() {
-            @Override
-            public void write(int i) throws IOException {
-                outputStream.write(i);
-            }
-        };
+        return this.servletOutputStream;
     }
 
     public PrintWriter getWriter() throws IOException {
-        return new PrintWriter(outputStream);
+        return this.printWriter;
     }
 
     public void setCharacterEncoding(String charset) {
