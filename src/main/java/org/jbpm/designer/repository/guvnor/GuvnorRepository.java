@@ -59,6 +59,10 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
+    public boolean deleteAssetFromPath(String path) {
+        throw new UnsupportedOperationException();
+    }
+
     public boolean assetExists(String assetUniqueId) {
         throw new UnsupportedOperationException();
     }

@@ -469,7 +469,7 @@ public class TransformerServlet extends HttpServlet {
                     assetFileExt = ".svg";
                 }
                 String assetFullName = processid + assetExt + assetFileExt;
-                repository.deleteAsset(processAsset.getAssetLocation() + assetFullName);
+                repository.deleteAssetFromPath(processAsset.getAssetLocation() + assetFullName);
 
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();

@@ -181,6 +181,13 @@ public class VFSRepository implements Repository {
         }
     }
 
+    public boolean deleteAssetFromPath(String path) {
+
+        Path filePath = Paths.get(repositoryRoot.toString() + path);
+
+        return deleteAsset(filePath.toUri().toString());
+    }
+
     public boolean assetExists(String assetUniqueId) {
         try {
             return ioService.exists(Paths.get(URI.create(assetUniqueId)));

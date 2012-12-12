@@ -101,6 +101,13 @@ public interface Repository {
     boolean deleteAsset(String assetUniqueId);
 
     /**
+     * Deletes asset from repository given by the <code>path</code> if exists
+     * @param path - complete path of the asset to delete
+     * @return return true if and only if operation completed successfully otherwise false
+     */
+    boolean deleteAssetFromPath(String path);
+
+    /**
      * Examines repository if asset given by the <code>assetUniqueId</code> exists
      * @param assetUniqueId - unique identifier of the asset
      * @return true if and only if asset exists otherwise false
