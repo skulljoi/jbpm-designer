@@ -66,6 +66,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private String _repositorySubdomain;
     private String _repositoryUsr;
     private String _repositoryPwd;
+    private String _repositoryGlobalDir;
 
     public JbpmProfileImpl(ServletContext servletContext) {
         this(servletContext, true, true);
@@ -136,6 +137,14 @@ public class JbpmProfileImpl implements IDiagramProfile {
                                     _repositoryId = repositoryId;
                                 } else {
                                     _logger.info("Invalid repository id specified");
+                                }
+                            }
+                            if ("globaldir".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryGlobalDir = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryGlobalDir)) {
+                                    _repositoryGlobalDir = repositoryGlobalDir;
+                                } else {
+                                    _repositoryGlobalDir = "repository";
                                 }
                             }
                             if ("root".equals(reader.getAttributeLocalName(i))) {
@@ -267,9 +276,14 @@ public class JbpmProfileImpl implements IDiagramProfile {
         return _localHistoryTimeout;
     }
 
+    public String getRepositoryGlobalDir() {
+        return _repositoryGlobalDir;
+    }
+
     public void setRepositoryId(String _repositoryId) {
         this._repositoryId = _repositoryId;
     }
+
 
     public void setRepositoryRoot(String _repositoryRoot) {
         this._repositoryRoot = _repositoryRoot;
@@ -293,6 +307,10 @@ public class JbpmProfileImpl implements IDiagramProfile {
 
     public void setRepositoryPwd(String _repositoryPwd) {
         this._repositoryPwd = _repositoryPwd;
+    }
+
+    public void setREpositoryGlobalDir(String repositoryGlobalDir) {
+        this._repositoryGlobalDir = repositoryGlobalDir;
     }
 
     public Repository getRepository(ServletContext context) {

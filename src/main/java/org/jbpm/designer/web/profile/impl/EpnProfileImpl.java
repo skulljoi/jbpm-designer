@@ -48,6 +48,7 @@ public class EpnProfileImpl implements IDiagramProfile {
     private String _repositorySubdomain;
     private String _repositoryUsr;
     private String _repositoryPwd;
+    private String _repositoryGlobalDir;
     
     public EpnProfileImpl(ServletContext servletContext) {
         this(servletContext, true);
@@ -96,6 +97,14 @@ public class EpnProfileImpl implements IDiagramProfile {
                                     _repositoryId = repositoryId;
                                 } else {
                                     _logger.info("Invalid repository id specified");
+                                }
+                            }
+                            if ("globaldir".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryGlobalDir = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryGlobalDir)) {
+                                    _repositoryGlobalDir = repositoryGlobalDir;
+                                } else {
+                                    _repositoryGlobalDir = "repository";
                                 }
                             }
                             if ("root".equals(reader.getAttributeLocalName(i))) {
@@ -286,6 +295,10 @@ public class EpnProfileImpl implements IDiagramProfile {
 
     public String getRepositoryPwd() {
         return _repositoryPwd;
+    }
+
+    public String getRepositoryGlobalDir() {
+        return _repositoryGlobalDir;
     }
 
     public String getLocalHistoryEnabled() {

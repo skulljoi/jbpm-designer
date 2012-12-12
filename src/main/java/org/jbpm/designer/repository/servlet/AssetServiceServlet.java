@@ -3,7 +3,6 @@ package org.jbpm.designer.repository.servlet;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Asset;
 import org.jbpm.designer.repository.AssetBuilderFactory;
-import org.jbpm.designer.repository.AssetNotFoundException;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
@@ -21,8 +20,6 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.Collection;
 
-import static org.junit.Assert.assertNotNull;
-
 /**
  * Servlet wraps Repository asset api.
  */
@@ -36,7 +33,10 @@ public class AssetServiceServlet extends HttpServlet {
     private static final String ACTION_DIRECTORY_EXISTS = "existsdir";
     private static final String ACTION_LIST_DIRECTORIES = "listdirs";
     private static final String ACTION_LIST_ASSETS = "listassets";
-    private static final String ACTION_LOAD_ASSET = "loadasset";
+    private static final String ACTION_GET_ASSET_INFO = "getassetinfo";
+    private static final String ACTION_GET_ASSET_SOURCE = "getassetsource";
+    private static final String OPTION_BY_PATH = "optionbypath";
+    private static final String OPTION_BY_ID = "optionbyid";
 
     @Override
     public void init(ServletConfig config) throws ServletException {
@@ -54,6 +54,7 @@ public class AssetServiceServlet extends HttpServlet {
         String assetName = req.getParameter("assetname");
         String assetContent = req.getParameter("assetcontent");
         String assetLocation = req.getParameter("assetlocation");
+        String loadoption = req.getParameter("loadoption");
         JSONObject returnObj = new JSONObject();
         JSONArray errorsArray = new JSONArray();
 
@@ -75,15 +76,17 @@ public class AssetServiceServlet extends HttpServlet {
                 } catch (Exception e) {
                     addError(errorsArray, "Error storing asset: " + e.getMessage());
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_DELETE_ASSET)) {
                 try {
                     Boolean ret = repository.deleteAsset(assetId);
                     if(!ret) {
                         addError(errorsArray, "Unable to delete asset");
                     }
-                } catch (AssetNotFoundException e) {
+                } catch (Exception e) {
                     addError(errorsArray, "Error deleting asset: " + e.getMessage());
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_ASSET_EXISTS)) {
                 try {
                     Boolean ret = repository.assetExists(assetId);
@@ -92,11 +95,13 @@ public class AssetServiceServlet extends HttpServlet {
                     returnObj.put("answer", "false");
                     addError(errorsArray, "Error: " + e.getMessage());
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_CREATE_DIRECTORY)) {
                 String ret = repository.storeDirectory(assetLocation);
                 if(ret == null) {
                     addError(errorsArray, "Unable to create asset");
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_DELETE_DIRECTORY)) {
                 try {
                     Boolean ret = repository.deleteDirectory(assetLocation, false);
@@ -105,6 +110,7 @@ public class AssetServiceServlet extends HttpServlet {
                     returnObj.put("answer", "false");
                     addError(errorsArray, "Error: " + e.getMessage());
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_DIRECTORY_EXISTS)) {
                 try {
                     Boolean ret = repository.directoryExists(assetLocation);
@@ -113,32 +119,70 @@ public class AssetServiceServlet extends HttpServlet {
                     returnObj.put("answer", "false");
                     addError(errorsArray, "Error: " + e.getMessage());
                 }
+                returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_LIST_DIRECTORIES)) {
-                Collection<Asset> dirCollection = repository.listAssets(assetLocation);
-                if(dirCollection!= null) {
-                    for(Asset dir : dirCollection) {
-                        // TODO finish
+                try {
+                    Collection<String> dirCollection = repository.listDirectories(assetLocation);
+                    if(dirCollection!= null) {
+                        JSONArray dirListingArray = new JSONArray();
+                        for(String dir : dirCollection) {
+                            JSONObject dirObj = new JSONObject();
+                            dirObj.put("name", dir);
+                            dirListingArray.put(dirObj);
+                        }
+                        returnObj.put("answer", dirListingArray);
+                    } else {
+                        returnObj.put("answer", new JSONArray());
                     }
+                } catch (Exception e) {
+                    returnObj.put("answer", new JSONArray());
+                    addError(errorsArray, "Error: " + e.getMessage());
+                }
+                returnJSONContent(returnObj, errorsArray, resp);
+            } else if(action != null && action.equals(ACTION_LIST_ASSETS)) {
+                try {
+                    Collection<Asset> assetCollection = repository.listAssets(assetLocation);
+                    if(assetCollection != null) {
+                        JSONArray assetListingArray = new JSONArray();
+                        for(Asset asset : assetCollection) {
+                            JSONObject assetObj = new JSONObject();
+                            assetObj.put("fullname", asset.getFullName());
+                            assetObj.put("name", asset.getName());
+                            assetObj.put("description", asset.getDescription());
+                            assetObj.put("owner", asset.getOwner());
+                            assetObj.put("version", asset.getVersion());
+                            assetObj.put("id", asset.getUniqueId());
+                            assetObj.put("location", asset.getAssetLocation());
+                            assetObj.put("type", asset.getAssetType());
+                            assetObj.put("created", asset.getCreationDate());
+                            assetObj.put("modified", asset.getLastModificationDate());
+                            assetListingArray.put(assetObj);
+                        }
+                        returnObj.put("answer" , assetListingArray);
+                    } else {
+                        returnObj.put("answer", new JSONArray());
+                    }
+                } catch (JSONException e) {
+                    returnObj.put("answer", new JSONArray());
+                    addError(errorsArray, "Error: " + e.getMessage());
+                }
+                returnJSONContent(returnObj, errorsArray, resp);
+            } else if(action != null && action.equals(ACTION_GET_ASSET_SOURCE)) {
+                Asset<String> asset;
+                if(loadoption != null && loadoption.equals(OPTION_BY_ID)) {
+                    asset = repository.loadAsset(assetId);
+                } else if(loadoption != null && loadoption.equals(OPTION_BY_PATH)) {
+                    asset = repository.loadAssetFromPath(assetLocation);
                 } else {
 
                 }
 
-            } else if(action != null && action.equals(ACTION_LIST_ASSETS)) {
-                // TODO finish
-
-            } else if(action != null && action.equals(ACTION_LOAD_ASSET)) {
-                // TODO finish
-
+            } else if(action != null && action.equals(ACTION_GET_ASSET_INFO)) {
+                // TODO FINISH
             } else {
                 addError(errorsArray, "Invalid action specified");
+                returnJSONContent(returnObj, errorsArray, resp);
             }
-
-            returnObj.put("errors", errorsArray);
-
-            PrintWriter pw = resp.getWriter();
-            resp.setContentType("text/json");
-            resp.setCharacterEncoding("UTF-8");
-            pw.write(returnObj.toString());
         } catch(Exception e) {
             _logger.error(e.getMessage());
         }
@@ -155,4 +199,17 @@ public class AssetServiceServlet extends HttpServlet {
             errorArray.put(errorMessage);
         }
     }
+
+    private void returnJSONContent(JSONObject returnObj, JSONArray errorsArray, HttpServletResponse resp) throws Exception {
+        returnObj.put("errors", errorsArray);
+        PrintWriter pw = resp.getWriter();
+        resp.setContentType("text/json");
+        resp.setCharacterEncoding("UTF-8");
+        pw.write(returnObj.toString());
+    }
+
+    private void returnXMLContent(String content) {
+
+    }
+
 }

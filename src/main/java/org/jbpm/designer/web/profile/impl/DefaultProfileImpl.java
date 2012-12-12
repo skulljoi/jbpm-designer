@@ -78,6 +78,7 @@ public class DefaultProfileImpl implements IDiagramProfile {
     private String _repositorySubdomain;
     private String _repositoryUsr;
     private String _repositoryPwd;
+    private String _repositoryGlobalDir;
     
     public DefaultProfileImpl(ServletContext servletContext) {
         this(servletContext, true);
@@ -179,6 +180,10 @@ public class DefaultProfileImpl implements IDiagramProfile {
 
     public String getRepositoryPwd() {
         return _repositoryPwd;
+    }
+
+    public String getRepositoryGlobalDir() {
+        return _repositoryGlobalDir;
     }
 
     public String getLocalHistoryEnabled() {
