@@ -35,7 +35,7 @@ public interface Repository {
      * @param location - location in the repository to be created
      * @return - returns identifier of the new directory
      */
-    String storeDirectory(String location);
+    String createDirectory(String location);
 
     /**
      * Examines repository if given directory exists in the repository
@@ -93,7 +93,15 @@ public interface Repository {
      * @param asset - asset to be stored
      * @return returns asset unique identifier that can be used to locate it
      */
-    String storeAsset(Asset asset);
+    String createAsset(Asset asset);
+
+    /**
+     * Updates content of the asset
+     * @param asset - asset to be stored with new content in it, all other data (like name, location) should be same
+     * @return - returns uniqueId of the asset
+     * @throws AssetNotFoundException - throws in case of asset given by id does not exist
+     */
+    String updateAsset(Asset asset) throws AssetNotFoundException;
 
     /**
      * Deletes asset from repository identified by <code>assetUniqueId</code> if exists

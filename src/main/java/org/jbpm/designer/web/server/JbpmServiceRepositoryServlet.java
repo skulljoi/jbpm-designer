@@ -176,7 +176,7 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
                                        .type("wid")
                                        .content(workItemDefinitionContent);
 
-                        repository.storeAsset(widAssetBuilder.getAsset());
+                        repository.createAsset(widAssetBuilder.getAsset());
 
                         AssetBuilder iconAssetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
                         String iconExtension = iconName.substring(iconName.lastIndexOf(".") + 1);
@@ -186,7 +186,7 @@ public class JbpmServiceRepositoryServlet extends HttpServlet {
                                 .type(iconExtension)
                                 .content(iconContent);
 
-                        repository.storeAsset(iconAssetBuilder.getAsset());
+                        repository.createAsset(iconAssetBuilder.getAsset());
 					}
 				}
 			} else {

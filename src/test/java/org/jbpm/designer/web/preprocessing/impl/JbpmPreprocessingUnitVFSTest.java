@@ -8,20 +8,12 @@ import org.jbpm.designer.repository.AssetBuilderFactory;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
-import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.*;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 import java.io.*;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.security.Principal;
 import java.util.*;
 
 import static org.junit.Assert.assertEquals;
@@ -63,8 +55,8 @@ public class JbpmPreprocessingUnitVFSTest {
     public void testProprocess() {
         Repository repository = new VFSRepository(profile);
         //prepare folders that will be used
-        repository.storeDirectory("/myprocesses");
-        repository.storeDirectory("/global");
+        repository.createDirectory("/myprocesses");
+        repository.createDirectory("/global");
 
         // prepare process asset that will be used to preprocess
         AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
@@ -72,7 +64,7 @@ public class JbpmPreprocessingUnitVFSTest {
                 .type("bpmn2")
                 .name("process")
                 .location("/myprocesses");
-        String uniqueId = repository.storeAsset(builder.getAsset());
+        String uniqueId = repository.createAsset(builder.getAsset());
 
         // create instance of preprocessing unit
         JbpmPreprocessingUnitVFS preprocessingUnitVFS = new JbpmPreprocessingUnitVFS(new TestServletContext());

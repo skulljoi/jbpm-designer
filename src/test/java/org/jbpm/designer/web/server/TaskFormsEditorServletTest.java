@@ -65,7 +65,7 @@ public class TaskFormsEditorServletTest {
                 .type("bpmn2")
                 .name("testprocess")
                 .location("/defaultPackage");
-        String uniqueId = repository.storeAsset(builder.getAsset());
+        String uniqueId = repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
         params.put("uuid", uniqueId);
@@ -105,14 +105,14 @@ public class TaskFormsEditorServletTest {
                 .type("bpmn2")
                 .name("testprocess")
                 .location("/defaultPackage");
-        String uniqueId = repository.storeAsset(builder.getAsset());
+        String uniqueId = repository.createAsset(builder.getAsset());
 
         AssetBuilder builderForm = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
         builderForm.content("this is simple task content")
                 .type("flt")
                 .name("evaluate-taskform")
                 .location("/defaultPackage");
-        String uniqueIdForm = repository.storeAsset(builderForm.getAsset());
+        String uniqueIdForm = repository.createAsset(builderForm.getAsset());
 
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();

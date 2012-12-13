@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -70,7 +69,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.storeDirectory("/test");
+        String directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -84,7 +83,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.storeDirectory("/test");
+        String directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -105,7 +104,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.storeDirectory("/test/nested");
+        String directoryId = repository.createDirectory("/test/nested");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -213,7 +212,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
 
-        String directoryId = repository.storeDirectory("/test/nested");
+        String directoryId = repository.createDirectory("/test/nested");
         assertNotNull(directoryId);
 
         Collection<Asset> assets = repository.listAssets("/test/nested");
@@ -255,7 +254,7 @@ public class VFSRepositoryDefaultFileSystemTest {
                 .name("test")
                 .location("/");
 
-        String id = repository.storeAsset(builder.getAsset());
+        String id = repository.createAsset(builder.getAsset());
 
         assertNotNull(id);
 
@@ -286,7 +285,7 @@ public class VFSRepositoryDefaultFileSystemTest {
                 .name("test")
                 .location("/");
 
-        String id = repository.storeAsset(builder.getAsset());
+        String id = repository.createAsset(builder.getAsset());
 
         assertNotNull(id);
 
@@ -317,7 +316,7 @@ public class VFSRepositoryDefaultFileSystemTest {
                 .name("test")
                 .location("/");
 
-        String id = repository.storeAsset(builder.getAsset());
+        String id = repository.createAsset(builder.getAsset());
 
         assertNotNull(id);
 
@@ -335,11 +334,42 @@ public class VFSRepositoryDefaultFileSystemTest {
                 .name("process")
                 .location("/1/2/3/4/5/6");
 
-        String id = repository.storeAsset(builder.getAsset());
-        System.out.println(id);
+        String id = repository.createAsset(builder.getAsset());
+
         Collection<Asset> foundAsset = repository.listAssetsRecursively("/", new FilterByExtension("bpmn2"));
 
         assertNotNull(foundAsset);
         assertEquals(1, foundAsset.size());
+    }
+
+    @Test
+    public void testUpdateAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        builder.content("updated content").uniqueId(id);
+
+        id = repository.updateAsset(builder.getAsset());
+
+        foundAsset = repository.listAssetsRecursively("/", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        String content = ((Asset<String>)repository.loadAsset(id)).getAssetContent();
+        assertNotNull(content);
+        assertEquals("updated content\n", content);
     }
 }

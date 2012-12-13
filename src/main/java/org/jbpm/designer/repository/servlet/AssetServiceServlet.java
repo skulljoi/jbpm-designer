@@ -69,7 +69,7 @@ public class AssetServiceServlet extends HttpServlet {
                             .type(assetType)
                             .name(assetName)
                             .location(assetLocation);
-                    String id = repository.storeAsset(builder.getAsset());
+                    String id = repository.createAsset(builder.getAsset());
                     if(id == null) {
                         addError(errorsArray, "Unable to store asset");
                     }
@@ -97,7 +97,7 @@ public class AssetServiceServlet extends HttpServlet {
                 }
                 returnJSONContent(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_CREATE_DIRECTORY)) {
-                String ret = repository.storeDirectory(assetLocation);
+                String ret = repository.createDirectory(assetLocation);
                 if(ret == null) {
                     addError(errorsArray, "Unable to create asset");
                 }

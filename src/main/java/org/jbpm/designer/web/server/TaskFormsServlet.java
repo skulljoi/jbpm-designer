@@ -131,7 +131,7 @@ public class TaskFormsServlet extends HttpServlet {
                     .type(FORMTEMPLATE_FILE_EXTENSION)
                     .content(taskForm.getOutput().getBytes("UTF-8"));
 
-            repository.storeAsset(builder.getAsset());
+            repository.createAsset(builder.getAsset());
 
 		} catch (Exception e) {
 			_logger.error(e.getMessage());

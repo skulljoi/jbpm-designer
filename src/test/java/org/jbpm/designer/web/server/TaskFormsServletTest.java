@@ -15,7 +15,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.ServletException;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -66,7 +65,7 @@ public class TaskFormsServletTest {
                 .type("bpmn2")
                 .name("hello")
                 .location("/defaultPackage");
-        String uniqueId = repository.storeAsset(builder.getAsset());
+        String uniqueId = repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
         params.put("uuid", uniqueId);
@@ -101,7 +100,7 @@ public class TaskFormsServletTest {
                 .type("bpmn2")
                 .name("userTask")
                 .location("/defaultPackage");
-        String uniqueId = repository.storeAsset(builder.getAsset());
+        String uniqueId = repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
         params.put("uuid", uniqueId);

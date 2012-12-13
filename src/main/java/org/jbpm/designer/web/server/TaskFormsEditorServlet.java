@@ -89,7 +89,7 @@ public class TaskFormsEditorServlet extends HttpServlet {
                 .type(TASKFORM_FILE_EXTENSION)
                 .content(formValue.getBytes("UTF-8"));
 
-        repository.storeAsset(builder.getAsset());
+        repository.createAsset(builder.getAsset());
         return "ok";
 	 }
 	 

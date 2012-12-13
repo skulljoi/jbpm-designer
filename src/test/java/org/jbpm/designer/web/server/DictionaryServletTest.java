@@ -1,6 +1,5 @@
 package org.jbpm.designer.web.server;
 
-import org.drools.rule.Collect;
 import org.jbpm.designer.helper.TestHttpServletRequest;
 import org.jbpm.designer.helper.TestHttpServletResponse;
 import org.jbpm.designer.helper.TestServletConfig;
@@ -97,7 +96,7 @@ public class DictionaryServletTest {
                 .type("json")
                 .name("processdictionary")
                 .location("/global");
-        repository.storeAsset(builder.getAsset());
+        repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
 

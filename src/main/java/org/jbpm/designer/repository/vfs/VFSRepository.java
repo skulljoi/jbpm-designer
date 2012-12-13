@@ -77,7 +77,7 @@ public class VFSRepository implements Repository {
         return foundAssets;
     }
 
-    public String storeDirectory(String location) {
+    public String createDirectory(String location) {
         Path path = Paths.get(repositoryRoot.toString() + location);
 
         path = ioService.createDirectories(path);
@@ -183,7 +183,7 @@ public class VFSRepository implements Repository {
 
     }
 
-    public String storeAsset(Asset asset) {
+    public String createAsset(Asset asset) {
         Path filePath = Paths.get(repositoryRootPath.toString() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()), asset.getFullName());
         if (!ioService.exists(filePath.getParent())) {
             ioService.createDirectories(filePath.getParent());
@@ -196,6 +196,21 @@ public class VFSRepository implements Repository {
         }
 
         return encodeUniqueId(filePath.toUri().toString());
+    }
+
+    public String updateAsset(Asset asset) throws AssetNotFoundException {
+        String uniqueId = decodeUniqueId(asset.getUniqueId());
+        Path filePath = Paths.get(URI.create(uniqueId));
+        if (!ioService.exists(filePath)) {
+            throw new AssetNotFoundException();
+        }
+        if(((AbstractAsset)asset).acceptBytes()) {
+            ioService.write(filePath, ((Asset<byte[]>)asset).getAssetContent(), StandardOpenOption.TRUNCATE_EXISTING);
+        } else {
+            ioService.write(filePath, asset.getAssetContent().toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+        }
+
+        return asset.getUniqueId();
     }
 
     public boolean deleteAsset(String assetUniqueId) {

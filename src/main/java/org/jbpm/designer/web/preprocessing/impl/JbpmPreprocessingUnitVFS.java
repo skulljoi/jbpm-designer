@@ -329,7 +329,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
 
                 themeAsset = assetBuilder.getAsset();
 
-                repository.storeAsset(themeAsset);
+                repository.createAsset(themeAsset);
 
             } else {
                 themeAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir() + "/" + THEME_NAME + THEME_EXT);
@@ -499,7 +499,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
 
                 Asset<byte[]> customEditorsAsset = assetBuilder.getAsset();
 
-                return repository.storeAsset(customEditorsAsset);
+                return repository.createAsset(customEditorsAsset);
             }
 
         } catch (Exception e) {

@@ -23,7 +23,7 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
-    public String storeDirectory(String location) {
+    public String createDirectory(String location) {
         throw new UnsupportedOperationException();
     }
 
@@ -51,8 +51,12 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
-    public String storeAsset(Asset asset) {
+    public String createAsset(Asset asset) {
         throw new UnsupportedOperationException();
+    }
+
+    public String updateAsset(Asset asset) throws AssetNotFoundException {
+        return null;
     }
 
     public boolean deleteAsset(String assetUniqueId) {

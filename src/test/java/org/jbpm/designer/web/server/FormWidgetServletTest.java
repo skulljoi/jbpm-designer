@@ -62,7 +62,7 @@ public class FormWidgetServletTest {
                 .type("fw")
                 .name("testformwidget")
                 .location("/global");
-        repository.storeAsset(builder.getAsset());
+        repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
 
@@ -91,7 +91,7 @@ public class FormWidgetServletTest {
                 .type("fw")
                 .name("testformwidget")
                 .location("/global");
-        repository.storeAsset(builder.getAsset());
+        repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
 

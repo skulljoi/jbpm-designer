@@ -108,7 +108,7 @@ public class DictionaryServlet extends HttpServlet {
                    .location(profile.getRepositoryGlobalDir())
                    .content(dvalue);
 
-            repository.storeAsset(builder.getAsset());
+            repository.createAsset(builder.getAsset());
 
 		} catch (Exception e) {
             // we dont want to barf..just log that error happened

@@ -505,7 +505,7 @@ public class TransformerServlet extends HttpServlet {
 
                 Asset<byte[]> resourceAsset = builder.getAsset();
 
-                repository.storeAsset(resourceAsset);
+                repository.createAsset(resourceAsset);
             }
         } catch (Exception e) {
             // we dont want to barf..just log that error happened

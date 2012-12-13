@@ -63,7 +63,7 @@ public class CustomEditorsServletTest {
                 .type("json")
                 .name("customeditors")
                 .location("/global");
-        repository.storeAsset(builder.getAsset());
+        repository.createAsset(builder.getAsset());
         // setup parameters
         Map<String, String> params = new HashMap<String, String>();
 
