@@ -1,11 +1,5 @@
 package org.jbpm.designer.web.repository.impl;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -15,7 +9,6 @@ import org.jboss.drools.impl.DroolsPackageImpl;
 import org.jbpm.designer.repository.Asset;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 import org.jbpm.designer.web.repository.IUUIDBasedRepository;
 
 
@@ -31,7 +24,7 @@ public class UUIDBasedJbpmRepository implements IUUIDBasedRepository {
     }
 
     public byte[] load(HttpServletRequest req, String uuid, IDiagramProfile profile, ServletContext servletContext) throws Exception {
-        Repository repository = profile.getRepository(servletContext);
+        Repository repository = profile.getRepository();
         String processjson = "";
         String preProcessingParam = req.getParameter("pp");
         // check with Guvnor to see what it has for this uuid for us

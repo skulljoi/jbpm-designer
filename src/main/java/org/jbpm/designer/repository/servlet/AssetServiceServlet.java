@@ -60,7 +60,7 @@ public class AssetServiceServlet extends HttpServlet {
 
         try {
             IDiagramProfile profile = ServletUtil.getProfile(req, profileName, getServletContext());
-            Repository repository = profile.getRepository(getServletContext());
+            Repository repository = profile.getRepository();
 
             if(action != null && action.equals(ACTION_STORE_ASSET)) {
                 try {

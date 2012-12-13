@@ -1,11 +1,7 @@
 package org.jbpm.designer.web.server;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Scanner;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
@@ -67,7 +63,7 @@ public class ThemeServlet extends HttpServlet {
 	}
 	
 	private String getThemeJson(IDiagramProfile profile, ServletContext servletContext) {
-        Repository repository = profile.getRepository(servletContext);
+        Repository repository = profile.getRepository();
 
 		String retStr = "";
 
@@ -83,7 +79,7 @@ public class ThemeServlet extends HttpServlet {
 	}
 	
 	private String getThemeNames(IDiagramProfile profile, ServletContext servletContext) {
-        Repository repository = profile.getRepository(servletContext);
+        Repository repository = profile.getRepository();
 
 		String themesStr = "";
 		String themesURL = RepositoryInfo.getRepositoryProtocol(profile)

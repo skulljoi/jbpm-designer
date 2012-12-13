@@ -88,7 +88,7 @@ public class JbpmPreprocessingUnitVFS implements IDiagramPreprocessingUnit {
 
     public void preprocess(HttpServletRequest req, HttpServletResponse res, IDiagramProfile profile, ServletContext serlvetContext) {
 
-        Repository repository = profile.getRepository(serlvetContext);
+        Repository repository = profile.getRepository();
 
         String uuid = req.getParameter("uuid");
         try {

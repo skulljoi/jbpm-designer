@@ -19,7 +19,7 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
-    public Map<String, Collection<Asset>> listDirectoriesRecursively(String startAt) {
+    public Collection<Asset> listAssetsRecursively(String startAt, Filter filter) {
         throw new UnsupportedOperationException();
     }
 

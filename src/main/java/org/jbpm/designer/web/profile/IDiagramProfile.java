@@ -113,7 +113,7 @@ public interface IDiagramProfile {
     /**
      * @return the repository.
      */
-    public Repository getRepository(ServletContext context);
+    public Repository getRepository();
     
     /**
      * Parser to produce the final model to be saved.

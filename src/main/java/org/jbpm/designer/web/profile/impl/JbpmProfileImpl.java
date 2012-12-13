@@ -23,6 +23,7 @@ import org.eclipse.bpmn2.Definitions;
 import org.eclipse.emf.common.util.URI;
 import org.jboss.drools.DroolsPackage;
 import org.jbpm.designer.repository.Repository;
+import org.jbpm.designer.repository.RepositoryManager;
 import org.jbpm.designer.repository.guvnor.GuvnorRepository;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.slf4j.Logger;
@@ -68,8 +69,10 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private String _repositoryPwd;
     private String _repositoryGlobalDir;
 
+    private boolean initialized = false;
+
     public JbpmProfileImpl(ServletContext servletContext) {
-        this(servletContext, true, true);
+        this(servletContext, true, false);
     }
 
     public JbpmProfileImpl() {
@@ -81,7 +84,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
             initializeLocalPlugins(servletContext);
         }
         if(initializeRepository) {
-            initializeRepository(servletContext);
+            initializeRepository();
         }
     }
 
@@ -218,18 +221,11 @@ public class JbpmProfileImpl implements IDiagramProfile {
         }
     }
 
-    private void initializeRepository(ServletContext context) {
-        String repoKey = "repository-" + _repositoryId;
-        if(context.getAttribute(repoKey) == null) {
-            // TODO hard-coded for now - figure out where to put mapping should be
-            if(_repositoryId.equals("guvnor")) {
-                context.setAttribute(repoKey, new GuvnorRepository(this));
-            } else if(_repositoryId.equals("vfs")) {
-                context.setAttribute(repoKey, new VFSRepository(this));
-            } else {
-                _logger.warn("Invalid repository id: " + _repositoryId);
-            }
-        }
+    private void initializeRepository() {
+
+        RepositoryManager.getInstance().registerRepository("repository-guvnor", new GuvnorRepository(this));
+        RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
+        initialized = true;
     }
 
     public String getName() {
@@ -313,8 +309,12 @@ public class JbpmProfileImpl implements IDiagramProfile {
         this._repositoryGlobalDir = repositoryGlobalDir;
     }
 
-    public Repository getRepository(ServletContext context) {
-        return (Repository) context.getAttribute("repository-" + _repositoryId);
+    public Repository getRepository() {
+        if (!initialized) {
+            initializeRepository();
+
+        }
+        return RepositoryManager.getInstance().getRepository("repository-" + _repositoryId);
     }
     
     public IDiagramMarshaller createMarshaller() {

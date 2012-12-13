@@ -20,7 +20,6 @@ import org.apache.batik.transcoder.TranscoderInput;
 import org.apache.batik.transcoder.TranscoderOutput;
 import org.apache.batik.transcoder.image.ImageTranscoder;
 import org.apache.batik.transcoder.image.PNGTranscoder;
-import org.apache.batik.util.ParsedURL;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.fop.svg.PDFTranscoder;
 import org.apache.log4j.Logger;
@@ -45,7 +44,6 @@ import org.jbpm.designer.repository.AssetBuilderFactory;
 import org.jbpm.designer.repository.AssetNotFoundException;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
-import org.jbpm.designer.web.batikprotocolhandler.GuvnorParsedURLProtocolHandler;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
 import org.jbpm.designer.web.profile.impl.RepositoryInfo;
@@ -108,7 +106,7 @@ public class TransformerServlet extends HttpServlet {
         IDiagramProfile profile = ServletUtil.getProfile(req, profileName, getServletContext());
         DroolsFactoryImpl.init();
 
-        Repository repository = profile.getRepository(getServletContext());
+        Repository repository = profile.getRepository();
 
         if (transformto != null && transformto.equals(TO_PDF)) {
             try {

@@ -51,7 +51,7 @@ public class TaskFormsEditorServlet extends HttpServlet {
          if (profile == null) {
 	        profile = ServletUtil.getProfile(req, profileName, getServletContext());
          }
-         Repository repository = profile.getRepository(getServletContext());
+         Repository repository = profile.getRepository();
 
          Asset<String> processAsset = null;
          try {

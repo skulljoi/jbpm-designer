@@ -22,10 +22,12 @@ public interface Repository {
     /**
      * Retrieves all directories stored under <code>startAt</code> location including all sub folders.
      * NOTE: Directory should be always relative to the repository root
+     *
      * @param startAt - location where directories should be fetched from
-     * @return - list of directories
+     * @param filter - filter that allows to narrow the results
+     * @return - list of assets found
      */
-    Map<String, Collection<Asset>> listDirectoriesRecursively(String startAt);
+    Collection<Asset> listAssetsRecursively(String startAt, Filter filter);
 
     /**
      * Stores new directory in given location, in case of sub folders existence in the location

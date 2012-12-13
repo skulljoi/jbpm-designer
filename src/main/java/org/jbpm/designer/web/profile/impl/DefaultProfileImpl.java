@@ -52,8 +52,6 @@ import org.jbpm.designer.bpmn2.resource.JBPMBpmn2ResourceImpl;
 import org.jbpm.designer.web.plugin.IDiagramPlugin;
 import org.jbpm.designer.web.plugin.impl.PluginServiceImpl;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.IDiagramProfile.IDiagramUnmarshaller;
-
 
 
 /**
@@ -194,7 +192,7 @@ public class DefaultProfileImpl implements IDiagramProfile {
         return _localHistoryTimeout;
     }
 
-    public Repository getRepository(ServletContext context) {
+    public Repository getRepository() {
         return null;
     }
     

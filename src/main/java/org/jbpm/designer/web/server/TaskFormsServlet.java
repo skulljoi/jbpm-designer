@@ -23,7 +23,6 @@ import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.taskforms.TaskFormInfo;
 import org.jbpm.designer.taskforms.TaskFormTemplateManager;
 import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /** 
  * 
@@ -60,7 +59,7 @@ public class TaskFormsServlet extends HttpServlet {
         if (profile == null) {
             profile = ServletUtil.getProfile(req, profileName, getServletContext());
         }
-        Repository repository = profile.getRepository(getServletContext());
+        Repository repository = profile.getRepository();
 
         Asset<String> processAsset = null;
         try {

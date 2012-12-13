@@ -1,29 +1,28 @@
 package org.jbpm.designer.web.server;
 
+import org.apache.commons.codec.binary.Base64;
+import org.apache.log4j.Logger;
+import org.jbpm.designer.repository.Asset;
+import org.jbpm.designer.repository.AssetNotFoundException;
+import org.jbpm.designer.repository.Repository;
+import org.jbpm.designer.repository.filters.FilterByExtension;
+import org.jbpm.designer.repository.filters.FilterByFileName;
+import org.jbpm.designer.web.profile.IDiagramProfile;
+import org.jbpm.designer.web.profile.IDiagramProfileService;
+import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
+import org.jbpm.designer.web.profile.impl.RepositoryInfo;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.xml.stream.XMLInputFactory;
-import javax.xml.stream.XMLStreamReader;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.jbpm.designer.web.profile.IDiagramProfile;
-import org.jbpm.designer.web.profile.IDiagramProfileService;
-import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
-import org.apache.commons.codec.binary.Base64;
-import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 /**
  * Utility class for web servlets.
@@ -51,42 +50,14 @@ public class ServletUtil {
         return profile;
     }
 	
-	public static List<String> getFormWidgetList(IDiagramProfile profile) {
+	public static List<String> getFormWidgetList(IDiagramProfile profile, Repository repository) {
 		List<String> widgets = new ArrayList<String>();
-		String globalAreaURL = RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/globalArea/assets";
-		try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory
-                    .createXMLStreamReader(ServletUtil.getInputStreamForURL(
-                    		globalAreaURL, "GET", profile), "UTF-8");
-            String title = "";
-            String format = "";
-            while (reader.hasNext()) {
-                int next = reader.next();
-                if (next == XMLStreamReader.START_ELEMENT) {
-                    if ("title".equals(reader.getLocalName())) {
-                        title = reader.getElementText();
-                    }
-                    if ("format".equals(reader.getLocalName())) {
-                    	format = reader.getElementText();
-                    }
-                }
-                if (next == XMLStreamReader.END_ELEMENT) {
-                	if ("asset".equals(reader.getLocalName())) {
-                		if(title.length() > 0 && format.length() > 0 && format.equals("fw")) {
-                			widgets.add(title);
-                			title = "";
-                			format = "";
-                		}
-                	}
-                }
+        try {
+            Collection<Asset> formWidgets = repository.listAssets(profile.getRepositoryGlobalDir(), new FilterByExtension("fw"));
+            for (Asset widget : formWidgets) {
+                widgets.add(widget.getName());
             }
+
         } catch (Exception e) {
             // we dont want to barf..just log that error happened
             _logger.error(e.getMessage());
@@ -94,80 +65,20 @@ public class ServletUtil {
 		return widgets;
 	}
 	
-	public static String[] findPackageAndAssetInfo(String uuid,
-            IDiagramProfile profile) {
-        List<String> packages = new ArrayList<String>();
-        String packagesURL = RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/";
-        try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory
-                    .createXMLStreamReader(ServletUtil.getInputStreamForURL(packagesURL,
-                            "GET", profile), "UTF-8");
-            while (reader.hasNext()) {
-                if (reader.next() == XMLStreamReader.START_ELEMENT) {
-                    if ("title".equals(reader.getLocalName())) {
-                        packages.add(reader.getElementText());
-                    }
-                }
-            }
-        } catch (Exception e) {
-            // we dont want to barf..just log that error happened
-            _logger.error(e.getMessage());
-        }
-        
-        boolean gotPackage = false;
+	public static String[] findPackageAndAssetInfo(String uuid, IDiagramProfile profile) {
+
+        Repository repository = profile.getRepository();
+
         String[] pkgassetinfo = new String[2];
-        for (String nextPackage : packages) {
-        	try {
-	        	String packageAssetURL = RepositoryInfo.getRepositoryProtocol(profile)
-	                    + "://"
-	                    + RepositoryInfo.getRepositoryHost(profile)
-	                    + "/"
-	                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-	                            RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-	                    + "/rest/packages/" + URLEncoder.encode(nextPackage, "UTF-8") + "/assets/";
-                XMLInputFactory factory = XMLInputFactory.newInstance();
-                XMLStreamReader reader = factory
-                        .createXMLStreamReader(ServletUtil.getInputStreamForURL(
-                                packageAssetURL, "GET", profile), "UTF-8");
-                String title = "";
-                String readuuid = "";
-                while (reader.hasNext()) {
-                    int next = reader.next();
-                    if (next == XMLStreamReader.START_ELEMENT) {
-                        if ("title".equals(reader.getLocalName())) {
-                            title = reader.getElementText();
-                        }
-                        if ("uuid".equals(reader.getLocalName())) {
-                        	readuuid = reader.getElementText();
-                        }
-                    }
-                    if (next == XMLStreamReader.END_ELEMENT) {
-                    	if ("asset".equals(reader.getLocalName())) {
-                    		if(title.length() > 0 && readuuid.length() > 0 && uuid.equals(readuuid)) {
-                    			pkgassetinfo[0] = nextPackage;
-                                pkgassetinfo[1] = title;
-                                gotPackage = true;
-                    		}
-                    	}
-                    }
-                }
-            } catch (Exception e) {
-                // we dont want to barf..just log that error happened
-                _logger.error(e.getMessage());
-            }
-            if (gotPackage) {
-                // noo need to loop through rest of packages
-                break;
-            }
+        try {
+        Asset asset = repository.loadAsset(uuid);
+
+        pkgassetinfo[0] = asset.getAssetLocation();
+        pkgassetinfo[1] = asset.getName();
+        } catch (AssetNotFoundException e) {
+            _logger.error("Asset " + uuid + " not found");
         }
-        
+
         return pkgassetinfo;
     }
 	
@@ -211,28 +122,11 @@ public class ServletUtil {
     }
 	
 	public static boolean assetExistsInGuvnor(String packageName, String assetName, IDiagramProfile profile) {
-    	try {	
-    		String formURL = RepositoryInfo.getRepositoryProtocol(profile)
-    	        + "://"
-    	        + RepositoryInfo.getRepositoryHost(profile)
-    	        + "/"
-    	        + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-    	        + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + URLEncoder.encode(assetName, "UTF-8");
-    	
-    	
-			URL checkURL = new URL(formURL);
-			HttpURLConnection checkConnection = (HttpURLConnection) checkURL
-			        .openConnection();
-			ServletUtil.applyAuth(profile, checkConnection);
-			checkConnection.setRequestMethod("GET");
-			checkConnection
-			        .setRequestProperty("Accept", "application/atom+xml");
-			checkConnection.connect();
-			_logger.info("check connection response code: " + checkConnection.getResponseCode());
-			if (checkConnection.getResponseCode() == 200) {
-				return true;
-			}
+    	try {
+            Repository repository = profile.getRepository();
+
+            return repository.assetExists(packageName + "/" + assetName);
+
 		} catch (Exception e) {
 			_logger.error(e.getMessage());
 		}
@@ -241,22 +135,7 @@ public class ServletUtil {
 	
 	public static boolean existsProcessImageInGuvnor(String assetURL, IDiagramProfile profile) {
 		try {	
-			URL checkURL = new URL(assetURL);
-			HttpURLConnection checkConnection = (HttpURLConnection) checkURL
-			        .openConnection();
-			ServletUtil.applyAuth(profile, checkConnection);
-			checkConnection.setRequestMethod("GET");
-			//checkConnection
-			//        .setRequestProperty("Accept", "application/binary");
-			checkConnection.connect();
-			_logger.info("check connection response code: " + checkConnection.getResponseCode());
-			InputStream is = checkConnection.getInputStream();
-			while(is.read() != -1) {
-				// read all response data
-			}
-			if (checkConnection.getResponseCode() == 200) {
-				return true;
-			}
+			return profile.getRepository().assetExists(assetURL);
 		} catch (Exception e) {
 			_logger.error(e.getMessage());
 		}
@@ -265,122 +144,55 @@ public class ServletUtil {
 	
 	public static List<String> getPackageNamesFromGuvnor(IDiagramProfile profile) {
         List<String> packages = new ArrayList<String>();
-        String packagesURL = RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/";
-        try {
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory
-                    .createXMLStreamReader(ServletUtil.getInputStreamForURL(packagesURL, "GET", profile), "UTF-8");
-            while (reader.hasNext()) {
-                if (reader.next() == XMLStreamReader.START_ELEMENT) {
-                    if ("title".equals(reader.getLocalName())) {
-                    	String pname = reader.getElementText();
-                    	if(!pname.equalsIgnoreCase("Packages")) {
-                    		 packages.add(pname);
-                    	}
-                    }
-                }
-            }
-        } catch (Exception e) {
-            _logger.error("Error retriving packages from guvnor: " + e.getMessage());
-        }
+
+        Repository repository = profile.getRepository();
+
+        packages.addAll(repository.listDirectories("/"));
+
         return packages;
     }
 	
 	public static List<String> getAllProcessesInPackage(String pkgName, IDiagramProfile profile) {
-        List<String> processes = new ArrayList<String>();
-        try {
-	        String assetsURL = RepositoryInfo.getRepositoryProtocol(profile)
-	                + "://"
-	                + RepositoryInfo.getRepositoryHost(profile)
-	                + "/"
-	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-	    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-	                + "/rest/packages/"
-	                + URLEncoder.encode(pkgName, "UTF-8")
-	                + "/assets/";
-	        
-            XMLInputFactory factory = XMLInputFactory.newInstance();
-            XMLStreamReader reader = factory.createXMLStreamReader(ServletUtil.getInputStreamForURL(assetsURL, "GET", profile), "UTF-8");
 
-            String format = "";
-            String title = ""; 
-            while (reader.hasNext()) {
-                int next = reader.next();
-                if (next == XMLStreamReader.START_ELEMENT) {
-                    if ("format".equals(reader.getLocalName())) {
-                        format = reader.getElementText();
-                    } 
-                    if ("title".equals(reader.getLocalName())) {
-                        title = reader.getElementText();
-                    }
-                    if ("asset".equals(reader.getLocalName())) {
-                        if(format.equals(EXT_BPMN) || format.equals(EXT_BPMN2)) {
-                            processes.add(title);
-                            title = "";
-                            format = "";
-                        }
-                    }
-                }
-            }
-            // last one
-            if(format.equals(EXT_BPMN) || format.equals(EXT_BPMN2)) {
-                processes.add(title);
-            }
-        } catch (Exception e) {
-        	_logger.error("Error finding processes in package: " + e.getMessage());
-        } 
+        Repository repository = profile.getRepository();
+        Collection<Asset> processesAssets = repository.listAssets(pkgName, new FilterByExtension(EXT_BPMN));
+        processesAssets.addAll(repository.listAssets(pkgName, new FilterByExtension(EXT_BPMN2)));
+
+
+        List<String> processes = new ArrayList<String>();
+
+        for (Asset processAsset : processesAssets) {
+            processes.add(processAsset.getName());
+        }
         return processes;
     }
 	
 	public static String getProcessImagePath(String packageName, String processid, IDiagramProfile profile) {
-		try {
-			return RepositoryInfo.getRepositoryProtocol(profile)
-			        + "://"
-			        + RepositoryInfo.getRepositoryHost(profile)
-			        + "/"
-			        + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-			                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-			        + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + processid + "-image"
-			        + "/binary/";
-		} catch (UnsupportedEncodingException e) {
-			_logger.error(e.getMessage());
-			return "";
-		}
-	}
-	
-	public static String getProcessImageSourcePath(String packageName, String processid, IDiagramProfile profile) {
-		return RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/" + packageName + "/assets/" + processid + "-image"
-                + "/source/";
-	}
-	
-	public static String getProcessSourceContent(String packageName, String assetName, IDiagramProfile profile) {
-		try {	
-			String assetSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
-	                + "://"
-	                + RepositoryInfo.getRepositoryHost(profile)
-	                + "/"
-	                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-	    	                RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-	                + "/rest/packages/" + URLEncoder.encode(packageName, "UTF-8") + "/assets/" + assetName
-	                + "/source/";
 
-        
-            InputStream in = ServletUtil.getInputStreamForURL(assetSourceURL, "GET", profile);
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(in, writer);
-            return writer.toString();
+        Repository repository = profile.getRepository();
+        Collection<Asset> imageAssets = repository.listAssets(packageName, new FilterByFileName(processid + "-image.png"));
+        if (imageAssets != null && imageAssets.size() > 0) {
+            Asset image = imageAssets.iterator().next();
+            return image.getUniqueId();
+        } else {
+            return "";
+        }
+	}
+
+    public static Collection<Asset> findAssetsInRepository(String assetName, IDiagramProfile profile) {
+
+        Repository repository = profile.getRepository();
+
+        return repository.listAssetsRecursively("/", new FilterByFileName(assetName));
+    }
+	
+	public static String getProcessSourceContent(String uuid, IDiagramProfile profile) {
+		try {
+            Repository repository = profile.getRepository();
+
+            Asset<String> processAsset = repository.loadAsset(uuid);
+
+            return processAsset.getAssetContent();
         } catch (Exception e) {
         	_logger.error("Error retrieving asset content: " + e.getMessage());
             return "";

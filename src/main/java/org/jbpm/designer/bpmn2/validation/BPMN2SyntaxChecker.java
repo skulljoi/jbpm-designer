@@ -434,7 +434,7 @@ public class BPMN2SyntaxChecker implements SyntaxChecker {
 				    for (String packageName : allPackageNames) {
 				        List<String> allProcessesInPackage = ServletUtil.getAllProcessesInPackage(packageName, profile);
 				        for(String p : allProcessesInPackage) {
-				            String processContent = ServletUtil.getProcessSourceContent(packageName, p, profile);
+				            String processContent = ServletUtil.getProcessSourceContent(uuid, profile);
 				            Pattern pattern = Pattern.compile("<\\S*process[\\s\\S]*id=\"" + ca.getCalledElement() + "\"", Pattern.MULTILINE);
 				            Matcher m = pattern.matcher(processContent);
 				            if(m.find()) {

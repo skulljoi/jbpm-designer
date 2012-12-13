@@ -51,7 +51,7 @@ public class CalledElementServlet extends HttpServlet {
         			List<String> allProcessesInPackage = ServletUtil.getAllProcessesInPackage(packageName, profile);
         			if(allProcessesInPackage != null && allProcessesInPackage.size() > 0) {
         				for(String p : allProcessesInPackage) {
-                			String processContent = ServletUtil.getProcessSourceContent(packageName, p, profile);
+                			String processContent = ServletUtil.getProcessSourceContent(uuid, profile);
                 			Pattern idPattern = Pattern.compile("<\\S*process[^\"]+id=\"([^_\"]+)\"", Pattern.MULTILINE);
         		            Matcher idMatcher = idPattern.matcher(processContent);
         		            if(idMatcher.find()) {
@@ -78,7 +78,7 @@ public class CalledElementServlet extends HttpServlet {
 	        		List<String> allProcessesInPackage = ServletUtil.getAllProcessesInPackage(packageName, profile);
 	        		if(allProcessesInPackage != null && allProcessesInPackage.size() > 0) {
 	    				for(String p : allProcessesInPackage) {
-	    					String processContent = ServletUtil.getProcessSourceContent(packageName, p, profile);
+	    					String processContent = ServletUtil.getProcessSourceContent(uuid, profile);
 	    					Pattern idPattern = Pattern.compile("<\\S*process[^\"]+id=\"([^_\"]+)\"", Pattern.MULTILINE);
 	    		            Matcher idMatcher = idPattern.matcher(processContent);
 	    		            if(idMatcher.find()) {
