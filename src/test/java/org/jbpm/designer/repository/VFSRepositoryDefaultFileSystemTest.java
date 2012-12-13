@@ -1,5 +1,6 @@
 package org.jbpm.designer.repository;
 
+import org.jbpm.designer.repository.filters.FilterByExtension;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
@@ -322,5 +323,23 @@ public class VFSRepositoryDefaultFileSystemTest {
 
         boolean assetExists = repository.assetExists(id);
         assertTrue(assetExists);
+    }
+
+    @Test
+    public void testListAssetsRecursively() {
+        Repository repository = new VFSRepository(profile);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/1/2/3/4/5/6");
+
+        String id = repository.storeAsset(builder.getAsset());
+        System.out.println(id);
+        Collection<Asset> foundAsset = repository.listAssetsRecursively("/", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
     }
 }

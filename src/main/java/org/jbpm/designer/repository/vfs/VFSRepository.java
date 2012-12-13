@@ -1,5 +1,6 @@
 package org.jbpm.designer.repository.vfs;
 
+import org.apache.commons.codec.binary.Base64;
 import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AbstractAsset;
 import org.jbpm.designer.repository.impl.AssetBuilder;
@@ -11,6 +12,7 @@ import org.kie.commons.java.nio.file.*;
 import org.kie.commons.java.nio.file.attribute.BasicFileAttributes;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.nio.charset.Charset;
 import java.util.*;
@@ -57,8 +59,22 @@ public class VFSRepository implements Repository {
         return foundDirectories;
     }
 
-    public Collection<Asset> listAssetsRecursively(String startAt, Filter filter) {
-        throw new UnsupportedOperationException();
+    public Collection<Asset> listAssetsRecursively(String startAt, final Filter filter) {
+        final Collection<Asset> foundAssets = new ArrayList<Asset>();
+        Path path = Paths.get(repositoryRoot.toString() + startAt);
+
+        Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+
+           public FileVisitResult visitFile(Path paths, BasicFileAttributes basicFileAttributes) throws IOException {
+               if (filter.accept(paths)) {
+                   foundAssets.add(buildAsset(paths, false));
+               }
+               return FileVisitResult.CONTINUE;
+           }
+
+        });
+
+        return foundAssets;
     }
 
     public String storeDirectory(String location) {
@@ -76,20 +92,30 @@ public class VFSRepository implements Repository {
     }
 
     public boolean deleteDirectory(String directory, boolean failIfNotEmpty) {
-        // TODO improve as soon as walkFileTree methods are provided on ioService
-        // before it gets use of walkFileTree if could have unexpected results for different file system providers
+
         try {
             Path path = Paths.get(repositoryRoot.toString() + directory);
-            File file = path.toFile();
-            if (failIfNotEmpty && file.listFiles().length > 0) {
-                throw new IllegalArgumentException("Directory " + directory + " is not empty");
-            }
-            if (file.isDirectory()) {
-                for (File f : file.listFiles()) {
-                    deleteDirectory(f.getAbsolutePath().replaceFirst(repositoryRoot.getPath(), ""), failIfNotEmpty);
+
+            Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path paths, BasicFileAttributes basicFileAttributes) throws IOException {
+
+                    ioService.delete(paths);
+
+                    return FileVisitResult.CONTINUE;
                 }
-            }
-            ioService.delete(path);
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                    if (e == null) {
+                        ioService.delete(dir);
+                        return FileVisitResult.CONTINUE;
+                    } else {
+                        // directory iteration failed
+                        throw e;
+                    }
+                }
+
+            });
 
             return true;
         } catch (Exception e)  {
@@ -138,8 +164,8 @@ public class VFSRepository implements Repository {
     }
 
     public Asset loadAsset(String assetUniqueId) throws AssetNotFoundException {
-
-        Path assetPath = Paths.get(URI.create(assetUniqueId));
+        String uniqueId = decodeUniqueId(assetUniqueId);
+        Path assetPath = Paths.get(URI.create(uniqueId));
 
         Asset asset = buildAsset(assetPath, true);
 
@@ -169,13 +195,13 @@ public class VFSRepository implements Repository {
             ioService.write(filePath, asset.getAssetContent().toString().getBytes(), null);
         }
 
-        return filePath.toUri().toString();
+        return encodeUniqueId(filePath.toUri().toString());
     }
 
     public boolean deleteAsset(String assetUniqueId) {
-
+        String uniqueId = decodeUniqueId(assetUniqueId);
         try {
-            return ioService.deleteIfExists(Paths.get(URI.create(assetUniqueId)));
+            return ioService.deleteIfExists(Paths.get(URI.create(uniqueId)));
         } catch (Exception e) {
             return false;
         }
@@ -189,8 +215,9 @@ public class VFSRepository implements Repository {
     }
 
     public boolean assetExists(String assetUniqueId) {
+        String uniqueId = decodeUniqueId(assetUniqueId);
         try {
-            return ioService.exists(Paths.get(URI.create(assetUniqueId)));
+            return ioService.exists(Paths.get(URI.create(uniqueId)));
         } catch (Exception e) {
             return ioService.exists(Paths.get(this.repositoryRoot.toString() + assetUniqueId));
         }
@@ -203,7 +230,7 @@ public class VFSRepository implements Repository {
 
         AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(file.getFileName().toString());
         BasicFileAttributes attrs = ioService.readAttributes(file, BasicFileAttributes.class);
-        assetBuilder.uniqueId(file.toUri().toString())
+        assetBuilder.uniqueId(encodeUniqueId(file.toUri().toString()))
                     .location(location)
                     .creationDate(attrs.creationTime() == null ? "" : attrs.creationTime().toString())
                     .lastModificationDate(attrs.lastModifiedTime() == null ? "" : attrs.lastModifiedTime().toString())
@@ -220,5 +247,26 @@ public class VFSRepository implements Repository {
         }
 
         return assetBuilder.getAsset();
+    }
+
+    private String decodeUniqueId(String uniqueId) {
+        if (Base64.isBase64(uniqueId)) {
+            byte[] decoded = Base64.decodeBase64(uniqueId);
+            try {
+                return new String(decoded, "UTF-8");
+            } catch (UnsupportedEncodingException e) {
+
+            }
+        }
+
+        return uniqueId;
+    }
+
+    private String encodeUniqueId(String uniqueId) {
+        try {
+            return Base64.encodeBase64URLSafeString(uniqueId.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            throw new IllegalStateException(e.getMessage());
+        }
     }
 }
