@@ -29,6 +29,54 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
         });
     },
     save : function() {
+
+        Ext.Ajax.request({
+            url: ORYX.PATH + 'assetservice',
+            method: 'POST',
+            success: function(response) {
+                try {
+                    if(response.responseText && response.responseText.length > 0) {
+//                        var pathjson = response.responseText.evalJSON();
+//                        var pathobj = pathjson["paths"];
+//                        for(var key in pathobj) {
+//                            if(key == pathid) {
+//                                var color = this.getDisplayColor(0);
+//                                var val = pathobj[key];
+//                                this.setNodeColors(key, color, val);
+//                            }
+//                        }
+//                        this.facade.raiseEvent({
+//                            type: ORYX.CONFIG.EVENT_SIMULATION_PATH_SVG_GENERATED
+//                        });
+                    } else {
+//                        Ext.MessageBox.minWidth = 200;
+//                        Ext.Msg.alert('Invalid Path data.');
+                    }
+                } catch(e) {
+//                    Ext.MessageBox.minWidth = 200;
+//                    Ext.Msg.alert('Error finding Paths:\n' + e);
+                }
+            }.bind(this),
+            failure: function(){
+//                Ext.Msg.alert('Error finding Paths.');
+            },
+            params: {
+                action: 'updateasset',
+                assetcontent: ORYX.EDITOR.getSerializedJSON(),
+                pp: ORYX.PREPROCESSING,
+                assetlocation: ORYX.UUID
+
+
+            }
+        });
+
+
+
+
+
+
+
+
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'success',
