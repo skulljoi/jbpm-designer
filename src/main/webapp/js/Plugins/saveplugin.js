@@ -24,7 +24,7 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
                 regexa = new RegExp( regexSa );
                 profileParams = regexa.exec( window.location.href );
                 profileParamValue = profileParams[1];
-                return profileParamValue == "jbpm";
+                return profileParamValue == "jbpm" && ORYX.ORYX.REPOSITORY_ID != "guvnor";
             }.bind(this)
         });
     },
@@ -36,52 +36,58 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
             success: function(response) {
                 try {
                     if(response.responseText && response.responseText.length > 0) {
-//                        var pathjson = response.responseText.evalJSON();
-//                        var pathobj = pathjson["paths"];
-//                        for(var key in pathobj) {
-//                            if(key == pathid) {
-//                                var color = this.getDisplayColor(0);
-//                                var val = pathobj[key];
-//                                this.setNodeColors(key, color, val);
-//                            }
-//                        }
-//                        this.facade.raiseEvent({
-//                            type: ORYX.CONFIG.EVENT_SIMULATION_PATH_SVG_GENERATED
-//                        });
+                        var saveResponse = response.responseText.evalJSON();
+                        if(saveResponse.errors && saveResponse.errors.lengt > 0) {
+                            var errors = saveResponse.errors;
+                            for(var j=0; j < errors.length; j++) {
+                                var errormessageobj = errors[j];
+                                this.facade.raiseEvent({
+                                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                    ntype		: 'error',
+                                    msg         : errormessageobj.message,
+                                    title       : ''
+                                });
+                            }
+                        } else {
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'success',
+                                msg         : 'Successfully saved asset: ' + ORYX.UUID,
+                                title       : ''
+                            });
+                        }
                     } else {
-//                        Ext.MessageBox.minWidth = 200;
-//                        Ext.Msg.alert('Invalid Path data.');
+                        this.facade.raiseEvent({
+                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                            ntype		: 'error',
+                            msg         : 'Unable to save: ' + e,
+                            title       : ''
+                        });
                     }
                 } catch(e) {
-//                    Ext.MessageBox.minWidth = 200;
-//                    Ext.Msg.alert('Error finding Paths:\n' + e);
+                    this.facade.raiseEvent({
+                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                        ntype		: 'error',
+                        msg         : 'Unable to save: ' + e,
+                        title       : ''
+                    });
                 }
             }.bind(this),
             failure: function(){
-//                Ext.Msg.alert('Error finding Paths.');
+                this.facade.raiseEvent({
+                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                    ntype		: 'error',
+                    msg         : 'Unable to save.',
+                    title       : ''
+                });
             },
             params: {
                 action: 'updateasset',
-                assetcontent: ORYX.EDITOR.getSerializedJSON(),
+                assetContent: ORYX.EDITOR.getSerializedJSON(),
                 pp: ORYX.PREPROCESSING,
-                assetlocation: ORYX.UUID
-
-
+                assetlocation: ORYX.UUID,
+                assetcontenttransform: 'jsontobpmn2'
             }
-        });
-
-
-
-
-
-
-
-
-        this.facade.raiseEvent({
-            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-            ntype		: 'success',
-            msg         : 'Successfully saved Asset',
-            title       : ''
         });
     }
 });

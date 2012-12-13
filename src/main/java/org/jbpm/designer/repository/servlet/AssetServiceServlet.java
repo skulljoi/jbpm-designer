@@ -63,7 +63,22 @@ public class AssetServiceServlet extends HttpServlet {
             IDiagramProfile profile = ServletUtil.getProfile(req, profileName, getServletContext());
             Repository repository = profile.getRepository();
             if(action != null && action.equals(ACTION_CREATE_ASSET)) {
-                // TODO FINISH
+                try {
+                    AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+                    builder.content("")
+                            .type(assetType)
+                            .name(assetName)
+                            .location(assetLocation);
+
+                    String id = repository.createAsset(builder.getAsset());
+                    if(id == null) {
+                        _logger.error("Unable to create asset: " + assetLocation);
+                        addError(errorsArray, "Unable to create asset: " + assetLocation);
+                    }
+                } catch (Exception e) {
+                    _logger.error("Error creating asset: " + e.getMessage());
+                    addError(errorsArray, "Error creating asset: " + e.getMessage());
+                }
             } else if(action != null && action.equals(ACTION_UPDATE_ASSET)) {
                 try {
                     if(assetContentTransform != null && assetContentTransform.equals(TRANSFORMATION_JSON_TO_BPMN2)) {
@@ -247,7 +262,13 @@ public class AssetServiceServlet extends HttpServlet {
 
     private void addError(JSONArray errorArray, String errorMessage) {
         if(errorArray != null) {
-            errorArray.put(errorMessage);
+            try {
+                JSONObject error = new JSONObject();
+                error.put("message", errorMessage);
+                errorArray.put(error);
+            } catch (JSONException e) {
+                _logger.error("Unable to add error message: " + errorMessage);
+            }
         }
     }
 

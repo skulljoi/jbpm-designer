@@ -448,6 +448,9 @@ public class EditorHandler extends HttpServlet {
             } else if ("localhistorytimeout".equals(elt)) {
                 resultHtml.append(profile.getLocalHistoryTimeout());
                 replacementMade = true;
+            } else if ("repositoryid".equals(elt)) {
+                resultHtml.append(profile.getRepositoryId());
+                replacementMade = true;
             } else if ("designerversion".equals(elt)) {
                 resultHtml.append(_designerVersion);
                 replacementMade = true;
