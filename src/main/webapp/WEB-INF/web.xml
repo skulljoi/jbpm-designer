@@ -69,6 +69,11 @@
   <servlet-class>org.jbpm.designer.web.server.TransformerServlet</servlet-class>
  </servlet>
  <servlet>
+  <display-name>AssetService</display-name>
+  <servlet-name>AssetServiceServlet</servlet-name>
+  <servlet-class>org.jbpm.designer.repository.servlet.AssetServiceServlet</servlet-class>
+ </servlet>
+ <servlet>
   <display-name>FileStore</display-name>
   <servlet-name>FileStoreServlet</servlet-name>
   <servlet-class>org.jbpm.designer.web.server.FileStoreServlet</servlet-class>
@@ -180,6 +185,10 @@
   <servlet-name>TransformerServlet</servlet-name>
   <url-pattern>/transformer</url-pattern>
  </servlet-mapping>
+<servlet-mapping>
+  <servlet-name>AssetServiceServlet</servlet-name>
+  <url-pattern>/assetservice</url-pattern>
+</servlet-mapping>
  <servlet-mapping>
   <servlet-name>FileStoreServlet</servlet-name>
   <url-pattern>/filestore</url-pattern>
