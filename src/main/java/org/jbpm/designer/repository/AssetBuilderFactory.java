@@ -43,4 +43,26 @@ public class AssetBuilderFactory {
             return getAssetBuilder(Asset.AssetType.Text).type(extension).name(nameOnly);
         }
     }
+
+    public static AssetBuilder getAssetBuilder(Asset asset) {
+        AssetBuilder builder = null;
+        if(binaryFormats.contains(asset.getAssetType())) {
+            builder = getAssetBuilder(Asset.AssetType.Byte);
+
+
+        } else {
+            builder = getAssetBuilder(Asset.AssetType.Text);
+        }
+        builder.type(asset.getAssetType())
+                .name(asset.getName())
+                .version(asset.getVersion())
+                .location(asset.getAssetLocation())
+                .uniqueId(asset.getUniqueId())
+                .creationDate(asset.getCreationDate())
+                .lastModificationDate(asset.getLastModificationDate())
+                .description(asset.getDescription())
+                .owner(asset.getOwner());
+
+        return builder;
+    }
 }
