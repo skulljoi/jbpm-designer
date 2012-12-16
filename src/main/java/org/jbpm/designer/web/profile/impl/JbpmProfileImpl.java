@@ -222,9 +222,16 @@ public class JbpmProfileImpl implements IDiagramProfile {
     }
 
     private void initializeRepository() {
-
-        RepositoryManager.getInstance().registerRepository("repository-guvnor", new GuvnorRepository(this));
-        RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
+        try {
+            RepositoryManager.getInstance().registerRepository("repository-guvnor", new GuvnorRepository(this));
+        } catch(Exception e) {
+            _logger.error("Unable to register guvnor repository.");
+        }
+        try {
+            RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
+        } catch(Exception e) {
+            _logger.error("Unable to register vfs repository.");
+        }
         initialized = true;
     }
 

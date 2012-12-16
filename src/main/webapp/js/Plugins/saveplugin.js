@@ -24,7 +24,7 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
                 regexa = new RegExp( regexSa );
                 profileParams = regexa.exec( window.location.href );
                 profileParamValue = profileParams[1];
-                return profileParamValue == "jbpm" && ORYX.ORYX.REPOSITORY_ID != "guvnor";
+                return profileParamValue == "jbpm" && ORYX.REPOSITORY_ID != "guvnor";
             }.bind(this)
         });
     },
@@ -80,7 +80,7 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
                     msg         : 'Unable to save.',
                     title       : ''
                 });
-            },
+            }.bind(this),
             params: {
                 action: 'updateasset',
                 assetContent: ORYX.EDITOR.getSerializedJSON(),

@@ -433,15 +433,15 @@ public class EditorHandler extends HttpServlet {
                 resultHtml.append(preprocessingUnit == null ? "" : preprocessingUnit.getOutData());
                 replacementMade = true;    
             } else if ("externalprotocol".equals(elt)) {
-                resultHtml.append(RepositoryInfo.getRepositoryProtocol(profile));
+                resultHtml.append(RepositoryInfo.getRepositoryProtocol(profile) == null ? "" : RepositoryInfo.getRepositoryProtocol(profile));
                 replacementMade = true;    
             } else if ("externalhost".equals(elt)) {
                 resultHtml.append(RepositoryInfo.getRepositoryHost(profile));
                 replacementMade = true;    
             } else if ("externalsubdomain".equals(elt)) {
-                resultHtml.append(RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")));
-                replacementMade = true;    
+                resultHtml.append(RepositoryInfo.getRepositorySubdomain(profile) != null ? RepositoryInfo.getRepositorySubdomain(profile).substring(0,
+                    RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) : "");
+                replacementMade = true;
             } else if ("localhistoryenabled".equals(elt)) {
                 resultHtml.append(profile.getLocalHistoryEnabled());
                 replacementMade = true;
@@ -643,7 +643,7 @@ public class EditorHandler extends HttpServlet {
                 }
             }
             inputStream.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             _logger.error(e.getMessage(), e);
         }
         return retStr;
