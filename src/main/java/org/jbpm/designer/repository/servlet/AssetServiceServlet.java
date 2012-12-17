@@ -38,6 +38,12 @@ public class AssetServiceServlet extends HttpServlet {
     private static final String OPTION_BY_ID = "optionbyid";
     private static final String TRANSFORMATION_JSON_TO_BPMN2 = "jsontobpmn2";
 
+    private IDiagramProfile profile;
+    // this is here just for unit testing purpose
+    public void setProfile(IDiagramProfile profile) {
+        this.profile = profile;
+    }
+
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
@@ -60,7 +66,10 @@ public class AssetServiceServlet extends HttpServlet {
         JSONArray errorsArray = new JSONArray();
 
         try {
-            IDiagramProfile profile = ServletUtil.getProfile(req, profileName, getServletContext());
+
+            if (profile == null) {
+                profile = ServletUtil.getProfile(req, profileName, getServletContext());
+            }
             Repository repository = profile.getRepository();
             if(action != null && action.equals(ACTION_CREATE_ASSET)) {
                 try {
@@ -75,10 +84,12 @@ public class AssetServiceServlet extends HttpServlet {
                         _logger.error("Unable to create asset: " + assetLocation);
                         addError(errorsArray, "Unable to create asset: " + assetLocation);
                     }
+                    returnObj.put("assetId", id);
                 } catch (Exception e) {
                     _logger.error("Error creating asset: " + e.getMessage());
                     addError(errorsArray, "Error creating asset: " + e.getMessage());
                 }
+                jsonResponse(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_UPDATE_ASSET)) {
                 try {
                     if(assetContentTransform != null && assetContentTransform.equals(TRANSFORMATION_JSON_TO_BPMN2)) {
