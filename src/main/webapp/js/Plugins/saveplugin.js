@@ -83,9 +83,10 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
             }.bind(this),
             params: {
                 action: 'updateasset',
-                assetContent: ORYX.EDITOR.getSerializedJSON(),
+                profile: ORYX.PROFILE,
+                assetcontent: ORYX.EDITOR.getSerializedJSON(),
                 pp: ORYX.PREPROCESSING,
-                assetlocation: ORYX.UUID,
+                assetid: ORYX.UUID,
                 assetcontenttransform: 'jsontobpmn2'
             }
         });

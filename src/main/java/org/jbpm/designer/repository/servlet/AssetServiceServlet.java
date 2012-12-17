@@ -85,8 +85,8 @@ public class AssetServiceServlet extends HttpServlet {
                             assetContent = profile.createMarshaller().parseModel(assetContent, preprocessingData);
                     }
 
-                    Asset<String> currentAsset = repository.loadAssetFromPath(assetLocation);
-                    AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(currentAsset.getFullName());
+                    Asset<String> currentAsset = repository.loadAsset(assetId);
+                    AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(currentAsset);
                     builder.content(assetContent);
                     String id = repository.updateAsset(builder.getAsset());
 
@@ -95,6 +95,7 @@ public class AssetServiceServlet extends HttpServlet {
                         addError(errorsArray, "Unable to store asset: " + assetLocation);
                     }
                 } catch (Exception e) {
+                    e.printStackTrace();
                     _logger.error("Error storing asset: " + e.getMessage());
                     addError(errorsArray, "Error storing asset: " + e.getMessage());
                 }
@@ -250,6 +251,7 @@ public class AssetServiceServlet extends HttpServlet {
                 jsonResponse(returnObj, errorsArray, resp);
             }
         } catch(Exception e) {
+            e.printStackTrace();
             _logger.error(e.getMessage());
         }
     }

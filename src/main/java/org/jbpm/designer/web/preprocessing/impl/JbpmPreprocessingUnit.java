@@ -60,6 +60,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     private String formWidgetsDir;
     private String customEditorsInfo;
     private String patternsData;
+    private String sampleBpmn2;
 
     public JbpmPreprocessingUnit(ServletContext servletContext) {
         stencilPath = servletContext.getRealPath("/" + STENCILSET_PATH);
@@ -75,6 +76,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
         formWidgetsDir = servletContext.getRealPath("/defaults/formwidgets");
         customEditorsInfo = servletContext.getRealPath("/defaults/customeditors.json");
         patternsData = servletContext.getRealPath("/defaults/patterns.json");
+        sampleBpmn2 = servletContext.getRealPath("/defaults/SampleProcess.bpmn2");
     }
 
     public String getOutData() {
@@ -92,6 +94,8 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
         String uuid = req.getParameter("uuid");
         try {
+            createAssetIfNotExisting(repository, "/defaultPackage", "BPMN2-SampleProcess", "bpmn2", getBytesFromFile(new File(sampleBpmn2)));
+
             Asset<String> asset = repository.loadAsset(uuid);
             outData = "";
             Map<String, ThemeInfo> themeData = setupThemes(req, repository, profile);
@@ -99,7 +103,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
 
             setupFormWidgets(repository, profile);
-            setupDefaultIcons(asset.getAssetLocation(), repository);
+            setupDefaultIcons(profile.getRepositoryGlobalDir(), repository);
 
             // figure out which package our uuid belongs in and get back the list of configs
             Collection<Asset> workitemConfigInfo = findWorkitemInfoForUUID(asset.getAssetLocation(), repository);
@@ -120,6 +124,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
                 try {
                     evaluateWorkDefinitions(workDefinitions, entry, repository, profile);
                 } catch(Exception e) {
+                    e.printStackTrace();
                     // log and continue
                     _logger.error("Unable to parse a workitem definition: " + e.getMessage());
                 }
@@ -315,13 +320,13 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
     private Map<String, ThemeInfo> setupThemes(HttpServletRequest req, Repository repository, IDiagramProfile profile) {
         Map<String, ThemeInfo> themeData = new HashMap<String, JbpmPreprocessingUnit.ThemeInfo>();
-        Asset<byte[]> themeAsset = null;
+        Asset<String> themeAsset = null;
         try {
             boolean themeExists = repository.assetExists(profile.getRepositoryGlobalDir() + "/" + THEME_NAME + THEME_EXT);
             if (!themeExists) {
                 // create theme asset
-                AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
-                assetBuilder.content(getBytesFromFile(new File(themeInfo)))
+                AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+                assetBuilder.content(new String(getBytesFromFile(new File(themeInfo)), "UTF-8"))
                         .location(profile.getRepositoryGlobalDir())
                         .name(THEME_NAME)
                         .type("json")
@@ -336,7 +341,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
             }
 
 
-            String themesStr = new String(themeAsset.getAssetContent(), "UTF-8");
+            String themesStr = themeAsset.getAssetContent();
 
 
             JSONObject themesObject =  new JSONObject(themesStr);
@@ -368,6 +373,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
             }
             return themeData;
         } catch (Exception e) {
+            e.printStackTrace();
             // we dont want to barf..just log that error happened
             _logger.error(e.getMessage());
             return themeData;
@@ -487,7 +493,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
     private String createAssetIfNotExisting(Repository repository, String location, String name, String type, byte[] content) {
         try {
-            boolean assetExists = repository.assetExists(location + name);
+            boolean assetExists = repository.assetExists(location + name + "." + type);
             if (!assetExists) {
                 // create theme asset
                 AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);

@@ -82,21 +82,6 @@ public class ThemeServlet extends HttpServlet {
         Repository repository = profile.getRepository();
 
 		String themesStr = "";
-		String themesURL = RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/globalArea/assets/" + THEME_NAME;
-    	
-    	String themesSourceURL = RepositoryInfo.getRepositoryProtocol(profile)
-                + "://"
-                + RepositoryInfo.getRepositoryHost(profile)
-                + "/"
-                + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                        RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                + "/rest/packages/globalArea/assets/" + THEME_NAME + "/source";
     	
         try {
 
