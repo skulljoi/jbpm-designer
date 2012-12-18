@@ -84,7 +84,7 @@ public class TaskFormsServletTest {
         assertNotNull(forms);
         assertEquals(1, forms.size());
         assertEquals("hello-taskform", forms.iterator().next().getName());
-        assertEquals("/defaultPackage/", forms.iterator().next().getAssetLocation());
+        assertEquals("/defaultPackage", forms.iterator().next().getAssetLocation());
 
         Asset<String> form = repository.loadAsset(forms.iterator().next().getUniqueId());
         assertNotNull(form.getAssetContent());
@@ -121,11 +121,11 @@ public class TaskFormsServletTest {
         Iterator<Asset> assets = forms.iterator();
         Asset asset1 = assets.next();
         assertEquals("evaluate-taskform", asset1.getName());
-        assertEquals("/defaultPackage/", asset1.getAssetLocation());
+        assertEquals("/defaultPackage", asset1.getAssetLocation());
 
         Asset asset2 = assets.next();
         assertEquals("testprocess-taskform", asset2.getName());
-        assertEquals("/defaultPackage/", asset2.getAssetLocation());
+        assertEquals("/defaultPackage", asset2.getAssetLocation());
 
         Asset<String> form1 = repository.loadAsset(asset1.getUniqueId());
         assertNotNull(form1.getAssetContent());

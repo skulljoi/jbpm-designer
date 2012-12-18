@@ -391,7 +391,7 @@ public class AssetServiceServletTest {
 
         String jsonResponse = new String(response.getContent());
         assertNotNull(jsonResponse);
-        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage/\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
+        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
     }
 
 
@@ -488,7 +488,7 @@ public class AssetServiceServletTest {
 
         String jsonResponse = new String(response.getContent());
         assertNotNull(jsonResponse);
-        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage/\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
+        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
     }
 
     @Test
@@ -520,6 +520,6 @@ public class AssetServiceServletTest {
 
         String jsonResponse = new String(response.getContent());
         assertNotNull(jsonResponse);
-        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage/\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
+        assertTrue(jsonResponse.indexOf("\"location\":\"/defaultPackage\",\"description\":\"\",\"name\":\"testprocess\",\"owner\":\"\",\"type\":\"bpmn2\",\"fullname\":\"testprocess.bpmn2\"") != -1);
     }
 }

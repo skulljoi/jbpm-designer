@@ -95,10 +95,10 @@ public class TaskFormsEditorServlet extends HttpServlet {
 	 
 	 private String getTaskFormFromRepository(String taskName, String packageName, Repository repository) {
          try {
-
-             Asset<String> formAsset = repository.loadAssetFromPath(packageName + taskName + TASKFORM_NAME_EXTENSION + "." + TASKFORM_FILE_EXTENSION);
+             Asset<String> formAsset = repository.loadAssetFromPath(packageName + "/" + taskName + TASKFORM_NAME_EXTENSION + "." + TASKFORM_FILE_EXTENSION);
              return formAsset.getAssetContent();
          } catch (Exception e) {
+             e.printStackTrace();
              _logger.error(e.getMessage());
          }
          return "false";

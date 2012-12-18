@@ -88,7 +88,7 @@ public class TaskFormsEditorServletTest {
 
         Asset asset1 = assets.next();
         assertEquals("evaluate-taskform", asset1.getName());
-        assertEquals("/defaultPackage/", asset1.getAssetLocation());
+        assertEquals("/defaultPackage", asset1.getAssetLocation());
 
         Asset<String> form1 = repository.loadAsset(asset1.getUniqueId());
         assertNotNull(form1.getAssetContent());
@@ -130,6 +130,7 @@ public class TaskFormsEditorServletTest {
         taskFormsEditorServlet.doPost(new TestHttpServletRequest(params), response);
 
         String formData =      new String(response.getContent());
+        System.out.println(formData);
         assertEquals("this is simple task content\n", formData);
     }
 }
