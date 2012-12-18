@@ -9,28 +9,52 @@ import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.*;
 
-import java.io.*;
-import java.util.*;
+import java.io.File;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-public class JbpmPreprocessingUnitVFSTest {
+public class JbpmPreprocessingUnitVFSGitTest {
 
-    private static final String REPOSITORY_ROOT = System.getProperty("java.io.tmpdir")+"designer-repo";
-    private static final String VFS_REPOSITORY_ROOT = "default://" + REPOSITORY_ROOT;
+    // TODO change it to generic independent path
+    private static final String REPOSITORY_ROOT = "designer-playground";
+    private static final String VFS_REPOSITORY_ROOT = "git://" + REPOSITORY_ROOT;
+    private static final String USERNAME = "guvnorngtestuser1";
+    private static final String PASSWORD = "test1234";
+    private static final String ORIGIN_URL      = "https://github.com/mswiderski/designer-playground.git";
+    private static final String FETCH_COMMAND = "?fetch";
     private JbpmProfileImpl profile;
+
+    private static String gitLocalClone = System.getProperty("java.io.tmpdir") + "git-repo";
+    private static Map<String, String> env = new HashMap<String, String>();
+
+    private static int counter = -100;
+
+    @BeforeClass
+    public static void prepare() {
+
+        env.put( "username", USERNAME );
+        env.put( "password", PASSWORD );
+        env.put( "origin", ORIGIN_URL );
+        env.put( "fetch.cmd", FETCH_COMMAND );
+        System.setProperty("org.kie.nio.git.dir", gitLocalClone);
+    }
+
+    @AfterClass
+    public static void cleanup() {
+        System.clearProperty("org.kie.nio.git.dir");
+    }
 
     @Before
     public void setup() {
-        new File(REPOSITORY_ROOT).mkdir();
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
-        profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
+        profile.setRepositoryRoot(VFS_REPOSITORY_ROOT + counter);
         profile.setRepositoryGlobalDir("/global");
     }
 
@@ -45,15 +69,21 @@ public class JbpmPreprocessingUnitVFSTest {
 
     @After
     public void teardown() {
-        File repo = new File(REPOSITORY_ROOT);
+        File repo = new File(gitLocalClone);
         if(repo.exists()) {
             deleteFiles(repo);
         }
         repo.delete();
+        repo = new File(".niogit");
+        if(repo.exists()) {
+            deleteFiles(repo);
+        }
+        repo.delete();
+        counter++;
     }
     @Test
     public void testProprocess() {
-        Repository repository = new VFSRepository(profile);
+        Repository repository = new VFSRepository(profile, env);
         //prepare folders that will be used
         repository.createDirectory("/myprocesses");
         repository.createDirectory("/global");
@@ -79,7 +109,7 @@ public class JbpmPreprocessingUnitVFSTest {
         // validate results
         Collection<Asset> globalAssets = repository.listAssets("/global");
         assertNotNull(globalAssets);
-        assertEquals(29, globalAssets.size());
+        assertEquals(30, globalAssets.size());
         repository.assetExists("/global/backboneformsinclude.fw");
         repository.assetExists("/global/backbonejsinclude.fw");
         repository.assetExists("/global/cancelbutton.fw");
@@ -109,13 +139,15 @@ public class JbpmPreprocessingUnitVFSTest {
         repository.assetExists("/global/defaultemailicon.gif");
         repository.assetExists("/global/defaultlogicon.gif");
         repository.assetExists("/global/defaultservicenodeicon.png");
+        repository.assetExists("/global/.gitignore");
 
         Collection<Asset> defaultStuff = repository.listAssets("/myprocesses");
         assertNotNull(defaultStuff);
-        assertEquals(2, defaultStuff.size());
+        assertEquals(3, defaultStuff.size());
         repository.assetExists("/myprocesses/WorkDefinitions.wid");
         // this is the process asset that was created for the test but let's check it anyway
         repository.assetExists("/myprocesses/process.bpmn2");
+        repository.assetExists("/myprocesses/.gitignore");
 
     }
 }

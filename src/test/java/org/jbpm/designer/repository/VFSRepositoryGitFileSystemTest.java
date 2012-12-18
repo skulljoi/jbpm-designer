@@ -26,7 +26,7 @@ public class VFSRepositoryGitFileSystemTest {
     private JbpmProfileImpl profile;
 
     private static String gitLocalClone = System.getProperty("java.io.tmpdir") + "git-repo";
-    private static Map<String, Object> env = new HashMap<String, Object>();
+    private static Map<String, String> env = new HashMap<String, String>();
 
     private static int counter = 0;
 

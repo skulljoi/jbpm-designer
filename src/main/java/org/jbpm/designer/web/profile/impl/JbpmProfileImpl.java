@@ -225,7 +225,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
             _logger.error("Unable to register guvnor repository.");
         }
         try {
-            RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
+            RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this, profileParameters));
         } catch(Exception e) {
             e.printStackTrace();
             _logger.error("Unable to register vfs repository.");

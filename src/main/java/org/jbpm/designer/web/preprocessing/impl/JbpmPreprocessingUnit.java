@@ -35,7 +35,7 @@ import java.util.*;
  */
 public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     private static final Logger _logger =
-            Logger.getLogger(JbpmPreprocessingUnitVFS.class);
+            Logger.getLogger(JbpmPreprocessingUnit.class);
     public static final String STENCILSET_PATH = "stencilsets";
     public static final String WORKITEM_DEFINITION_EXT = "wid";
     public static final String THEME_NAME = "themes";
@@ -297,7 +297,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
                 int extPosition = formWidget.getName().lastIndexOf(".");
                 String extension = formWidget.getName().substring(extPosition + 1);
                 String name = formWidget.getName().substring(0, extPosition);
-                createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir() + "/", name, extension,
+                createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir(), name, extension,
                         getBytesFromFile(formWidget));
 
 
@@ -310,7 +310,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     private void setupCustomEditors(Repository repository, IDiagramProfile profile) {
 
         try {
-            createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir() + "/", CUSTOMEDITORS_NAME, "json",
+            createAssetIfNotExisting(repository, profile.getRepositoryGlobalDir(), CUSTOMEDITORS_NAME, "json",
                     getBytesFromFile(new File(customEditorsInfo)));
 
         } catch (Exception e) {

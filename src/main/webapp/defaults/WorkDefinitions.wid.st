@@ -18,6 +18,6 @@ import org.drools.process.core.datatype.impl.type.StringDataType;
       "Message" : new StringDataType()
     ],
     "displayName" : "Log",
-    "icon" : "global/defaultlogicon.gif"
+    "icon" : "/global/defaultlogicon.gif"
   ]
 ]

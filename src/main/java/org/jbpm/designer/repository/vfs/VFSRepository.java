@@ -32,10 +32,10 @@ public class VFSRepository implements Repository {
 
     public VFSRepository(IDiagramProfile profile) {
         // TODO build env from profile params?
-        this(profile, new HashMap<String, Object>());
+        this(profile, new HashMap<String, String>());
     }
 
-    public VFSRepository(IDiagramProfile profile, Map<String, Object> env) {
+    public VFSRepository(IDiagramProfile profile, Map<String, String> env) {
         this.repositoryRoot = URI.create(profile.getRepositoryRoot());
 
         this.fileSystem = ioService.getFileSystem( this.repositoryRoot );
