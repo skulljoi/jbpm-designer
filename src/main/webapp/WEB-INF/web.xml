@@ -54,6 +54,16 @@
    <param-value>default</param-value>
   </init-param>
  </servlet>
+<servlet>
+    <display-name>Menu Connector Servlet</display-name>
+    <servlet-name>MenuConnectorServlet</servlet-name>
+    <servlet-class>org.jbpm.designer.web.server.menu.MenuConnectorServlet</servlet-class>
+</servlet>
+<servlet>
+    <display-name>Menu Servlet</display-name>
+    <servlet-name>MenuServlet</servlet-name>
+    <servlet-class>org.jbpm.designer.web.server.menu.MenuServlet</servlet-class>
+</servlet>
  <servlet>
   <display-name>UUID Based Repository</display-name>
   <servlet-name>UUIDBasedRepositoryServlet</servlet-name>
@@ -173,6 +183,14 @@
   <servlet-name>EditorHandler</servlet-name>
   <url-pattern>/editor/*</url-pattern>
  </servlet-mapping>
+<servlet-mapping>
+    <servlet-name>MenuConnectorServlet</servlet-name>
+    <url-pattern>/menuconnector/*</url-pattern>
+</servlet-mapping>
+<servlet-mapping>
+    <servlet-name>MenuServlet</servlet-name>
+    <url-pattern>/menu/*</url-pattern>
+</servlet-mapping>
  <servlet-mapping>
   <servlet-name>DirectoryListingServlet</servlet-name>
   <url-pattern>/generated-uis/</url-pattern>

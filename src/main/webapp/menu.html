@@ -1,11 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta charset="utf-8">
-    <link href="/designer/css/menu/menu.css" rel="stylesheet" type="text/css">
-    <script src="/designer/lib/jquery-1.7.2.min.js" type="text/javascript"></script>
-    <script src="/designer/lib/handlebars-1.0.0.beta.6.js" type="text/javascript"></script>
-    </head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="stylesheet" href="/designer/css/smoothness/jquery-ui-1.8.13.custom.css" type="text/css" media="screen" charset="utf-8">
+    <link rel="stylesheet" href="/designer/css/menu.css" type="text/css" media="screen" charset="utf-8">
 
+    <script src="/designer/lib/jquery-1.7.2.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/designer/lib/jquery-ui-1.8.13.custom.min.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/designer/js/menu/menu.full.js" type="text/javascript" charset="utf-8"></script>
+
+    <script charset="utf-8">
+        $().ready(function() {
+
+            var menu = $('#menu').elfinder({
+                root: '@rootid@',
+                rootAlias: '@rootname@',
+                url : '/designer/menuconnector',
+                lang : '@language@',
+                docked : true,
+                debug: true,
+                fileURL: false,
+                dirSize: false,
+                dotFiles: false,
+                uploadDeny: ['application'],
+                uploadAllow: ['image/png', 'image/jpeg', 'image/png', 'text/xml', 'text/plain'],
+                disabled: ['rename', 'quicklook', 'archive', 'extract']
+
+                // dialog : {
+                // 	title : 'File manager',
+                // 	height : 500
+                // }
+
+                // Callback example
+                //editorCallback : function(url) {
+                //	if (window.console && window.console.log) {
+                //		window.console.log(url);
+                //	} else {
+                //		alert(url);
+                //	}
+                //},
+                //closeOnEditorCallback : true
+            })
+        })
+    </script>
+</head>
+<body>
+    <div id="menu">menu</div>
 </body>
 </html>

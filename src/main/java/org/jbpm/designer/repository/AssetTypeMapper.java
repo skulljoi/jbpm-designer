@@ -14,6 +14,11 @@ public class AssetTypeMapper {
         mimeTypes.put("flt", "text/plain");
         mimeTypes.put("xml", "text/xml");
         mimeTypes.put("json", "text/json");
+        mimeTypes.put("html", "text/html");
+        mimeTypes.put("htm", "text/html");
+        mimeTypes.put("js", "text/javascript");
+        mimeTypes.put("css", "text/css");
+        mimeTypes.put("java", "text/x-java-source");
 
     }
 

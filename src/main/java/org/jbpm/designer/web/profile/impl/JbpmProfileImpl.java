@@ -52,9 +52,9 @@ import org.jbpm.designer.web.profile.IDiagramProfile;
  * @author Tihomir Surdilovic
  */
 public class JbpmProfileImpl implements IDiagramProfile {
-    
+
     private static Logger _logger = LoggerFactory.getLogger(JbpmProfileImpl.class);
-    
+
     private Map<String, IDiagramPlugin> _plugins = new LinkedHashMap<String, IDiagramPlugin>();
 
     private String _stencilSet;
@@ -72,7 +72,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
     public JbpmProfileImpl() {
         this(null, false, false);
     }
-    
+
     public JbpmProfileImpl(ServletContext servletContext, boolean initializeLocalPlugins, boolean initializeRepository) {
         if(initializeLocalPlugins) {
             initializeLocalPlugins(servletContext);
@@ -97,7 +97,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
     public Collection<String> getPlugins() {
         return Collections.unmodifiableCollection(_plugins.keySet());
     }
-    
+
     private void initializeLocalPlugins(ServletContext context) {
         Map<String, IDiagramPlugin> registry = PluginServiceImpl.getLocalPluginsRegistry(context);
         FileInputStream fileStream = null;
@@ -153,7 +153,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
                                 if(!isEmpty(repositorySubdomain)) {
                                     if(repositorySubdomain.startsWith("/")) {
                                         repositorySubdomain = repositorySubdomain.substring(1);
-                                    } 
+                                    }
                                     if(repositorySubdomain.endsWith("/")) {
                                         repositorySubdomain = repositorySubdomain.substring(0, repositorySubdomain.length() - 1);
                                     }
@@ -225,7 +225,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
             _logger.error("Unable to register guvnor repository.");
         }
         try {
-            RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this, profileParameters));
+            RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
         } catch(Exception e) {
             e.printStackTrace();
             _logger.error("Unable to register vfs repository.");
@@ -243,6 +243,10 @@ public class JbpmProfileImpl implements IDiagramProfile {
 
     public String getRepositoryId() {
         return profileParameters.get("id");
+    }
+
+    public String getRepositoryName() {
+        return profileParameters.get("name");
     }
 
     public String getRepositoryRoot() {
@@ -285,6 +289,9 @@ public class JbpmProfileImpl implements IDiagramProfile {
         this.profileParameters.put("id", _repositoryId);
     }
 
+    public void setRepositoryName(String _repositoryName) {
+        this.profileParameters.put("name", _repositoryName);
+    }
 
     public void setRepositoryRoot(String _repositoryRoot) {
         this.profileParameters.put("root", _repositoryRoot);
@@ -301,7 +308,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
         }
         return RepositoryManager.getInstance().getRepository("repository-" + profileParameters.get("id"));
     }
-    
+
     public IDiagramMarshaller createMarshaller() {
         return new IDiagramMarshaller() {
             public String parseModel(String jsonModel, String preProcessingData) {
@@ -321,31 +328,31 @@ public class JbpmProfileImpl implements IDiagramProfile {
                 return "";
             }
 
-			public Definitions getDefinitions(String jsonModel,
-					String preProcessingData) {
-				try {
-					Bpmn2JsonUnmarshaller unmarshaller = new Bpmn2JsonUnmarshaller();
-					JBPMBpmn2ResourceImpl res = (JBPMBpmn2ResourceImpl) unmarshaller.unmarshall(jsonModel, preProcessingData);
-					return (Definitions) res.getContents().get(0);
-				} catch (JsonParseException e) {
-					_logger.error(e.getMessage(), e);
-				} catch (IOException e) {
-					_logger.error(e.getMessage(), e);
-				}
-				return null;
-			}
-			
-			public Resource getResource(String jsonModel, String preProcessingData) {
-				try {
-					Bpmn2JsonUnmarshaller unmarshaller = new Bpmn2JsonUnmarshaller();
-					return (JBPMBpmn2ResourceImpl) unmarshaller.unmarshall(jsonModel, preProcessingData);
-				} catch (JsonParseException e) {
-					_logger.error(e.getMessage(), e);
-				} catch (IOException e) {
-					_logger.error(e.getMessage(), e);
-				}
-				return null;
-			}
+            public Definitions getDefinitions(String jsonModel,
+                                              String preProcessingData) {
+                try {
+                    Bpmn2JsonUnmarshaller unmarshaller = new Bpmn2JsonUnmarshaller();
+                    JBPMBpmn2ResourceImpl res = (JBPMBpmn2ResourceImpl) unmarshaller.unmarshall(jsonModel, preProcessingData);
+                    return (Definitions) res.getContents().get(0);
+                } catch (JsonParseException e) {
+                    _logger.error(e.getMessage(), e);
+                } catch (IOException e) {
+                    _logger.error(e.getMessage(), e);
+                }
+                return null;
+            }
+
+            public Resource getResource(String jsonModel, String preProcessingData) {
+                try {
+                    Bpmn2JsonUnmarshaller unmarshaller = new Bpmn2JsonUnmarshaller();
+                    return (JBPMBpmn2ResourceImpl) unmarshaller.unmarshall(jsonModel, preProcessingData);
+                } catch (JsonParseException e) {
+                    _logger.error(e.getMessage(), e);
+                } catch (IOException e) {
+                    _logger.error(e.getMessage(), e);
+                }
+                return null;
+            }
         };
     }
 
@@ -364,13 +371,13 @@ public class JbpmProfileImpl implements IDiagramProfile {
             }
         };
     }
-    
+
     public Definitions getDefinitions(String xml) {
         try {
-        	DroolsFactoryImpl.init();
+            DroolsFactoryImpl.init();
             ResourceSet resourceSet = new ResourceSetImpl();
             resourceSet.getResourceFactoryRegistry().getExtensionToFactoryMap()
-                .put(Resource.Factory.Registry.DEFAULT_EXTENSION, new JBPMBpmn2ResourceFactoryImpl());
+                    .put(Resource.Factory.Registry.DEFAULT_EXTENSION, new JBPMBpmn2ResourceFactoryImpl());
             resourceSet.getPackageRegistry().put("http://www.omg.org/spec/BPMN/20100524/MODEL", Bpmn2Package.eINSTANCE);
             resourceSet.getPackageRegistry().put("http://www.jboss.org/drools", DroolsPackage.eINSTANCE);
 
@@ -383,13 +390,13 @@ public class JbpmProfileImpl implements IDiagramProfile {
             resource.load(is, options);
 
             EList<Diagnostic> warnings = resource.getWarnings();
-            
+
             if (warnings != null && !warnings.isEmpty()){
                 for (Diagnostic diagnostic : warnings) {
                     System.out.println("Warning: "+diagnostic.getMessage());
                 }
             }
-            
+
             EList<Diagnostic> errors = resource.getErrors();
             if (errors != null && !errors.isEmpty()){
                 for (Diagnostic diagnostic : errors) {
@@ -419,7 +426,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
     public String getStencilSetExtensionURL() {
         return "http://oryx-editor.org/stencilsets/extensions/bpmncosts-2.0#";
     }
-    
+
     private boolean isEmpty(final CharSequence str) {
         if ( str == null || str.length() == 0 ) {
             return true;
@@ -432,4 +439,3 @@ public class JbpmProfileImpl implements IDiagramProfile {
         return true;
     }
 }
-

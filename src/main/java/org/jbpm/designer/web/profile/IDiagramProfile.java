@@ -88,6 +88,8 @@ public interface IDiagramProfile {
 
     public String getRepositoryRoot();
 
+    public String getRepositoryName();
+
     public String getRepositoryHost();
 
     public String getRepositoryProtocol();

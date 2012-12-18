@@ -71,6 +71,7 @@ public class DefaultProfileImpl implements IDiagramProfile {
     private String _localHistoryTimeout;
     private String _repositoryId;
     private String _repositoryRoot;
+    private String _repositoryName;
     private String _repositoryHost;
     private String _repositoryProtocol;
     private String _repositorySubdomain;
@@ -158,6 +159,10 @@ public class DefaultProfileImpl implements IDiagramProfile {
 
     public String getRepositoryRoot() {
         return _repositoryRoot;
+    }
+
+    public String getRepositoryName() {
+        return _repositoryName;
     }
 
     public String getRepositoryHost() {

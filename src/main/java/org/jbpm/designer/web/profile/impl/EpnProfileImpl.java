@@ -43,6 +43,7 @@ public class EpnProfileImpl implements IDiagramProfile {
     private String _localHistoryTimeout;
     private String _repositoryId;
     private String _repositoryRoot;
+    private String _repositoryName;
     private String _repositoryHost;
     private String _repositoryProtocol;
     private String _repositorySubdomain;
@@ -111,6 +112,12 @@ public class EpnProfileImpl implements IDiagramProfile {
                                 String repositoryRoot = reader.getAttributeValue(i);
                                 if(!isEmpty(repositoryRoot)) {
                                     _repositoryRoot = repositoryRoot;
+                                }
+                            }
+                            if ("name".equals(reader.getAttributeLocalName(i))) {
+                                String repositoryName = reader.getAttributeValue(i);
+                                if(!isEmpty(repositoryName)) {
+                                    _repositoryName = repositoryName;
                                 }
                             }
                             if ("protocol".equals(reader.getAttributeLocalName(i))) {
@@ -275,6 +282,10 @@ public class EpnProfileImpl implements IDiagramProfile {
 
     public String getRepositoryRoot() {
         return _repositoryRoot;
+    }
+
+    public String getRepositoryName() {
+        return _repositoryName;
     }
 
     public String getRepositoryHost() {
