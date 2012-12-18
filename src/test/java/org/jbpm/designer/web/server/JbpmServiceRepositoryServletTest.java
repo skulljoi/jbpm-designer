@@ -5,10 +5,7 @@ import org.jbpm.designer.helper.TestHttpServletResponse;
 import org.jbpm.designer.helper.TestServletConfig;
 import org.jbpm.designer.helper.TestServletContext;
 import org.jbpm.designer.repository.Asset;
-import org.jbpm.designer.repository.AssetBuilderFactory;
 import org.jbpm.designer.repository.Repository;
-import org.jbpm.designer.repository.filters.FilterByExtension;
-import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
 import org.junit.After;
@@ -39,7 +36,7 @@ public class JbpmServiceRepositoryServletTest {
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
-        profile.setREpositoryGlobalDir("/global");
+        profile.setRepositoryGlobalDir("/global");
     }
 
     private void deleteFiles(File directory) {

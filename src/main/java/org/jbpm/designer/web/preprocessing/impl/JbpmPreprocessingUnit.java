@@ -493,7 +493,7 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
     private String createAssetIfNotExisting(Repository repository, String location, String name, String type, byte[] content) {
         try {
-            boolean assetExists = repository.assetExists(location + name + "." + type);
+            boolean assetExists = repository.assetExists(location + "/" + name + "." + type);
             if (!assetExists) {
                 // create theme asset
                 AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);

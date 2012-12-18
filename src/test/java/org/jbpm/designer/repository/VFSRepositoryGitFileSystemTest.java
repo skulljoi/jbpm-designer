@@ -50,7 +50,7 @@ public class VFSRepositoryGitFileSystemTest {
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT + counter);
-        profile.setREpositoryGlobalDir("/global");
+        profile.setRepositoryGlobalDir("/global");
     }
 
     private void deleteFiles(File directory) {

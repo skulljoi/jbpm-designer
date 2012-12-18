@@ -60,14 +60,8 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private String _stencilSet;
     private String _localHistoryEnabled;
     private String _localHistoryTimeout;
-    private String _repositoryId;
-    private String _repositoryRoot;
-    private String _repositoryHost;
-    private String _repositoryProtocol;
-    private String _repositorySubdomain;
-    private String _repositoryUsr;
-    private String _repositoryPwd;
-    private String _repositoryGlobalDir;
+
+    private Map<String, String> profileParameters = new LinkedHashMap<String, String>();
 
     private boolean initialized = false;
 
@@ -137,35 +131,21 @@ public class JbpmProfileImpl implements IDiagramProfile {
                             if ("id".equals(reader.getAttributeLocalName(i))) {
                                 String repositoryId = reader.getAttributeValue(i);
                                 if(!isEmpty(repositoryId)) {
-                                    _repositoryId = repositoryId;
+                                    profileParameters.put("id", repositoryId);
                                 } else {
                                     _logger.info("Invalid repository id specified");
-                                }
-                            }
-                            if ("globaldir".equals(reader.getAttributeLocalName(i))) {
-                                String repositoryGlobalDir = reader.getAttributeValue(i);
-                                if(!isEmpty(repositoryGlobalDir)) {
-                                    _repositoryGlobalDir = repositoryGlobalDir;
-                                } else {
-                                    _repositoryGlobalDir = "repository";
-                                }
-                            }
-                            if ("root".equals(reader.getAttributeLocalName(i))) {
-                                String repositoryRoot = reader.getAttributeValue(i);
-                                if(!isEmpty(repositoryRoot)) {
-                                    _repositoryRoot = repositoryRoot;
                                 }
                             }
                             if ("protocol".equals(reader.getAttributeLocalName(i))) {
                                 String repositoryProtocol = reader.getAttributeValue(i);
                                 if(!isEmpty(repositoryProtocol)) {
-                                    _repositoryProtocol = repositoryProtocol;
+                                    profileParameters.put("protocol", repositoryProtocol);
                                 }
                             }
                             if ("host".equals(reader.getAttributeLocalName(i))) {
                                 String repositoryHost = reader.getAttributeValue(i);
                                 if(!isEmpty(repositoryHost)) {
-                                    _repositoryHost = repositoryHost;
+                                    profileParameters.put("host", repositoryHost);
                                 }
                             }
                             if ("subdomain".equals(reader.getAttributeLocalName(i))) {
@@ -177,18 +157,18 @@ public class JbpmProfileImpl implements IDiagramProfile {
                                     if(repositorySubdomain.endsWith("/")) {
                                         repositorySubdomain = repositorySubdomain.substring(0, repositorySubdomain.length() - 1);
                                     }
-                                    _repositorySubdomain = repositorySubdomain;
+                                    profileParameters.put("subdomain", repositorySubdomain);
                                 }
                             }
                             if ("usr".equals(reader.getAttributeLocalName(i))) {
                                 String repositoryUsr = reader.getAttributeValue(i);
                                 if(!isEmpty(repositoryUsr)) {
-                                    _repositoryUsr = repositoryUsr;
+                                    profileParameters.put("usr", repositoryUsr);
                                 }
                             }
                             if ("pwd".equals(reader.getAttributeLocalName(i))) {
                                 // allow any value for pwd
-                                _repositoryPwd = reader.getAttributeValue(i);
+                                profileParameters.put("pwd", reader.getAttributeValue(i));
                             }
                         }
                     } else if ("localhistory".equals(reader.getLocalName())) {
@@ -210,6 +190,23 @@ public class JbpmProfileImpl implements IDiagramProfile {
                                 }
                             }
                         }
+                    } else if ("parameter".equals(reader.getLocalName())) {
+                        String name = null;
+                        String value = null;
+                        String systemProperty = null;
+                        for (int i = 0 ; i < reader.getAttributeCount() ; i++) {
+                            if ("name".equals(reader.getAttributeLocalName(i))) {
+                                name = reader.getAttributeValue(i);
+                            } else if ("value".equals(reader.getAttributeLocalName(i))) {
+                                value = reader.getAttributeValue(i);
+                            } else if ("system-property".equals(reader.getAttributeLocalName(i))) {
+                                systemProperty = reader.getAttributeValue(i);
+                            }
+                        }
+                        profileParameters.put(name, value);
+                        if ("true".equalsIgnoreCase(systemProperty)) {
+                            System.setProperty(name, value);
+                        }
                     }
                 }
             }
@@ -230,6 +227,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
         try {
             RepositoryManager.getInstance().registerRepository("repository-vfs", new VFSRepository(this));
         } catch(Exception e) {
+            e.printStackTrace();
             _logger.error("Unable to register vfs repository.");
         }
         initialized = true;
@@ -244,31 +242,31 @@ public class JbpmProfileImpl implements IDiagramProfile {
     }
 
     public String getRepositoryId() {
-        return _repositoryId;
+        return profileParameters.get("id");
     }
 
     public String getRepositoryRoot() {
-        return _repositoryRoot;
+        return profileParameters.get("root");
     }
 
     public String getRepositoryHost() {
-        return _repositoryHost;
+        return profileParameters.get("host");
     }
 
     public String getRepositoryProtocol() {
-        return _repositoryProtocol;
+        return profileParameters.get("protocol");
     }
 
     public String getRepositorySubdomain() {
-        return _repositorySubdomain;
+        return profileParameters.get("subdomain");
     }
 
     public String getRepositoryUsr() {
-        return _repositoryUsr;
+        return profileParameters.get("usr");
     }
 
     public String getRepositoryPwd() {
-        return _repositoryPwd;
+        return profileParameters.get("pwd");
     }
 
     public String getLocalHistoryEnabled() {
@@ -280,40 +278,20 @@ public class JbpmProfileImpl implements IDiagramProfile {
     }
 
     public String getRepositoryGlobalDir() {
-        return _repositoryGlobalDir;
+        return profileParameters.get("globaldir");
     }
 
     public void setRepositoryId(String _repositoryId) {
-        this._repositoryId = _repositoryId;
+        this.profileParameters.put("id", _repositoryId);
     }
 
 
     public void setRepositoryRoot(String _repositoryRoot) {
-        this._repositoryRoot = _repositoryRoot;
+        this.profileParameters.put("root", _repositoryRoot);
     }
 
-    public void setRepositoryHost(String _repositoryHost) {
-        this._repositoryHost = _repositoryHost;
-    }
-
-    public void setRepositoryProtocol(String _repositoryProtocol) {
-        this._repositoryProtocol = _repositoryProtocol;
-    }
-
-    public void setRepositorySubdomain(String _repositorySubdomain) {
-        this._repositorySubdomain = _repositorySubdomain;
-    }
-
-    public void setRepositoryUsr(String _repositoryUsr) {
-        this._repositoryUsr = _repositoryUsr;
-    }
-
-    public void setRepositoryPwd(String _repositoryPwd) {
-        this._repositoryPwd = _repositoryPwd;
-    }
-
-    public void setREpositoryGlobalDir(String repositoryGlobalDir) {
-        this._repositoryGlobalDir = repositoryGlobalDir;
+    public void setRepositoryGlobalDir(String repositoryGlobalDir) {
+        this.profileParameters.put("globaldir", repositoryGlobalDir);
     }
 
     public Repository getRepository() {
@@ -321,7 +299,7 @@ public class JbpmProfileImpl implements IDiagramProfile {
             initializeRepository();
 
         }
-        return RepositoryManager.getInstance().getRepository("repository-" + _repositoryId);
+        return RepositoryManager.getInstance().getRepository("repository-" + profileParameters.get("id"));
     }
     
     public IDiagramMarshaller createMarshaller() {

@@ -10,12 +10,10 @@ import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
-import org.jbpm.designer.web.server.CustomEditorsServlet;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-import javax.servlet.ServletException;
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -33,7 +31,7 @@ public class AssetServiceServletTest {
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
-        profile.setREpositoryGlobalDir("/global");
+        profile.setRepositoryGlobalDir("/global");
     }
 
     private void deleteFiles(File directory) {

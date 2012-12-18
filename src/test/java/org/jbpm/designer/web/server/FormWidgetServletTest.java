@@ -32,7 +32,7 @@ public class FormWidgetServletTest {
         profile = new JbpmProfileImpl();
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT);
-        profile.setREpositoryGlobalDir("/global");
+        profile.setRepositoryGlobalDir("/global");
     }
 
     private void deleteFiles(File directory) {
