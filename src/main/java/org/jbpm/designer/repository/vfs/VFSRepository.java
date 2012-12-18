@@ -265,7 +265,7 @@ public class VFSRepository implements Repository {
         String location = trimLocation(file);
 
         AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(name);
-        BasicFileAttributes attrs = ioService.readAttributes(file, BasicFileAttributes.class);
+        BasicFileAttributes attrs = fileSystem.provider().readAttributes(file, BasicFileAttributes.class);
         assetBuilder.uniqueId(encodeUniqueId(file.toUri().toString()))
                     .location(location)
                     .creationDate(attrs.creationTime() == null ? "" : attrs.creationTime().toString())
