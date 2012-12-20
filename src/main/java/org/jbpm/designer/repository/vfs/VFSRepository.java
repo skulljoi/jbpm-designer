@@ -269,8 +269,8 @@ public class VFSRepository implements Repository {
         BasicFileAttributes attrs = fileSystem.provider().readAttributes(file, BasicFileAttributes.class);
         assetBuilder.uniqueId(encodeUniqueId(file.toUri().toString()))
                     .location(location)
-                    .creationDate(attrs.creationTime() == null ? "" : attrs.creationTime().toString())
-                    .lastModificationDate(attrs.lastModifiedTime() == null ? "" : attrs.lastModifiedTime().toString())
+                    .creationDate(attrs.creationTime() == null ? "" : new Date(attrs.creationTime().toMillis()).toString())
+                    .lastModificationDate(attrs.lastModifiedTime() == null ? "" : new Date(attrs.lastModifiedTime().toMillis()).toString())
                     // TODO some provider specific details
                     .description("")
                     .owner("");
