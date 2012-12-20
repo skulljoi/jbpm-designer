@@ -14,11 +14,8 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class VFSRepositoryGitFileSystemTest {
+public class VFSRepositoryGitFileSystemTest extends RepositoryBaseTest {
 
-    // TODO change it to generic independent path
-    private static final String REPOSITORY_ROOT = "designer-playground";
-    private static final String VFS_REPOSITORY_ROOT = "git://" + REPOSITORY_ROOT;
     private static final String USERNAME = "guvnorngtestuser1";
     private static final String PASSWORD = "test1234";
     private static final String ORIGIN_URL      = "https://github.com/mswiderski/designer-playground.git";
@@ -32,7 +29,6 @@ public class VFSRepositoryGitFileSystemTest {
 
     @BeforeClass
     public static void prepare() {
-
         env.put( "username", USERNAME );
         env.put( "password", PASSWORD );
         env.put( "origin", ORIGIN_URL );
@@ -51,15 +47,6 @@ public class VFSRepositoryGitFileSystemTest {
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT + counter);
         profile.setRepositoryGlobalDir("/global");
-    }
-
-    private void deleteFiles(File directory) {
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                deleteFiles(file);
-            }
-            file.delete();
-        }
     }
 
     @After

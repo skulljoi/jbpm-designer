@@ -4,9 +4,7 @@ import org.jbpm.designer.helper.TestHttpServletRequest;
 import org.jbpm.designer.helper.TestHttpServletResponse;
 import org.jbpm.designer.helper.TestServletConfig;
 import org.jbpm.designer.helper.TestServletContext;
-import org.jbpm.designer.repository.Asset;
-import org.jbpm.designer.repository.AssetBuilderFactory;
-import org.jbpm.designer.repository.Repository;
+import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.repository.vfs.VFSRepository;
 import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
@@ -20,10 +18,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class AssetServiceServletTest {
-    private static final String REPOSITORY_ROOT = System.getProperty("java.io.tmpdir")+"designer-repo";
-    private static final String VFS_REPOSITORY_ROOT = "default://" + REPOSITORY_ROOT;
-    private JbpmProfileImpl profile;
+public class AssetServiceServletTest extends RepositoryBaseTest {
 
     @Before
     public void setup() {
@@ -34,15 +29,6 @@ public class AssetServiceServletTest {
         profile.setRepositoryGlobalDir("/global");
     }
 
-    private void deleteFiles(File directory) {
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                deleteFiles(file);
-            }
-            file.delete();
-        }
-    }
-
     @After
     public void teardown() {
         File repo = new File(REPOSITORY_ROOT);
@@ -51,7 +37,7 @@ public class AssetServiceServletTest {
         }
         repo.delete();
     }
-
+    
     @Test
     public void testCreateAsset() throws Exception {
 

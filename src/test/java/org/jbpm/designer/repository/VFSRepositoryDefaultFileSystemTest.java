@@ -14,12 +14,7 @@ import java.util.Collection;
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
-public class VFSRepositoryDefaultFileSystemTest {
-
-    // TODO change it to generic independent path
-    private static final String REPOSITORY_ROOT = System.getProperty("java.io.tmpdir")+"designer-repo";
-    private static final String VFS_REPOSITORY_ROOT = "default://" + REPOSITORY_ROOT;
-    private JbpmProfileImpl profile;
+public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
 
     @Before
     public void setup() {
@@ -30,15 +25,6 @@ public class VFSRepositoryDefaultFileSystemTest {
         profile.setRepositoryGlobalDir("/global");
     }
 
-    private void deleteFiles(File directory) {
-        for (File file : directory.listFiles()) {
-            if (file.isDirectory()) {
-                deleteFiles(file);
-            }
-            file.delete();
-        }
-    }
-
     @After
     public void teardown() {
         File repo = new File(REPOSITORY_ROOT);
@@ -47,7 +33,7 @@ public class VFSRepositoryDefaultFileSystemTest {
         }
         repo.delete();
     }
-
+    
     @Test
     public void testCreateDefaultVFSRepository() {
 
