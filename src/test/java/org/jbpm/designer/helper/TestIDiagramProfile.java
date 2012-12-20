@@ -61,6 +61,10 @@ public class TestIDiagramProfile implements IDiagramProfile {
         return null;
     }
 
+    public String getRepositoryName() {
+        return null;
+    }
+
     public String getRepositoryRoot() {
         return null;
     }

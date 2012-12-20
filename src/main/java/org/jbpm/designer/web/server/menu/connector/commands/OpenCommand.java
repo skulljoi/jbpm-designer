@@ -23,12 +23,17 @@ public class OpenCommand extends AbstractCommand {
         this.requestParams = requestParams;
     }
 
-    public JSONObject execute() {
+    public JSONObject execute() throws Exception {
         String current = (String) requestParams.get("current");
         String target = (String) requestParams.get("target");
-
+        String tree = (String) requestParams.get("tree");
 
         System.out.println("********* OPEN COMMAND - current: " + current + " - target: " + target);
+
+        if(current == null) {
+            return listContent(profile, target, Boolean.parseBoolean(tree));
+        }
+        // TODO fix
         return null;
     }
 }

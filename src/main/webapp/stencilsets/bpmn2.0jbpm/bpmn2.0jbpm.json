@@ -641,7 +641,7 @@
 					"id":"package",
 					"type":"String",
 					"title":"Package",
-					"value":"",
+					"value":"/defaultPackage/defaultPackage",
 					"description":"Package",
 					"description_ja":"パッケージ",
 					"readonly":false,
@@ -703,7 +703,7 @@
 					"id":"id",
 					"type":"String",
 					"title":"ID",
-					"value":".process",
+					"value":"[/defaultPackage, /defaultPackage].BPMN2-SampleProcess",
 					"description":"ID",
 					"description_ja":"ID",
 					"readonly":false,
@@ -3133,7 +3133,7 @@
 					"id":"name",
 					"type":"String",
 					"title":"Name",
-					"value":"process",
+					"value":"BPMN2-SampleProcess",
 					"description":"The descriptive name of the BPMN element.",
 					"description_ja":"BPMN要素のわかりやすい名前。",
 					"readonly":false,
@@ -3628,6 +3628,1025 @@
 			]
 		},
 		// start custom workitems
+
+				{
+					"type" : 			"node",
+					"id": 				"Log",
+					"title" : 			"Log",
+					"groups" : 			["Service Tasks"],
+					"description" : 	"",
+					"description_ja" : "",
+					"view" : 			"activity/workitems/Log.svg",
+						"icon" : 			"data%3Aimage%2Fpng%3Bbase64%2CR0lGODlhEAAQAMQAAG%2BFr3CFr3yRuIOSsYaUroidwIuWrI%2BZqJGlx5WdpZugoKGknaeomK6slLKv%0AkL21idSyaNq9fN3o%2BODIj%2BPs%2Bevx%2BvP2%2B%2Ff4%2B%2Fn6%2FAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkA%0AABkALAAAAAAQABAAAAVlYCaOZEk%2BaIqa4oO9MPSwLvxGsvlcwYUglwluRnJYjkiko9SwBCy%2FguDZ%0AKDEq2GyWUVpUApXotLIoKSjodFpRSlACFDGAkigdJHg8Gn8oGSQBEnISBiUEeYh4BCUDjY6PAyyS%0AIyEAOw%3D%3D",
+					"propertyPackages" :[
+						"customtask",
+						"customactivity"
+					],
+					"roles" : 			[
+						"all",
+						"sequence_start",
+						"sequence_end",
+						"from_task_event",
+						"to_task_event",
+						"FromEventbasedGateway",
+						"messageflow_start",
+						"messageflow_end",
+						"fromtoall",
+						"ActivitiesMorph"
+					],
+					"properties": [
+						{
+							"id":"bgcolor",
+							"type":"Color",
+							"title":"BackgroundColor",
+							"value":"#fafad2", 
+							"description":"",
+							"readonly":false,
+							"optional":false,
+							"refToView": "fill_el",
+							"fill":true,
+							"stroke":false
+						},
+						{
+							"id":"origbgcolor",
+							"type":"Color",
+							"title":"Original Background Color",
+							"value":"#fafad2",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"visible":false
+						},
+						{
+							"id":"bordercolor",
+							"type":"Color",
+							"title":"BorderColor",
+							"value":"#000000",
+							"description":"",
+							"readonly":false,
+							"optional":false,
+							"refToView": ["edge", "fill_border", "bg_frame", "frame", "frame2", "frame3", "frame4", "frame5", "frame6", "frame7", "frame8", "frame9", "frame10", "frame11", "frame12", "frame13", "frame14", "frame15", "frame16", "frame17", "frame18", "frame19", "frame20", "frame21", "frame22", "frame23", "frame24", "frame25", "frame26", "border"],
+							"fill":false,
+							"stroke":true
+						},
+						{
+							"id":"origbordercolor",
+							"type":"Color",
+							"title":"Original Border Color",
+							"value":"#000000",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"visible":false
+						},
+						{
+							"id":"fontcolor",
+							"type":"Color",
+							"title":"Font Color",
+							"value":"#000000",
+							"description":"Font color",
+							"description_ja":"フォントの色",
+							"readonly":false,
+							"optional":false,
+							"refToView": ["text_name"],
+							"fill":true,
+							"stroke":false
+						},
+						{
+							"id":"fontsize",
+							"type":"Choice",
+							"title":"Font Size",
+							"value":"",
+							"description":"The Font Size",
+							"description_ja":"フォントのサイズ",
+							"readonly":false,
+							"optional":false,
+							"refToView":"text_name",
+							"items":[
+								{
+									"id":"c1",
+									"title":"8",
+									"value":"8"
+								},
+								{
+									"id":"c2",
+									"title":"9",
+									"value":"9"
+								},
+								{
+									"id":"c3",
+									"title":"10",
+									"value":"10"
+								},
+								{
+									"id":"c4",
+									"title":"11",
+									"value":"11"
+								},
+								{
+									"id":"c5",
+									"title":"12",
+									"value":"12"
+								},
+								{
+									"id":"c6",
+									"title":"14",
+									"value":"14"
+								},
+								{
+									"id":"c7",
+									"title":"18",
+									"value":"18"
+								},
+								{
+									"id":"c8",
+									"title":"20",
+									"value":"20"
+								},
+								{
+									"id":"c9",
+									"title":"24",
+									"value":"24"
+								},
+								{
+									"id":"c10",
+									"title":"36",
+									"value":"36"
+								},
+								{
+									"id":"c11",
+									"title":"48",
+									"value":"48"
+								},
+								{
+									"id":"c12",
+									"title":"72",
+									"value":"72"
+								}
+							]
+						},
+					 {
+							"id":"tasktype",
+							"type":"Choice",
+							"title":"TaskType",
+							"value":"Log",
+							"description":"",
+							"readonly":true,
+							"optional":false,
+							"refToView":"",
+							"items":[
+								{
+									"id":"c1",
+									"title":"None",
+									"value":"None",
+									"refToView":"none"
+								},
+								{
+									"id":"c2",
+									"title":"Send",
+									"value":"Send",
+									"icon" : "activity/list/type.send.png",
+									"refToView":"sendTask"
+								},
+								{
+									"id":"c3",
+									"title":"Receive",
+									"value":"Receive",
+									"icon" : "activity/list/type.receive.png",
+									"refToView":"receiveTask"
+								},
+								{
+									"id":"c4",
+									"title":"User",
+									"value":"User",
+									"icon" : "activity/list/type.user.png",
+									"refToView":"userTask"
+								},
+								{
+									"id":"c5",
+									"title":"Manual",
+									"value":"Manual",
+									"icon" : "activity/list/type.manual.png",
+									"refToView":"manualTask"	
+								},
+								{
+									"id":"c6",
+									"title":"Service",
+									"value":"Service",
+									"icon" : "activity/list/type.service.png",
+									"refToView":"serviceTask"
+								},
+								{
+									"id":"c7",
+									"title":"Business Rule",
+									"value":"Business Rule",
+									"icon" : "activity/list/type.business.rule.png",
+									"refToView":"businessRuleTask"
+								},
+								{
+									"id":"c8",
+									"title":"Script",
+									"value":"Script",
+									"icon" : "activity/list/type.script.png",
+									"refToView":"scriptTask"
+								}
+							]
+						},
+						{
+							"id":"isselectable",
+							"type":"Choice",
+							"title":"Selectable",
+							"value":"true",
+							"default": "true",
+							"description":"This attribute is used to set selectable properties for every node and edges.",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"popular" : true,
+							"items":[
+								{
+									"id":"c1",
+									"title":"true",
+									"value":"true"
+								},
+								{
+									"id":"c2",
+									"title":"false",
+									"value":"false"
+								}
+							]
+						},
+						{
+							"id":"name",
+							"type":"String",
+							"title":"Name",
+							"value":"Log",
+							"description":"The descriptive name of the BPMN element.",
+							"description_ja":"BPMN要素のわかりやすい名前。",
+							"readonly":false,
+							"optional":true,
+							"length":"",
+							"wrapLines" : true,
+							"refToView":"text_name"	
+						},
+						{
+							"id":"documentation",
+							"type":"Text",
+							"title":"Documentation",
+							"value":"", 
+							"description":"This attribute is used to annotate the BPMN element, such as descriptions and other documentation.",
+							"description_ja":"この属性は、説明やドキュメントなど、BPMN要素の注釈に使用されます。",
+							"readonly":true,
+							"optional":true,
+							"length":"",
+							"wrapLines":true,
+							"popular" : true
+						},
+						{
+							"id":"taskName",
+							"type":"String",
+							"title":"Task Name",
+							"value":"Log",
+							"description":"Task Name",
+							"description_ja":"タスク名",
+							"readonly":true,
+							"optional":true
+						},
+						{
+							"id":"datainputset",
+							"type":"Datainput",
+							"title":"DataInputSet",
+							"value":"Message:String",
+							"description":"An InputSet is a collection of DataInput elements that together define a valid set of data inputs.",
+							"description_ja":"InputSetは、データ入力の有効なセットを合わせて定義するDataInputエレメントのコレクションです。",
+							"readonly":false,
+							"optional":true,
+						},  
+						{
+							"id":"dataoutputset",
+							"type":"Dataoutput",
+							"title":"DataOutputSet",
+							"value":"",
+							"description":"An OutputSet is a collection of DataOutputs elements that together may be produced as output from an Activity or Event.",
+							"description_ja":"OutputSet は、アクティビティまたはイベントの出力としてまとめて生成されるDataOutputs要素のコレクションです。",
+							"readonly":false,
+							"optional":true,
+						},
+						{
+							"id":"assignments",
+							"type":"Dataassignment",
+							"title":"Assignments",
+							"value":"Message",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+						},
+						{
+							"id":"onEntryActions",
+							"type":"Action",
+							"title":"On Entry Actions",
+							"value":"",
+							"description":"on entry actions",
+							"description_ja":"アクション開始時",
+							"readonly":false,
+							"optional":true
+						},
+						{
+							"id":"onExitActions",
+							"type":"Action",
+							"title":"On Exit Actions",
+							"value":"",
+							"description":"on exit actions",
+							"description_ja":"アクション終了時",
+							"readonly":false,
+							"optional":true
+						},
+						{
+							"id":"script_language",
+							"type":"Choice",
+							"title":"ScriptLanguage",
+							"value":"java",
+							"description":"Defines the script language.",
+							"description_ja":"スクリプト言語を定義します。",
+							"readonly":false,
+							"optional":true,
+							"items": [
+								{
+									"id": "c1",
+									"title":"java",
+									"value":"java"
+								},
+								{
+									"id": "c2",
+									"title": "mvel",
+									"value": "mvel"
+								}
+							]                                        
+						},
+						{
+		                    "id":"min",
+		                    "type":"Float",
+		                    "title":"Processing time (min)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"uniform|random",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"max",
+		                    "type":"Float",
+		                    "title":"Processing time (max)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"uniform|random",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"standarddeviation",
+		                    "type":"Float",
+		                    "title":"Standard Deviation",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"normal"
+		                },
+		                {
+		                    "id":"mean",
+		                    "type":"Float",
+		                    "title":"Processing time (mean)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"normal|poisson",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"timeunit",
+		                    "type":"Choice",
+		                    "title":"Time Unit",
+		                    "value":"",
+		                    "description":"Time unit options (seconds, minutes, hours)",
+		                    "description_ja":"Time unit options (seconds, minutes, hours)",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "items": [
+		                        {
+		                            "id": "c1",
+		                            "title":"milliseconds",
+		                            "value":"ms"
+		                        },
+		                        {
+		                            "id": "c2",
+		                            "title": "seconds",
+		                            "value": "s"
+		                        },
+		                        {
+		                            "id": "c3",
+		                            "title": "minutes",
+		                            "value": "min"
+		                        },
+		                        {
+		                            "id": "c4",
+		                            "title": "hours",
+		                            "value": "hour"
+		                        },
+		                        {
+		                            "id": "c5",
+		                            "title": "days",
+		                            "value": "day"
+		                        },
+		                        {
+		                            "id": "c6",
+		                            "title": "years",
+		                            "value": "year"
+		                        }
+		                    ]
+		                },
+		                {
+		                    "id":"distributiontype",
+		                    "type":"Choice",
+		                    "title":"Distribution Type",
+		                    "value":"random",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "items": [
+		                        {
+		                            "id": "c1",
+		                            "title":"normal",
+		                            "value":"normal"
+		                        },
+		                        {
+		                            "id": "c2",
+		                            "title": "uniform",
+		                            "value": "uniform"
+		                        },
+		                        {
+		                            "id": "c3",
+		                            "title": "random",
+		                            "value": "random"
+		                        },
+		                        {
+		                            "id": "c4",
+		                            "title": "poisson",
+		                            "value": "poisson"
+		                        }
+		                    ]
+		                },
+		                {
+		                    "id":"unitcost",
+		                    "type":"Float",
+		                    "title":"Cost per time unit",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"currency",
+		                    "type":"String",
+		                    "title":"Currency",
+		                    "value":"",
+		                    "description":"Base currency (ISO 4217)",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "min" : "0"
+		                }
+					]
+				},
+				
+				{
+					"type" : 			"node",
+					"id": 				"Email",
+					"title" : 			"Email",
+					"groups" : 			["Service Tasks"],
+					"description" : 	"",
+					"description_ja" : "",
+					"view" : 			"activity/workitems/Email.svg",
+						"icon" : 			"data%3Aimage%2Fpng%3Bbase64%2CR0lGODlhEAAQANUAAChilmd9qW2DrXeMtJiYkZuajqGeiqZrEKehh6m30qyjhK1yErCmgbOpfrZ8%0AFLmter2EFr%2Bwd8HG2ca0ceDq9%2BPs%2BOjv%2BOvx%2BfL1%2Bvb4%2B%2Fj5%2FPvll%2FvusPvyufz62%2F797wAAAAAA%0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA%0AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACH5BAkAACAALAAAAAAQABAAAAaAQJBw%0ASCwaJ8ikclLUOJ9QJtEpqVolGekQAsl4v16tEPKBYKpnCSYC4ro%2FZYx8%2FoB47vi7GcDHPBwdgYKB%0AHA4DAgEXDQsbjY6NCxd8ABcMIAeYmI0HFp2eCkUHGwcVCQmlpwihpBUVFK2vBkWtprWmFbJEFK%2B7%0ArrsUBUUEw8TFBUEAOw%3D%3D",
+					"propertyPackages" :[
+						"customtask",
+						"customactivity"
+					],
+					"roles" : 			[
+						"all",
+						"sequence_start",
+						"sequence_end",
+						"from_task_event",
+						"to_task_event",
+						"FromEventbasedGateway",
+						"messageflow_start",
+						"messageflow_end",
+						"fromtoall",
+						"ActivitiesMorph"
+					],
+					"properties": [
+						{
+							"id":"bgcolor",
+							"type":"Color",
+							"title":"BackgroundColor",
+							"value":"#fafad2", 
+							"description":"",
+							"readonly":false,
+							"optional":false,
+							"refToView": "fill_el",
+							"fill":true,
+							"stroke":false
+						},
+						{
+							"id":"origbgcolor",
+							"type":"Color",
+							"title":"Original Background Color",
+							"value":"#fafad2",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"visible":false
+						},
+						{
+							"id":"bordercolor",
+							"type":"Color",
+							"title":"BorderColor",
+							"value":"#000000",
+							"description":"",
+							"readonly":false,
+							"optional":false,
+							"refToView": ["edge", "fill_border", "bg_frame", "frame", "frame2", "frame3", "frame4", "frame5", "frame6", "frame7", "frame8", "frame9", "frame10", "frame11", "frame12", "frame13", "frame14", "frame15", "frame16", "frame17", "frame18", "frame19", "frame20", "frame21", "frame22", "frame23", "frame24", "frame25", "frame26", "border"],
+							"fill":false,
+							"stroke":true
+						},
+						{
+							"id":"origbordercolor",
+							"type":"Color",
+							"title":"Original Border Color",
+							"value":"#000000",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"visible":false
+						},
+						{
+							"id":"fontcolor",
+							"type":"Color",
+							"title":"Font Color",
+							"value":"#000000",
+							"description":"Font color",
+							"description_ja":"フォントの色",
+							"readonly":false,
+							"optional":false,
+							"refToView": ["text_name"],
+							"fill":true,
+							"stroke":false
+						},
+						{
+							"id":"fontsize",
+							"type":"Choice",
+							"title":"Font Size",
+							"value":"",
+							"description":"The Font Size",
+							"description_ja":"フォントのサイズ",
+							"readonly":false,
+							"optional":false,
+							"refToView":"text_name",
+							"items":[
+								{
+									"id":"c1",
+									"title":"8",
+									"value":"8"
+								},
+								{
+									"id":"c2",
+									"title":"9",
+									"value":"9"
+								},
+								{
+									"id":"c3",
+									"title":"10",
+									"value":"10"
+								},
+								{
+									"id":"c4",
+									"title":"11",
+									"value":"11"
+								},
+								{
+									"id":"c5",
+									"title":"12",
+									"value":"12"
+								},
+								{
+									"id":"c6",
+									"title":"14",
+									"value":"14"
+								},
+								{
+									"id":"c7",
+									"title":"18",
+									"value":"18"
+								},
+								{
+									"id":"c8",
+									"title":"20",
+									"value":"20"
+								},
+								{
+									"id":"c9",
+									"title":"24",
+									"value":"24"
+								},
+								{
+									"id":"c10",
+									"title":"36",
+									"value":"36"
+								},
+								{
+									"id":"c11",
+									"title":"48",
+									"value":"48"
+								},
+								{
+									"id":"c12",
+									"title":"72",
+									"value":"72"
+								}
+							]
+						},
+					 {
+							"id":"tasktype",
+							"type":"Choice",
+							"title":"TaskType",
+							"value":"Email",
+							"description":"",
+							"readonly":true,
+							"optional":false,
+							"refToView":"",
+							"items":[
+								{
+									"id":"c1",
+									"title":"None",
+									"value":"None",
+									"refToView":"none"
+								},
+								{
+									"id":"c2",
+									"title":"Send",
+									"value":"Send",
+									"icon" : "activity/list/type.send.png",
+									"refToView":"sendTask"
+								},
+								{
+									"id":"c3",
+									"title":"Receive",
+									"value":"Receive",
+									"icon" : "activity/list/type.receive.png",
+									"refToView":"receiveTask"
+								},
+								{
+									"id":"c4",
+									"title":"User",
+									"value":"User",
+									"icon" : "activity/list/type.user.png",
+									"refToView":"userTask"
+								},
+								{
+									"id":"c5",
+									"title":"Manual",
+									"value":"Manual",
+									"icon" : "activity/list/type.manual.png",
+									"refToView":"manualTask"	
+								},
+								{
+									"id":"c6",
+									"title":"Service",
+									"value":"Service",
+									"icon" : "activity/list/type.service.png",
+									"refToView":"serviceTask"
+								},
+								{
+									"id":"c7",
+									"title":"Business Rule",
+									"value":"Business Rule",
+									"icon" : "activity/list/type.business.rule.png",
+									"refToView":"businessRuleTask"
+								},
+								{
+									"id":"c8",
+									"title":"Script",
+									"value":"Script",
+									"icon" : "activity/list/type.script.png",
+									"refToView":"scriptTask"
+								}
+							]
+						},
+						{
+							"id":"isselectable",
+							"type":"Choice",
+							"title":"Selectable",
+							"value":"true",
+							"default": "true",
+							"description":"This attribute is used to set selectable properties for every node and edges.",
+							"readonly":false,
+							"optional":true,
+							"hidden":true,
+							"popular" : true,
+							"items":[
+								{
+									"id":"c1",
+									"title":"true",
+									"value":"true"
+								},
+								{
+									"id":"c2",
+									"title":"false",
+									"value":"false"
+								}
+							]
+						},
+						{
+							"id":"name",
+							"type":"String",
+							"title":"Name",
+							"value":"Email",
+							"description":"The descriptive name of the BPMN element.",
+							"description_ja":"BPMN要素のわかりやすい名前。",
+							"readonly":false,
+							"optional":true,
+							"length":"",
+							"wrapLines" : true,
+							"refToView":"text_name"	
+						},
+						{
+							"id":"documentation",
+							"type":"Text",
+							"title":"Documentation",
+							"value":"", 
+							"description":"This attribute is used to annotate the BPMN element, such as descriptions and other documentation.",
+							"description_ja":"この属性は、説明やドキュメントなど、BPMN要素の注釈に使用されます。",
+							"readonly":true,
+							"optional":true,
+							"length":"",
+							"wrapLines":true,
+							"popular" : true
+						},
+						{
+							"id":"taskName",
+							"type":"String",
+							"title":"Task Name",
+							"value":"Email",
+							"description":"Task Name",
+							"description_ja":"タスク名",
+							"readonly":true,
+							"optional":true
+						},
+						{
+							"id":"datainputset",
+							"type":"Datainput",
+							"title":"DataInputSet",
+							"value":"To:String,From:String,Subject:String,Body:String",
+							"description":"An InputSet is a collection of DataInput elements that together define a valid set of data inputs.",
+							"description_ja":"InputSetは、データ入力の有効なセットを合わせて定義するDataInputエレメントのコレクションです。",
+							"readonly":false,
+							"optional":true,
+						},  
+						{
+							"id":"dataoutputset",
+							"type":"Dataoutput",
+							"title":"DataOutputSet",
+							"value":"",
+							"description":"An OutputSet is a collection of DataOutputs elements that together may be produced as output from an Activity or Event.",
+							"description_ja":"OutputSet は、アクティビティまたはイベントの出力としてまとめて生成されるDataOutputs要素のコレクションです。",
+							"readonly":false,
+							"optional":true,
+						},
+						{
+							"id":"assignments",
+							"type":"Dataassignment",
+							"title":"Assignments",
+							"value":"To=,From=,Subject=,Body",
+							"description":"",
+							"readonly":false,
+							"optional":true,
+						},
+						{
+							"id":"onEntryActions",
+							"type":"Action",
+							"title":"On Entry Actions",
+							"value":"",
+							"description":"on entry actions",
+							"description_ja":"アクション開始時",
+							"readonly":false,
+							"optional":true
+						},
+						{
+							"id":"onExitActions",
+							"type":"Action",
+							"title":"On Exit Actions",
+							"value":"",
+							"description":"on exit actions",
+							"description_ja":"アクション終了時",
+							"readonly":false,
+							"optional":true
+						},
+						{
+							"id":"script_language",
+							"type":"Choice",
+							"title":"ScriptLanguage",
+							"value":"java",
+							"description":"Defines the script language.",
+							"description_ja":"スクリプト言語を定義します。",
+							"readonly":false,
+							"optional":true,
+							"items": [
+								{
+									"id": "c1",
+									"title":"java",
+									"value":"java"
+								},
+								{
+									"id": "c2",
+									"title": "mvel",
+									"value": "mvel"
+								}
+							]                                        
+						},
+						{
+		                    "id":"min",
+		                    "type":"Float",
+		                    "title":"Processing time (min)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"uniform|random",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"max",
+		                    "type":"Float",
+		                    "title":"Processing time (max)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"uniform|random",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"standarddeviation",
+		                    "type":"Float",
+		                    "title":"Standard Deviation",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"normal"
+		                },
+		                {
+		                    "id":"mean",
+		                    "type":"Float",
+		                    "title":"Processing time (mean)",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "fordistribution":"normal|poisson",
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"timeunit",
+		                    "type":"Choice",
+		                    "title":"Time Unit",
+		                    "value":"",
+		                    "description":"Time unit options (seconds, minutes, hours)",
+		                    "description_ja":"Time unit options (seconds, minutes, hours)",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "items": [
+		                        {
+		                            "id": "c1",
+		                            "title":"milliseconds",
+		                            "value":"ms"
+		                        },
+		                        {
+		                            "id": "c2",
+		                            "title": "seconds",
+		                            "value": "s"
+		                        },
+		                        {
+		                            "id": "c3",
+		                            "title": "minutes",
+		                            "value": "min"
+		                        },
+		                        {
+		                            "id": "c4",
+		                            "title": "hours",
+		                            "value": "hour"
+		                        },
+		                        {
+		                            "id": "c5",
+		                            "title": "days",
+		                            "value": "day"
+		                        },
+		                        {
+		                            "id": "c6",
+		                            "title": "years",
+		                            "value": "year"
+		                        }
+		                    ]
+		                },
+		                {
+		                    "id":"distributiontype",
+		                    "type":"Choice",
+		                    "title":"Distribution Type",
+		                    "value":"random",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "items": [
+		                        {
+		                            "id": "c1",
+		                            "title":"normal",
+		                            "value":"normal"
+		                        },
+		                        {
+		                            "id": "c2",
+		                            "title": "uniform",
+		                            "value": "uniform"
+		                        },
+		                        {
+		                            "id": "c3",
+		                            "title": "random",
+		                            "value": "random"
+		                        },
+		                        {
+		                            "id": "c4",
+		                            "title": "poisson",
+		                            "value": "poisson"
+		                        }
+		                    ]
+		                },
+		                {
+		                    "id":"unitcost",
+		                    "type":"Float",
+		                    "title":"Cost per time unit",
+		                    "value":"0",
+		                    "description":"",
+		                    "description_ja":"",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "min" : "0"
+		                },
+		                {
+		                    "id":"currency",
+		                    "type":"String",
+		                    "title":"Currency",
+		                    "value":"",
+		                    "description":"Base currency (ISO 4217)",
+		                    "readonly":false,
+		                    "optional":true,
+		                    "simulation" : true,
+		                    "min" : "0"
+		                }
+					]
+				},
+				
 		// end custom workitems
 		// start patterns
 		           {

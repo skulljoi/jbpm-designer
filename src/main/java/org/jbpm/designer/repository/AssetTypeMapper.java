@@ -19,6 +19,8 @@ public class AssetTypeMapper {
         mimeTypes.put("js", "text/javascript");
         mimeTypes.put("css", "text/css");
         mimeTypes.put("java", "text/x-java-source");
+        mimeTypes.put("bpmn", "text/xml");
+        mimeTypes.put("bpmn2", "text/xml");
 
     }
 

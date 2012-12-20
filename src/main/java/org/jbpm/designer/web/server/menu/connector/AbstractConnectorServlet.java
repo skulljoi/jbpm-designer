@@ -89,6 +89,7 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
 //                command.setResponseOutputDone(true);
 //            }
         } catch (Exception e) {
+            e.printStackTrace();
             logger.error(e.getMessage());
             putResponse(returnJson, "error", e.getMessage());
 
@@ -111,13 +112,12 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
     }
 
     protected static void output(HttpServletResponse response, boolean isResponseTextHtml, JSONObject json) {
-        // encoding was already set by servlet
         if (isResponseTextHtml) {
             response.setContentType("text/html; charset=UTF-8");
         } else {
             response.setContentType("application/json; charset=UTF-8");
         }
-
+        System.out.println("******************* RESPONSE\n: " + json.toString());
         try {
             json.write(response.getWriter());
         } catch (Exception e) {

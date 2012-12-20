@@ -1,6 +1,7 @@
 package org.jbpm.designer.web.server.menu;
 
 import org.apache.log4j.Logger;
+import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.profile.IDiagramProfileService;
 import org.jbpm.designer.web.profile.impl.ProfileServiceImpl;
@@ -55,6 +56,8 @@ public class MenuServlet extends HttpServlet {
                     "No profile with the name " + profileName +
                             " was registered");
         }
+        Repository repo = profile.getRepository();
+        System.out.println("************** REPO: " + repo);
         XMLOutputter outputter = new XMLOutputter();
         Format format = Format.getPrettyFormat();
         format.setExpandEmptyElements(true);
@@ -91,6 +94,8 @@ public class MenuServlet extends HttpServlet {
                 resultHtml.append(elt);
             }
         }
+
+        response.setContentType("text/html");
         response.setCharacterEncoding("UTF-8");
         response.getWriter().write(resultHtml.toString());
     }

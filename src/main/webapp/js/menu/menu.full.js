@@ -1938,14 +1938,14 @@ elFinder.prototype.ui.prototype.commands = {
 	 **/
 	mkfile : function(fm) {
 		var self  = this;
-		this.name = 'New text file';
+		this.name = 'New BPMN2 process';
 		this.fm   = fm;
 		
 		this.exec = function() {
 			self.fm.unselectAll();
-			var n     = this.fm.uniqueName('untitled file', '.txt'),
+			var n     = this.fm.uniqueName('newprocess-1.0', '.bpmn2'),
 				input = $('<input type="text"/>').val(n), 
-				f     = {name : n, hash : '', mime :'text/plain', read : true, write : true, date : '', size : 0},
+				f     = {name : n, hash : '', mime :'text/xml', read : true, write : true, date : '', size : 0},
 				el    = this.fm.options.view == 'list' 
 					? $(this.fm.view.renderRow(f)).children('td').eq(1).empty().append(input).end().end()
 					: $(this.fm.view.renderIcon(f)).children('label').empty().append(input).end();
