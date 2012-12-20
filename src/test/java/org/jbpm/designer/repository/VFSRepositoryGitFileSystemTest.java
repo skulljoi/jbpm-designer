@@ -14,21 +14,25 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class VFSRepositoryGitFileSystemTest extends RepositoryBaseTest {
+public class VFSRepositoryGitFileSystemTest {
 
+    // TODO change it to generic independent path
+    private static final String REPOSITORY_ROOT = "designer-playground";
+    private static final String VFS_REPOSITORY_ROOT = "git://" + REPOSITORY_ROOT;
     private static final String USERNAME = "guvnorngtestuser1";
     private static final String PASSWORD = "test1234";
     private static final String ORIGIN_URL      = "https://github.com/mswiderski/designer-playground.git";
     private static final String FETCH_COMMAND = "?fetch";
     private JbpmProfileImpl profile;
 
-    private static String gitLocalClone = System.getProperty("java.io.tmpdir") + "git-repo";
+    private static String gitLocalClone = System.getProperty("java.io.tmpdir") + File.separator + "git-repo";
     private static Map<String, String> env = new HashMap<String, String>();
 
     private static int counter = 0;
 
     @BeforeClass
     public static void prepare() {
+
         env.put( "username", USERNAME );
         env.put( "password", PASSWORD );
         env.put( "origin", ORIGIN_URL );
@@ -47,6 +51,15 @@ public class VFSRepositoryGitFileSystemTest extends RepositoryBaseTest {
         profile.setRepositoryId("vfs");
         profile.setRepositoryRoot(VFS_REPOSITORY_ROOT + counter);
         profile.setRepositoryGlobalDir("/global");
+    }
+
+    private void deleteFiles(File directory) {
+        for (File file : directory.listFiles()) {
+            if (file.isDirectory()) {
+                deleteFiles(file);
+            }
+            file.delete();
+        }
     }
 
     @After
