@@ -72,7 +72,7 @@ public class ProcessInfoServlet extends HttpServlet {
 		return sb.toString();
 	}
 	
-	public static Map<String, String> getProcessInfo(String packageName, String assetName, String uuid, IDiagramProfile profile) throws Exception {
+	private Map<String, String> getProcessInfo(String packageName, String assetName, String uuid, IDiagramProfile profile) throws Exception {
 		Map<String, String> infoMap = new LinkedHashMap<String, String>();
 		infoMap.put("Name", assetName);
 		infoMap.put("Format", "");
