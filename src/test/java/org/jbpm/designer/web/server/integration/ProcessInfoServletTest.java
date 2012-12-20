@@ -1,12 +1,5 @@
 package org.jbpm.designer.web.server.integration;
 
-import static junit.framework.Assert.*;
-
-import java.net.URL;
-import java.util.*;
-
-import javax.servlet.ServletContext;
-
 import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jbpm.designer.web.profile.IDiagramProfile;
@@ -16,7 +9,15 @@ import org.jbpm.designer.web.server.integration.util.GuvnorInterfaceUtil;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.ibm.icu.text.SimpleDateFormat;
+import javax.servlet.ServletContext;
+import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertTrue;
 
 @RunWith(Arquillian.class)
 @RunAsClient
