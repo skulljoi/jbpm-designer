@@ -3,6 +3,7 @@ package org.jbpm.designer.web.server.menu.connector.commands;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Asset;
 import org.jbpm.designer.repository.AssetTypeMapper;
+import org.jbpm.designer.repository.Directory;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -52,11 +53,11 @@ public abstract class AbstractCommand {
         info.put("read", "true");
         info.put("write", "true");
 
-        Collection<String> subdirs = profile.getRepository().listDirectories(path);
+        Collection<Directory> subdirs = profile.getRepository().listDirectories(path);
         List<Object> dirs = new ArrayList<Object>();
         if(subdirs != null) {
-            for(String sub : subdirs) {
-                dirs.add(getTree(profile, path.endsWith("/") ? path+sub : path + "/" + sub, tree));
+            for(Directory sub : subdirs) {
+                dirs.add(getTree(profile, path.endsWith("/") ? path+sub : path + "/" + sub.getName(), tree));
             }
         }
 
@@ -67,19 +68,13 @@ public abstract class AbstractCommand {
     public List<Map<String, Object>> getCdc(IDiagramProfile profile, String path, boolean tree) throws Exception {
         List<Map<String, Object>> cdcinfo = new ArrayList<Map<String, Object>>();
         Collection<Asset> assets = profile.getRepository().listAssets(path);
-        Collection<String> dirs = profile.getRepository().listDirectories(path);
+        Collection<Directory> dirs = profile.getRepository().listDirectories(path);
 
         if(assets != null) {
             for(Asset asset : assets) {
             cdcinfo.add(getAssetInfo(profile, asset));
             }
         }
-//        if(dirs != null) {
-//            for(String dir : dirs) {
-//                cdcinfo.add(getDirectoryInfo(profile, path));
-//            }
-//        }
-
         return cdcinfo;
     }
 
