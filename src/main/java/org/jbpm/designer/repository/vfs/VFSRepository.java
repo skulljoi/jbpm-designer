@@ -53,7 +53,7 @@ public class VFSRepository implements Repository {
         this.repositoryRootPath = fileSystem.provider().getPath(this.repositoryRoot);
     }
     
-    public Collection<String> listDirectories(String startAt) {
+    public Collection<Directory> listDirectories(String startAt) {
         Path path = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + startAt));
         DirectoryStream<Path> directories = ioService.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
 
@@ -64,10 +64,11 @@ public class VFSRepository implements Repository {
                 return false;
             }
         });
-        Collection<String> foundDirectories = new ArrayList<String>();
+        Collection<Directory> foundDirectories = new ArrayList<Directory>();
         Iterator<Path> it = directories.iterator();
         while (it.hasNext()) {
-            foundDirectories.add(it.next().getFileName().toString());
+            Path dir = it.next();
+            foundDirectories.add(new Directory(dir.getFileName().toString(), trimLocation(dir)));
         }
 
         return foundDirectories;

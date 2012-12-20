@@ -15,7 +15,7 @@ public class GuvnorRepository implements Repository {
 
     }
 
-    public Collection<String> listDirectories(String startAt) {
+    public Collection<Directory> listDirectories(String startAt) {
         throw new UnsupportedOperationException();
     }
 

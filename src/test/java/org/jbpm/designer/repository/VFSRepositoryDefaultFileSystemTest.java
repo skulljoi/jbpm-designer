@@ -43,7 +43,7 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
 
-        Collection<String> directories = repository.listDirectories("/");
+        Collection<Directory> directories = repository.listDirectories("/");
         assertNotNull(directories);
         assertEquals(0, directories.size());
     }
@@ -60,6 +60,38 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
 
         rootFolderExists = repository.directoryExists("/test");
         assertTrue(rootFolderExists);
+    }
+
+    @Test
+    public void testListDirectories() {
+        Repository repository = new VFSRepository(profile);
+
+        boolean rootFolderExists = repository.directoryExists("/test");
+        assertFalse(rootFolderExists);
+
+        String directoryId = repository.createDirectory("/test");
+        assertNotNull(directoryId);
+        directoryId = repository.createDirectory("/test2");
+        assertNotNull(directoryId);
+        directoryId = repository.createDirectory("/test3/nested");
+        assertNotNull(directoryId);
+
+        rootFolderExists = repository.directoryExists("/test");
+        assertTrue(rootFolderExists);
+
+        rootFolderExists = repository.directoryExists("/test2");
+        assertTrue(rootFolderExists);
+
+        rootFolderExists = repository.directoryExists("/test3");
+        assertTrue(rootFolderExists);
+
+        Collection<Directory> directories = repository.listDirectories("/");
+        assertNotNull(directories);
+        assertEquals(3, directories.size());
+
+        directories = repository.listDirectories("/test3");
+        assertNotNull(directories);
+        assertEquals(1, directories.size());
     }
 
     @Test

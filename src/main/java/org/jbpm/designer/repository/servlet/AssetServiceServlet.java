@@ -162,12 +162,12 @@ public class AssetServiceServlet extends HttpServlet {
                 jsonResponse(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_LIST_DIRECTORIES)) {
                 try {
-                    Collection<String> dirCollection = repository.listDirectories(assetLocation);
+                    Collection<Directory> dirCollection = repository.listDirectories(assetLocation);
                     if(dirCollection!= null) {
                         JSONArray dirListingArray = new JSONArray();
-                        for(String dir : dirCollection) {
+                        for(Directory dir : dirCollection) {
                             JSONObject dirObj = new JSONObject();
-                            dirObj.put("name", dir);
+                            dirObj.put("name", dir.getName());
                             dirListingArray.put(dirObj);
                         }
                         returnObj.put("answer", dirListingArray);

@@ -4,6 +4,7 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Asset;
 import org.jbpm.designer.repository.AssetNotFoundException;
+import org.jbpm.designer.repository.Directory;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.filters.FilterByExtension;
 import org.jbpm.designer.repository.filters.FilterByFileName;
@@ -146,8 +147,10 @@ public class ServletUtil {
         List<String> packages = new ArrayList<String>();
 
         Repository repository = profile.getRepository();
-
-        packages.addAll(repository.listDirectories("/"));
+        Collection<Directory> directories = repository.listDirectories("/");
+        for (Directory directory : directories) {
+            packages.add(directory.getName());
+        }
 
         return packages;
     }

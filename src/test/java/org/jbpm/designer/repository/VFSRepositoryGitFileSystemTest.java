@@ -85,9 +85,13 @@ public class VFSRepositoryGitFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/processes");
         assertTrue(rootFolderExists);
 
-        Collection<String> directories = repository.listDirectories("/");
+        Collection<Directory> directories = repository.listDirectories("/");
         assertNotNull(directories);
         assertEquals(2, directories.size());
+
+        directories = repository.listDirectories("/processes");
+        assertNotNull(directories);
+        assertEquals(1, directories.size());
     }
 
     @Test

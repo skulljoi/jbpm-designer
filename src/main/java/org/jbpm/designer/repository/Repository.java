@@ -17,7 +17,7 @@ public interface Repository {
      * @param startAt - location where directories should be fetched from
      * @return - list of directories
      */
-    Collection<String> listDirectories(String startAt);
+    Collection<Directory> listDirectories(String startAt);
 
     /**
      * Retrieves all directories stored under <code>startAt</code> location including all sub folders.
