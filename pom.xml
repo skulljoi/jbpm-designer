@@ -757,7 +757,7 @@
                 <version>2.0</version>
                 <configuration>
                     <path>/designer</path>
-                    <warFile>target/jbpm-designer-${project.version}-jboss7.war</warFile>
+                    <warFile>target/jbpm-designer-${project.version}-tomcat.war</warFile>
                     <port>${port}</port>
                 </configuration>
             </plugin>
