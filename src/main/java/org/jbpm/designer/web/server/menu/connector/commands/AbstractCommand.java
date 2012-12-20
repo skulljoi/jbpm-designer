@@ -57,7 +57,9 @@ public abstract class AbstractCommand {
         List<Object> dirs = new ArrayList<Object>();
         if(subdirs != null) {
             for(Directory sub : subdirs) {
-                dirs.add(getTree(profile, path.endsWith("/") ? path+sub : path + "/" + sub.getName(), tree));
+                System.out.println("***************** name: " + sub.getName());
+                System.out.println("***************** location: " + sub.getLocation());
+                dirs.add(getTree(profile, path.endsWith("/") ? path+sub.getName() : path + "/" + sub.getName(), tree));
             }
         }
 
