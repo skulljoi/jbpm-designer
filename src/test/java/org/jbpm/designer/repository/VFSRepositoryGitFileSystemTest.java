@@ -225,6 +225,21 @@ public class VFSRepositoryGitFileSystemTest {
     }
 
     @Test
+    public void testLoadAssetFromPath() throws AssetNotFoundException{
+
+        Repository repository = new VFSRepository(profile, env);
+
+        Asset<String> asset = repository.loadAssetFromPath("/processes/BPMN2-ScriptTask.bpmn2");
+
+        assertEquals("bpmn2", asset.getAssetType());
+        assertEquals("BPMN2-ScriptTask", asset.getName());
+        assertEquals("BPMN2-ScriptTask.bpmn2", asset.getFullName());
+        assertEquals("/processes", asset.getAssetLocation());
+        assertFalse(asset.getAssetContent()==null);
+        System.out.print(asset.getUniqueId());
+    }
+
+    @Test
     public void testStoreSingleBinaryAsset() throws AssetNotFoundException{
 
         Repository repository = new VFSRepository(profile, env);

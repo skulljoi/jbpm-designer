@@ -120,7 +120,7 @@ public class UUIDBasedRepositoryServlet extends HttpServlet {
 			String response =  new String(_repository.load(req, uuid, profile, getServletContext()), Charset.forName("UTF-8"));
 			resp.getWriter().write(response);
 		} catch (Exception e) {
-			throw new ServletException("Exception loading process: " + e.getMessage());
+			throw new ServletException("Exception loading process: " + e.getMessage(), e);
 		}
     }
 

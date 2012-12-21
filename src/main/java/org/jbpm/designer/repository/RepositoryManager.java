@@ -18,6 +18,9 @@ public class RepositoryManager {
     }
 
     public void registerRepository(String repositoryId, Repository repository) {
+        if (this.availableRepositories.containsKey(repositoryId)) {
+            return;
+        }
         this.availableRepositories.put(repositoryId, repository);
     }
 
