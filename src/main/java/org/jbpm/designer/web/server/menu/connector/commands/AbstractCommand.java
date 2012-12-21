@@ -43,20 +43,18 @@ public abstract class AbstractCommand {
             current = "/" + current;
         }
 
-        System.out.println("****************** creating dir: " + current + "/" + name);
-        String newDirId = "";
+        Directory newDir = null;
         try {
-            newDirId = profile.getRepository().createDirectory(current + "/" + name);
+            newDir = profile.getRepository().createDirectory(current + "/" + name);
         } catch (Exception e) {
             logger.error(e.getMessage());
         }
-        System.out.println("********************** new dir id: " + newDirId);
 
         JSONObject retObj = new JSONObject();
         retObj.put("cwd", getCwd(profile, current, tree));
         retObj.put("cdc", getCdc(profile, current, tree));
         retObj.put("tree", getTree(profile, "/", tree));
-        retObj.put("select", newDirId);
+        retObj.put("select", newDir == null ? "" : newDir.getName());
 
         return retObj;
     }
@@ -134,7 +132,6 @@ public abstract class AbstractCommand {
     protected Map<String, Object> getDirectoryInfo(IDiagramProfile profile, Directory dir) {
         Map<String, Object> info = new HashMap<String, Object>();
         info.put("name", dir.getName());
-        System.out.println("************************ DIR INFO: " + dir.getLocation() + "/" + dir.getName());
         info.put("hash", dir.getLocation() + "/" + dir.getName());
         info.put("mime", "directory");
         info.put("date", "");
