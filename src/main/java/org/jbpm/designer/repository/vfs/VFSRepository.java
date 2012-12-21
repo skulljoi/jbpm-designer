@@ -68,7 +68,8 @@ public class VFSRepository implements Repository {
         Iterator<Path> it = directories.iterator();
         while (it.hasNext()) {
             Path dir = it.next();
-            foundDirectories.add(new Directory(dir.getFileName().toString(), trimLocation(dir)));
+            String uniqueId = encodeUniqueId(dir.toUri().toString());
+            foundDirectories.add(new Directory(uniqueId, dir.getFileName().toString(), trimLocation(dir)));
         }
 
         return foundDirectories;
@@ -92,12 +93,13 @@ public class VFSRepository implements Repository {
         return foundAssets;
     }
 
-    public String createDirectory(String location) {
+    public Directory createDirectory(String location) {
         Path path = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location));
 
         path = ioService.createDirectories(path);
-
-        return path.toUri().toString();
+        String uniqueId = encodeUniqueId(path.toUri().toString());
+        Directory directory = new Directory(uniqueId, path.getFileName().toString(), trimLocation(path));
+        return directory;
     }
 
     public boolean directoryExists(String directory) {

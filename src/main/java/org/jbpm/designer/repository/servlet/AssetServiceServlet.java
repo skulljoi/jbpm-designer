@@ -134,7 +134,7 @@ public class AssetServiceServlet extends HttpServlet {
                 }
                 jsonResponse(returnObj, errorsArray, resp);
             } else if(action != null && action.equals(ACTION_CREATE_DIRECTORY)) {
-                String ret = repository.createDirectory(assetLocation);
+                Directory ret = repository.createDirectory(assetLocation);
                 if(ret == null) {
                     _logger.error("Unable to create asset: " + assetLocation);
                     addError(errorsArray, "Unable to create asset: " + assetLocation);

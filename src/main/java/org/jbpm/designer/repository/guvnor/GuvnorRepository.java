@@ -23,7 +23,7 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
-    public String createDirectory(String location) {
+    public Directory createDirectory(String location) {
         throw new UnsupportedOperationException();
     }
 

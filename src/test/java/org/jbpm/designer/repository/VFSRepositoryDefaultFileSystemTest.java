@@ -55,8 +55,11 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test");
+        Directory directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
+        assertEquals("test", directoryId.getName());
+        assertEquals("/", directoryId.getLocation());
+        assertNotNull(directoryId.getUniqueId());
 
         rootFolderExists = repository.directoryExists("/test");
         assertTrue(rootFolderExists);
@@ -69,7 +72,7 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test");
+        Directory directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
         directoryId = repository.createDirectory("/test2");
         assertNotNull(directoryId);
@@ -101,7 +104,7 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test");
+        Directory directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -122,7 +125,7 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test/nested");
+        Directory directoryId = repository.createDirectory("/test/nested");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -230,7 +233,7 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         boolean rootFolderExists = repository.directoryExists("/");
         assertTrue(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test/nested");
+        Directory directoryId = repository.createDirectory("/test/nested");
         assertNotNull(directoryId);
 
         Collection<Asset> assets = repository.listAssets("/test/nested");

@@ -35,7 +35,7 @@ public interface Repository {
      * @param location - location in the repository to be created
      * @return - returns identifier of the new directory
      */
-    String createDirectory(String location);
+    Directory createDirectory(String location);
 
     /**
      * Examines repository if given directory exists in the repository

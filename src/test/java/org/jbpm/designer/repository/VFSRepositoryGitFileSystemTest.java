@@ -102,8 +102,11 @@ public class VFSRepositoryGitFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test");
+        Directory directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
+        assertEquals("test", directoryId.getName());
+        assertEquals("/", directoryId.getLocation());
+        assertNotNull(directoryId.getUniqueId());
 
         rootFolderExists = repository.directoryExists("/test");
         assertTrue(rootFolderExists);
@@ -116,7 +119,7 @@ public class VFSRepositoryGitFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test");
+        Directory directoryId = repository.createDirectory("/test");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
@@ -137,7 +140,7 @@ public class VFSRepositoryGitFileSystemTest {
         boolean rootFolderExists = repository.directoryExists("/test");
         assertFalse(rootFolderExists);
 
-        String directoryId = repository.createDirectory("/test/nested");
+        Directory directoryId = repository.createDirectory("/test/nested");
         assertNotNull(directoryId);
 
         rootFolderExists = repository.directoryExists("/test");
