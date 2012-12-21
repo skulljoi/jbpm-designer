@@ -3,6 +3,7 @@
 <html>
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <title>jBPM Designer</title>
     <link rel="stylesheet" href="/designer/css/smoothness/jquery-ui-1.8.13.custom.css" type="text/css" media="screen" charset="utf-8"/>
     <link rel="stylesheet" href="/designer/css/menu.css" type="text/css" media="screen" charset="utf-8"/>
 
@@ -23,7 +24,7 @@
                 rememberLastDir: false,
                 toolbar        : [
                     ['back', 'reload'],
-                    ['select', 'open'],
+                    ['select'],
                     ['mkdir', 'mkfile', 'upload'],
                     ['copy', 'paste', 'rm'],
                     ['rename', 'edit'],
@@ -44,12 +45,13 @@
                     'cwd'   : ['reload', 'delim', 'mkdir', 'mkfile', 'upload', 'delim', 'paste', 'delim', 'info'],
                     'file'  : ['rm', 'rename'],
                     'group' : ['select', 'rm']
-                },
+                }
             })
         })
     </script>
 </head>
 <body>
+    <div class="menubox"/>
     <div id="menu">menu</div>
 </body>
 </html>

@@ -8,7 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
-public class OpenCommand extends AbstractCommand {
+public class MakeDirCommand extends AbstractCommand {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private IDiagramProfile profile;
@@ -25,11 +25,10 @@ public class OpenCommand extends AbstractCommand {
 
     public JSONObject execute() throws Exception {
         String current = (String) requestParams.get("current");
-        String target = (String) requestParams.get("target");
+        String name = (String) requestParams.get("name");
         String tree = (String) requestParams.get("tree");
 
-        System.out.println("********* OPEN COMMAND - current: " + current + " - target: " + target);
-
-        return listContent(profile, target, current, Boolean.parseBoolean(tree));
+        System.out.println("********* MKDIR COMMAND - current: " + current + " - name: " + name);
+        return makeDirectory(profile, current, name, Boolean.parseBoolean(tree));
     }
 }

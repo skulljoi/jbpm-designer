@@ -1866,7 +1866,7 @@ elFinder.prototype.ui.prototype.commands = {
 		
 		this.exec = function() {
 			self.fm.unselectAll();
-			var n     = this.fm.uniqueName('untitled folder');
+			var n     = this.fm.uniqueName('newdirectory');
 				input = $('<input type="text"/>').val(n);
 				prev  = this.fm.view.cwd.find('.directory:last');
 				f     = {name : n, hash : '', mime :'directory', read : true, write : true, date : '', size : 0},

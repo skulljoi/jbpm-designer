@@ -57,7 +57,6 @@ public class MenuServlet extends HttpServlet {
                             " was registered");
         }
         Repository repo = profile.getRepository();
-        System.out.println("************** REPO: " + repo);
         XMLOutputter outputter = new XMLOutputter();
         Format format = Format.getPrettyFormat();
         format.setExpandEmptyElements(true);

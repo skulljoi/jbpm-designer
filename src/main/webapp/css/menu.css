@@ -834,3 +834,23 @@ tr.el-finder-droppable td.icon  p { background-position:5px -450px; }
 }
 
 .el-finder-ql .ui-resizable-e, .el-finder-ql .ui-resizable-s { background:transparent !important;}
+
+.menubox {
+    background-image: url(../images/designerlogo.png);
+    background-repeat:no-repeat;
+    background-position:center;
+    display: table-cell;
+    vertical-align: middle;
+    width:1000px;
+    height:100px;
+    color:#000000;
+    font-family: Verdana,Arial,sans-serif; font-size: 1.3em; font-style:italic;
+    padding:40px;
+    -webkit-border-radius:10px;
+    -moz-border-radius:10px;
+    border-radius:10px;
+}
+
+.alignpright {
+    float: right;
+}

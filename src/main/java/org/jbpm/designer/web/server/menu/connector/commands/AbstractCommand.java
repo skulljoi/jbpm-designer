@@ -14,31 +14,54 @@ import java.util.*;
 public abstract class AbstractCommand {
     private static Logger logger = Logger.getLogger(AbstractCommand.class);
 
-    public JSONObject listContent(IDiagramProfile profile, String path, boolean tree) throws Exception {
+    public JSONObject listContent(IDiagramProfile profile, String target, String current, boolean tree) throws Exception {
         try {
-            if(path == null || path.length() < 1) {
-                path = "/";
-            } else if(!path.startsWith("/")) {
-                path = "/" + path;
+            if(target == null || target.length() < 1) {
+                target = "/";
+            } else if(!target.startsWith("/")) {
+                target = "/" + target;
             }
             JSONObject retObj = new JSONObject();
-            retObj.put("cwd", getCwd(profile, path, tree));
-            retObj.put("cdc", getCdc(profile, path, tree));
-            if(path == "/") {
-                retObj.put("tree", getTree(profile, path, tree));
+            retObj.put("cwd", getCwd(profile, target, tree));
+            retObj.put("cdc", getCdc(profile, target, tree));
+            if(target == "/") {
+                retObj.put("tree", getTree(profile, target, tree));
             }
             addParams(retObj);
             return retObj;
         } catch (JSONException e) {
             e.printStackTrace();
             logger.error(e.getMessage());
-            return null;
+            return new JSONObject();
         }
     }
 
-    public Map<String, Object> getTree(IDiagramProfile profile, String path, boolean tree) throws Exception {
-        System.out.print("******* getTree PATH: " + path);
+    public JSONObject makeDirectory(IDiagramProfile profile, String current, String name, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
 
+        System.out.println("****************** creating dir: " + current + "/" + name);
+        String newDirId = "";
+        try {
+            newDirId = profile.getRepository().createDirectory(current + "/" + name);
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+        System.out.println("********************** new dir id: " + newDirId);
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, "/", tree));
+        retObj.put("select", newDirId);
+
+        return retObj;
+    }
+
+    public Map<String, Object> getTree(IDiagramProfile profile, String path, boolean tree) throws Exception {
         String qname = "";
         if(path != "/") {
             String[] pathParts = path.split("/");
@@ -75,6 +98,11 @@ public abstract class AbstractCommand {
             cdcinfo.add(getAssetInfo(profile, asset));
             }
         }
+        if(dirs != null) {
+            for(Directory dir : dirs) {
+                cdcinfo.add(getDirectoryInfo(profile,dir));
+            }
+        }
         return cdcinfo;
     }
 
@@ -103,10 +131,11 @@ public abstract class AbstractCommand {
         retObj.put("disabled", new JSONArray());
     }
 
-    protected Map<String, Object> getDirectoryInfo(IDiagramProfile profile, String dir) {
+    protected Map<String, Object> getDirectoryInfo(IDiagramProfile profile, Directory dir) {
         Map<String, Object> info = new HashMap<String, Object>();
-        info.put("name", dir);
-        info.put("hash", dir);
+        info.put("name", dir.getName());
+        System.out.println("************************ DIR INFO: " + dir.getLocation() + "/" + dir.getName());
+        info.put("hash", dir.getLocation() + "/" + dir.getName());
         info.put("mime", "directory");
         info.put("date", "");
         info.put("size", "");

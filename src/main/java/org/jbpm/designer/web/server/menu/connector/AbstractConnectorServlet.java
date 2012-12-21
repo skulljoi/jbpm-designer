@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.server.ServletUtil;
+import org.jbpm.designer.web.server.menu.connector.commands.MakeDirCommand;
 import org.jbpm.designer.web.server.menu.connector.commands.OpenCommand;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -62,32 +63,11 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 OpenCommand command = new OpenCommand();
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
+            } else if(cmd != null && cmd.equals("mkdir")) {
+                MakeDirCommand command = new MakeDirCommand();
+                command.init(request, response, profile, repository, requestParams);
+                output(response, false, command.execute());
             }
-
-//            // prepare command and run
-//            AbstractCommand command = prepareCommand((String) requestParams.get("cmd"), request, response, config);
-//            try {
-//                command.execute();
-//            } catch (ConnectorException e) {
-//                logger.warn("command returned an error", e);
-//                putResponse("error", e.getMessage());
-//            }
-//
-//            // append init info if needed
-//            if (command.mustRunInit()) {
-//                try {
-//                    command.initCommand();
-//                } catch (ConnectorException e) {
-//                    logger.warn("command returned an error", e);
-//                    putResponse("error", e.getMessage());
-//                }
-//            }
-//
-//            // output if command didn't do it
-//            if (!command.isResponseOutputDone()) {
-//                output(response, command.isResponseTextHtml(), json, command.getResponseWriter());
-//                command.setResponseOutputDone(true);
-//            }
         } catch (Exception e) {
             e.printStackTrace();
             logger.error(e.getMessage());
@@ -100,15 +80,6 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 logger.error("", ee);
             }
         }
-
-//        // close streams
-//        if (listFileStreams != null) {
-//            for (ByteArrayOutputStream os : listFileStreams) {
-//                try {
-//                    os.close();
-//                } catch (Exception e) {}
-//            }
-//        }
     }
 
     protected static void output(HttpServletResponse response, boolean isResponseTextHtml, JSONObject json) {
@@ -123,8 +94,6 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
         } catch (Exception e) {
             logger.error("", e);
         }
-
-        //AbstractCommand.closeWriter(responseWriter);
     }
 
     /**
