@@ -2,8 +2,10 @@ package org.jbpm.designer.web.server.menu.connector.commands;
 
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Asset;
+import org.jbpm.designer.repository.AssetBuilderFactory;
 import org.jbpm.designer.repository.AssetTypeMapper;
 import org.jbpm.designer.repository.Directory;
+import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -55,6 +57,41 @@ public abstract class AbstractCommand {
         retObj.put("cdc", getCdc(profile, current, tree));
         retObj.put("tree", getTree(profile, "/", tree));
         retObj.put("select", newDir == null ? "" : newDir.getName());
+
+        return retObj;
+    }
+
+    public JSONObject makeFile(IDiagramProfile profile, String current, String name, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
+
+        if(name.endsWith(".bpmn2")) {
+            name = name.substring(0, name.length() - 6);
+        } else if(name.endsWith(("bpmn"))) {
+            name = name.substring(0, name.length() - 5);
+        }
+        System.out.println("************* NEW NAME: " + name);
+        String fullName = name + ".bpmn2";
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("")
+                .type("bpmn2")
+                .name(name)
+                .location(current);
+
+        String newFileId = profile.getRepository().createAsset(builder.getAsset());
+        if(newFileId == null) {
+            logger.error("Unable to create asset: " + current + "/" + fullName);
+        }
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, "/", tree));
+        retObj.put("select", newFileId == null ? "" : current + "/" + fullName);
 
         return retObj;
     }

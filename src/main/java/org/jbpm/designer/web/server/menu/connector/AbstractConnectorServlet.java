@@ -10,6 +10,7 @@ import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.server.ServletUtil;
 import org.jbpm.designer.web.server.menu.connector.commands.MakeDirCommand;
+import org.jbpm.designer.web.server.menu.connector.commands.MakeFileCommand;
 import org.jbpm.designer.web.server.menu.connector.commands.OpenCommand;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -67,6 +68,14 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 MakeDirCommand command = new MakeDirCommand();
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
+            } else if(cmd != null && cmd.equals("mkfile")) {
+                MakeFileCommand command = new MakeFileCommand();
+                command.init(request, response, profile, repository, requestParams);
+                output(response, false, command.execute());
+            } else if(cmd != null && cmd.equals("rename")) {
+                // name is new name
+                // target is full path of current dir to be renamed
+                // current is current "parent" dir
             }
         } catch (Exception e) {
             e.printStackTrace();
