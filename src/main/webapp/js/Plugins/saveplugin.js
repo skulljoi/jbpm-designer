@@ -29,7 +29,7 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
         });
     },
     save : function() {
-
+        // save process bpmn2 and svg
         Ext.Ajax.request({
             url: ORYX.PATH + 'assetservice',
             method: 'POST',
@@ -52,8 +52,41 @@ ORYX.Plugins.SavePlugin = Clazz.extend({
                             this.facade.raiseEvent({
                                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                 ntype		: 'success',
-                                msg         : 'Successfully saved asset: ' + ORYX.UUID,
+                                msg         : 'Successfully saved business process',
                                 title       : ''
+                            });
+                            // svg save
+                            var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
+                            var rawSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getRootNode().cloneNode(true));
+                            var processJSON = ORYX.EDITOR.getSerializedJSON();
+                            var processId = jsonPath(processJSON.evalJSON(), "$.properties.id");
+                            Ext.Ajax.request({
+                                url: ORYX.PATH + "transformer",
+                                method: 'POST',
+                                success: function(request) {
+                                    this.facade.raiseEvent({
+                                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                        ntype		: 'success',
+                                        msg         : 'Successfully saved business process image',
+                                        title       : ''
+                                    });
+                                }.bind(this),
+                                failure: function(){
+                                    this.facade.raiseEvent({
+                                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                        ntype		: 'error',
+                                        msg         : 'Unable to save business process image.',
+                                        title       : ''
+                                    });
+                                }.bind(this),
+                                params: {
+                                    fsvg: formattedSvgDOM,
+                                    rsvg: rawSvgDOM,
+                                    uuid: ORYX.UUID,
+                                    profile: ORYX.PROFILE,
+                                    transformto: 'svg',
+                                    processid: processId
+                                }
                             });
                         }
                     } else {

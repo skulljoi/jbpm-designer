@@ -1518,16 +1518,19 @@ elFinder.prototype.ui.prototype.commands = {
 	 **/
 	quicklook : function(fm) {
 		var self  = this;
-		this.name = 'Preview with Quick Look';
+		this.name = 'View process image';
 		this.fm   = fm;
 		
 		this.exec = function() {
 			self.fm.quickLook.toggle();
 		}
-		
-		this.isAllowed = function() {
-			return this.fm.selected.length == 1;
-		}
+
+        this.isAllowed = function() {
+            if (self.fm.selected.length == 1) {
+                var f = this.fm.getSelected()[0];
+                return f.write && f.read && (f.mime.indexOf('xml') == 0 || f.mime == 'text/xml');
+            }
+        }
 		
 		this.cm = function() {
 			return true;
@@ -2170,69 +2173,80 @@ elFinder.prototype.ui.prototype.commands = {
 	 **/
 	edit : function(fm) {
 		var self  = this;
-		this.name = 'Edit text file';
+		this.name = 'Edit BPMN2 process';
 		this.fm   = fm;
 		
 		this.exec = function() {
 			var f = this.fm.getSelected(0);
-			this.fm.lockShortcuts(true);
-			this.fm.ajax({
-				cmd     : 'read',
-				current : this.fm.cwd.hash,
-				target    : f.hash
-			}, function(data) {
-				self.fm.lockShortcuts(true);
-				var ta = $('<textarea/>').val(data.content||'').keydown(function(e) {
-					e.stopPropagation();
-					if (e.keyCode == 9) {
-						e.preventDefault();
-						if ($.browser.msie) {
-							var r = document.selection.createRange();
-							r.text = "\t"+r.text;
-							this.focus();
-						} else {
-							var before = this.value.substr(0, this.selectionStart),
-							after = this.value.substr(this.selectionEnd);
-							this.value = before+"\t"+after;
-							this.setSelectionRange(before.length+1, before.length+1);
-						}
-					}
-				});
-				$('<div/>').append(ta)
-					.dialog({
-						dialogClass : 'el-finder-dialog',
-						title   : self.fm.i18n(self.name),
-						modal   : true,
-						width   : 500,
-						close   : function() { self.fm.lockShortcuts(); },
-						buttons : {
-							Cancel : function() { $(this).dialog('close'); },
-							Ok     : function() {
-								var c = ta.val();
-								$(this).dialog('close');
-								self.fm.ajax({
-									cmd     : 'edit',
-									current : self.fm.cwd.hash,
-									target  : f.hash,
-									content : c
-								}, function(data) {
-									if (data.target) {
-										self.fm.cdc[data.target.hash] = data.target;
-										self.fm.view.updateFile(data.target);
-										self.fm.selectById(data.target.hash);
-										
-									}
-								}, {type : 'POST'});
-							}
-						}
-					});
-			});
+
+            if (!f.url) {
+                return this.fm.view.error('File URL disabled by connector config');
+            }
+            this.fm.options.editorCallback(this.fm.options.cutURL == 'root' ? f.url.substr(this.fm.params.url.length) : f.url.replace(new RegExp('^('+this.fm.options.cutURL+')'), ''));
+
+            if (this.fm.options.closeOnEditorCallback) {
+                this.fm.dock();
+                this.fm.close();
+                this.fm.destroy();
+            }
+//			this.fm.lockShortcuts(true);
+//			this.fm.ajax({
+//				cmd     : 'read',
+//				current : this.fm.cwd.hash,
+//				target    : f.hash
+//			}, function(data) {
+//				self.fm.lockShortcuts(true);
+//				var ta = $('<textarea/>').val(data.content||'').keydown(function(e) {
+//					e.stopPropagation();
+//					if (e.keyCode == 9) {
+//						e.preventDefault();
+//						if ($.browser.msie) {
+//							var r = document.selection.createRange();
+//							r.text = "\t"+r.text;
+//							this.focus();
+//						} else {
+//							var before = this.value.substr(0, this.selectionStart),
+//							after = this.value.substr(this.selectionEnd);
+//							this.value = before+"\t"+after;
+//							this.setSelectionRange(before.length+1, before.length+1);
+//						}
+//					}
+//				});
+//				$('<div/>').append(ta)
+//					.dialog({
+//						dialogClass : 'el-finder-dialog',
+//						title   : self.fm.i18n(self.name),
+//						modal   : true,
+//						width   : 500,
+//						close   : function() { self.fm.lockShortcuts(); },
+//						buttons : {
+//							Cancel : function() { $(this).dialog('close'); },
+//							Ok     : function() {
+//								var c = ta.val();
+//								$(this).dialog('close');
+//								self.fm.ajax({
+//									cmd     : 'edit',
+//									current : self.fm.cwd.hash,
+//									target  : f.hash,
+//									content : c
+//								}, function(data) {
+//									if (data.target) {
+//										self.fm.cdc[data.target.hash] = data.target;
+//										self.fm.view.updateFile(data.target);
+//										self.fm.selectById(data.target.hash);
+//
+//									}
+//								}, {type : 'POST'});
+//							}
+//						}
+//					});
+//			});
 		}
 		
 		this.isAllowed = function() {
 			if (self.fm.selected.length == 1) {
 				var f = this.fm.getSelected()[0];
-				return f.write && f.read && (f.mime.indexOf('text') == 0 || f.mime == 'application/x-empty' || f.mime == 'application/xml');
+				return f.write && f.read && (f.mime.indexOf('xml') == 0 || f.mime == 'text/xml');
 			}
 		}
 		

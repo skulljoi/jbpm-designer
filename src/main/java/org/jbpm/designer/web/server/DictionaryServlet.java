@@ -85,7 +85,6 @@ public class DictionaryServlet extends HttpServlet {
 	
 	private String getFromRepository(String uuid, IDiagramProfile profile, Repository repository) {
         try {
-            System.out.println("******** TRYING TO FIND DICTIONARY IN: " + profile.getRepositoryGlobalDir()+"/"+DICTIONARY_FNAME+"."+DICTIONARY_FEXT);
             Asset<String> dictionaryAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir()+"/"+DICTIONARY_FNAME+"."+DICTIONARY_FEXT);
             return dictionaryAsset.getAssetContent();
 		} catch (Exception e) {

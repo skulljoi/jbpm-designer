@@ -73,9 +73,14 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
             } else if(cmd != null && cmd.equals("rename")) {
+                // TODO FINISH
                 // name is new name
                 // target is full path of current dir to be renamed
                 // current is current "parent" dir
+            } else if(cmd != null && cmd.equals("paste")) {
+                // TODO FINISH
+            } else if(cmd != null && cmd.equals("paste")) {
+
             }
         } catch (Exception e) {
             e.printStackTrace();

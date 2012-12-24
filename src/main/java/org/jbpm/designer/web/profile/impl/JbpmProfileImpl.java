@@ -221,7 +221,6 @@ public class JbpmProfileImpl implements IDiagramProfile {
     private void initializeRepository() {
 
         if (!initialized) {
-            System.out.println("********* initializing repository");
             try {
                 RepositoryManager.getInstance().registerRepository("repository-guvnor", new GuvnorRepository(this));
             } catch(Exception e) {
