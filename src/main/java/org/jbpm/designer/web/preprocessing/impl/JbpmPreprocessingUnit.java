@@ -108,11 +108,9 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
             // figure out which package our uuid belongs in and get back the list of configs
             Collection<Asset> workitemConfigInfo = findWorkitemInfoForUUID(asset.getAssetLocation(), repository);
             if(workitemConfigInfo != null) {
-
                 setupDefaultWorkitemConfigs(asset.getAssetLocation(), repository);
 
             }
-
 
             // get the contents of each of the configs
             Collection<Asset> workItemsContent = getWorkitemConfigContent(workitemConfigInfo, repository);
@@ -151,7 +149,9 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
             if(workitemConfigInfo != null && workitemConfigInfo.size() > 0) {
                 for(Asset key: workitemConfigInfo) {
-                    workItemTemplate.setAttribute("packageName", key.getAssetLocation());
+                    workItemTemplate.removeAttribute("packageName");
+                    String assetLoc = key.getAssetLocation();
+                    workItemTemplate.setAttribute("packageName", assetLoc.startsWith("/") ? assetLoc.substring(1, assetLoc.length()) : assetLoc);
                 }
             } else {
                 workItemTemplate.setAttribute("packageName", "");
@@ -415,12 +415,9 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
     }
 
     private Collection<Asset> findWorkitemInfoForUUID(String location, Repository repository) {
-
         Collection<Asset> widAssets = repository.listAssets(location, new FilterByExtension(WORKITEM_DEFINITION_EXT));
-
         return widAssets;
     }
-
 
     private String readFile(String pathname) throws IOException {
         StringBuilder fileContents = new StringBuilder();
