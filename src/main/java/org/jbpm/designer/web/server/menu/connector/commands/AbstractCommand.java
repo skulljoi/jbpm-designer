@@ -125,7 +125,6 @@ public abstract class AbstractCommand {
 
     public List<Map<String, Object>> getCdc(IDiagramProfile profile, String path, boolean tree) throws Exception {
         List<Map<String, Object>> cdcinfo = new ArrayList<Map<String, Object>>();
-        System.out.println("***************** PATH: " + path);
         Collection<Asset> assets = profile.getRepository().listAssets(path);
         Collection<Directory> dirs = profile.getRepository().listDirectories(path);
 
