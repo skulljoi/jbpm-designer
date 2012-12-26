@@ -6,7 +6,10 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
+import org.jbpm.designer.repository.Asset;
+import org.jbpm.designer.repository.AssetBuilderFactory;
 import org.jbpm.designer.repository.Repository;
+import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.server.ServletUtil;
 import org.jbpm.designer.web.server.menu.connector.commands.MakeDirCommand;
@@ -19,9 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.util.*;
 
 public abstract class AbstractConnectorServlet extends HttpServlet {
@@ -30,6 +31,7 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
     private Map<String, Object> requestParams;
     private List<FileItemStream> listFiles;
     private List<ByteArrayOutputStream> listFileStreams;
+    private boolean initialized = false;
 
     @Override
     public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -41,6 +43,14 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
         processRequest(request, response);
     }
 
+    protected void initializeDefaultRepo(IDiagramProfile profile, Repository repository, HttpServletRequest request) throws Exception {
+        String sampleBpmn2 = getServletContext().getRealPath("/defaults/SampleProcess.bpmn2");
+        createAssetIfNotExisting(repository, "/defaultPackage", "BPMN2-SampleProcess", "bpmn2", getBytesFromFile(new File(sampleBpmn2)));
+        if(profile.getRepositoryGlobalDir() != null) {
+            createDirectoryIfNotExist(repository, profile.getRepositoryGlobalDir());
+        }
+    }
+
     /**
      * Processing a new request from ElFinder client.
      * @param request
@@ -50,6 +60,14 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
         parseRequest(request, response);
         IDiagramProfile profile = ServletUtil.getProfile(request, "jbpm", getServletContext());
         Repository repository = profile.getRepository();
+        if(!initialized) {
+            try {
+                initializeDefaultRepo(profile, repository, request);
+                initialized = true;
+            } catch (Exception e) {
+                logger.error("Unable to initialize repository: " + e.getMessage());
+            }
+        }
         JSONObject returnJson = new JSONObject();
         try {
             System.out.println("*********************************** COMMAND: " + requestParams.get("cmd"));
@@ -299,5 +317,62 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
         } catch (JSONException e) {
             logger.error("json write error", e);
         }
+    }
+
+    private void createDirectoryIfNotExist(Repository repository, String location) throws Exception {
+        if(!repository.directoryExists(location)) {
+            repository.createDirectory(location);
+        }
+    }
+
+    private String createAssetIfNotExisting(Repository repository, String location, String name, String type, byte[] content) {
+        try {
+            boolean assetExists = repository.assetExists(location + "/" + name + "." + type);
+            if (!assetExists) {
+                // create theme asset
+                AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
+                assetBuilder.content(content)
+                        .location(location)
+                        .name(name)
+                        .type(type)
+                        .version("1.0");
+
+                Asset<byte[]> customEditorsAsset = assetBuilder.getAsset();
+
+                return repository.createAsset(customEditorsAsset);
+            }
+
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+        }
+
+        return null;
+    }
+
+    public static byte[] getBytesFromFile(File file) throws IOException {
+        InputStream is = null;
+        is = new FileInputStream(file);
+        long length = file.length();
+
+        if (length > Integer.MAX_VALUE) {
+            is.close();
+            return null; // File is too large
+        }
+
+        byte[] bytes = new byte[(int) length];
+
+        int offset = 0;
+        int numRead = 0;
+        while (offset < bytes.length
+                && (numRead = is.read(bytes, offset, bytes.length - offset)) >= 0) {
+            offset += numRead;
+        }
+
+        if (offset < bytes.length) {
+            is.close();
+            throw new IOException("Could not completely read file " + file.getName());
+        }
+        is.close();
+        return bytes;
     }
 }
