@@ -147,20 +147,15 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
             workItemTemplate.setAttribute("workitemDefs", workDefinitions);
             workItemTemplate.setAttribute("patternData", patternInfoMap);
 
-            if(workitemConfigInfo != null && workitemConfigInfo.size() > 0) {
-                for(Asset key: workitemConfigInfo) {
-                    workItemTemplate.removeAttribute("packageName");
-                    String assetLoc = key.getAssetLocation();
-                    workItemTemplate.setAttribute("packageName", assetLoc.startsWith("/") ? assetLoc.substring(1, assetLoc.length()) : assetLoc);
-                }
-            } else {
-                workItemTemplate.setAttribute("packageName", "");
+            String processPackage = asset.getAssetLocation();
+            if(processPackage.startsWith("/")) {
+                processPackage = processPackage.substring(1, processPackage.length());
             }
+            processPackage = processPackage.replaceAll("/", ".");
+            workItemTemplate.setAttribute("packageName", processPackage);
+
             String processName = asset.getName();
-
-
             workItemTemplate.setAttribute("processName", processName);
-
 
             // default the process id to packagename.processName
             workItemTemplate.setAttribute("processid", workItemTemplate.getAttribute("packageName") + "." + workItemTemplate.getAttribute("processName"));
