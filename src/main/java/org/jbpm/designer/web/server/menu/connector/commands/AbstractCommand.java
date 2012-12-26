@@ -10,6 +10,7 @@ import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import sun.net.idn.StringPrep;
 
 import java.util.*;
 
@@ -36,6 +37,31 @@ public abstract class AbstractCommand {
             logger.error(e.getMessage());
             return new JSONObject();
         }
+    }
+
+    public JSONObject removeAssets(IDiagramProfile profile, String current, List<String> targets, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
+
+        if(profile.getRepository().directoryExists(current)) {
+            for(String target : targets) {
+                boolean deleted = profile.getRepository().deleteAssetFromPath(target);
+                if(!deleted) {
+                    logger.error("Unable to delete asset: " + target);
+                }
+            }
+        }
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, "/", tree));
+        retObj.put("select", "");
+
+        return retObj;
     }
 
     public JSONObject makeDirectory(IDiagramProfile profile, String current, String name, boolean tree) throws Exception {
@@ -73,7 +99,6 @@ public abstract class AbstractCommand {
         } else if(name.endsWith(("bpmn"))) {
             name = name.substring(0, name.length() - 5);
         }
-        System.out.println("************* NEW NAME: " + name);
         String fullName = name + ".bpmn2";
 
         AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);

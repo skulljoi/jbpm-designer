@@ -6,9 +6,10 @@ import org.json.JSONObject;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.util.List;
 import java.util.Map;
 
-public class OpenCommand extends AbstractCommand {
+public class RemoveAssetCommand extends AbstractCommand {
     private HttpServletRequest request;
     private HttpServletResponse response;
     private IDiagramProfile profile;
@@ -27,7 +28,8 @@ public class OpenCommand extends AbstractCommand {
         String current = (String) requestParams.get("current");
         String target = (String) requestParams.get("target");
         String tree = (String) requestParams.get("tree");
+        List<String> targets = (List<String>) requestParams.get("targets[]");
 
-        return listContent(profile, target, current, Boolean.parseBoolean(tree));
+        return removeAssets(profile, current, targets, Boolean.parseBoolean(tree));
     }
 }
