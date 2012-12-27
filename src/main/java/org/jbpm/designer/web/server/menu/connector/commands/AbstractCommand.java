@@ -48,23 +48,13 @@ public abstract class AbstractCommand {
 
         Repository repository = profile.getRepository();
 
-//        *********************************** COMMAND: rename
-//                ******************************* PARAM: cmd -- val: rename
-//                ******************************* PARAM: name -- val: myotherdir
-//                ******************************* PARAM: target -- val: //mydir
-//        ******************************* PARAM: current -- val: /
-//        ******************************* PARAM: _ -- val: 1356625001744
-
-
         if(repository.directoryExists(target)) {
-            System.out.println("******** MOVIND DIRECTORY!");
             System.out.println(target + " - " + current + " - " + name);
             boolean moved = repository.moveDirectory(target, current, name);
             if(!moved) {
                 logger.error("Unable to move directory: " + target);
             }
         } else {
-            System.out.println("******** MOVING ASSET!");
             Asset tobeRenamedAsset = null;
             try {
                 tobeRenamedAsset = repository.loadAssetFromPath(target);
