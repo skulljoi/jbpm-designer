@@ -372,4 +372,294 @@ public class VFSRepositoryGitFileSystemTest {
         assertNotNull(content);
         assertEquals("updated content\n", content);
     }
+
+    @Test
+    public void testDeleteAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExistsBeforeDelete = repository.assetExists(id);
+        assertTrue(assetExistsBeforeDelete);
+
+        boolean deleted = repository.deleteAsset(id);
+        assertTrue(deleted);
+
+        boolean assetExists = repository.assetExists(id);
+        assertFalse(assetExists);
+
+    }
+
+    @Test
+    public void testDeleteAssetFromPath() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExistsBeforeDelete = repository.assetExists(id);
+        assertTrue(assetExistsBeforeDelete);
+
+        boolean deleted = repository.deleteAssetFromPath("/process.bpmn2");
+        assertTrue(deleted);
+
+        boolean assetExists = repository.assetExists(id);
+        assertFalse(assetExists);
+
+    }
+
+
+    @Test
+    public void testCopyAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExistsBeforeDelete = repository.assetExists(id);
+        assertTrue(assetExistsBeforeDelete);
+
+        boolean copied = repository.copyAsset(id, "/target");
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/target", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/target/process.bpmn2");
+        assertTrue(assetExists);
+
+    }
+
+    @Ignore// git based vfs does not yet support move
+    @Test
+    public void testMoveAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean sourceAssetExists = repository.assetExists(id);
+        assertTrue(sourceAssetExists);
+
+        boolean copied = repository.moveAsset(id, "/target", null);
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/target", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/target/process.bpmn2");
+        assertTrue(assetExists);
+
+        foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(0, foundAsset.size());
+
+        sourceAssetExists = repository.assetExists(id);
+        assertFalse(sourceAssetExists);
+    }
+
+    @Ignore// git based vfs does not yet support move
+    @Test
+    public void testMoveAndRenameAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean sourceAssetExists = repository.assetExists(id);
+        assertTrue(sourceAssetExists);
+
+        boolean copied = repository.moveAsset(id, "/target", "renamed.bpmn2");
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/target", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/target/renamed.bpmn2");
+        assertTrue(assetExists);
+
+        foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(0, foundAsset.size());
+
+        sourceAssetExists = repository.assetExists(id);
+        assertFalse(sourceAssetExists);
+    }
+
+    @Ignore// git based vfs does not yet support move
+    @Test
+    public void testRenameAsset() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean sourceAssetExists = repository.assetExists(id);
+        assertTrue(sourceAssetExists);
+
+        boolean copied = repository.moveAsset(id, "/source", "renamed.bpmn2");
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/source/renamed.bpmn2");
+        assertTrue(assetExists);
+
+        foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        sourceAssetExists = repository.assetExists(id);
+        assertFalse(sourceAssetExists);
+    }
+
+    @Test
+    public void testCopyDirectory() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        Directory sourceDir = repository.createDirectory("/source");
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExistsBeforeDelete = repository.assetExists(id);
+        assertTrue(assetExistsBeforeDelete);
+
+        boolean copied = repository.copyDirectory("/source", "/target");
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/target/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/target/source/process.bpmn2");
+        assertTrue(assetExists);
+
+        boolean copiedDirectoryExists = repository.directoryExists("/source");
+        assertTrue(copiedDirectoryExists);
+
+    }
+
+    @Ignore// git based vfs does not yet support move
+    @Test
+    public void testMoveDirectory() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile, env);
+
+        Directory sourceDir = repository.createDirectory("/source");
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Text);
+        builder.content("simple content")
+                .type("bpmn2")
+                .name("process")
+                .location("/source");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExistsBeforeDelete = repository.assetExists(id);
+        assertTrue(assetExistsBeforeDelete);
+
+        boolean copied = repository.moveDirectory("/source", "/target", null);
+        assertTrue(copied);
+
+        foundAsset = repository.listAssets("/target/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(1, foundAsset.size());
+
+        boolean assetExists = repository.assetExists("/target/source/process.bpmn2");
+        assertTrue(assetExists);
+
+        boolean movedDirectoryExists = repository.directoryExists("/source");
+        assertFalse(movedDirectoryExists);
+
+    }
 }

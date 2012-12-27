@@ -139,6 +139,80 @@ public class VFSRepository implements Repository {
         }
     }
 
+    public boolean copyDirectory(String sourceDirectory, final String location) {
+        if (!directoryExists(sourceDirectory)) {
+            throw new IllegalArgumentException("Directory does not exist " + sourceDirectory);
+        }
+        try {
+
+            final Path sourcePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + sourceDirectory));
+            final String destinationPathRoot = getRepositoryRoot() + location + fileSystem.getSeparator() + sourcePath.getFileName().toString();
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+
+                @Override
+                public FileVisitResult visitFile(Path currentFile, BasicFileAttributes basicFileAttributes) throws IOException {
+
+                    if (!currentFile.endsWith(".gitignore")) {
+                        Path destinationPath = fileSystem.provider().getPath(URI.create(destinationPathRoot +
+                                fileSystem.getSeparator() + sourcePath.relativize(currentFile)));
+                        createIfNotExists(destinationPath);
+
+                        fileSystem.provider().copy(currentFile, destinationPath, null);
+                    }
+                    return FileVisitResult.CONTINUE;
+                }
+
+            });
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean moveDirectory(String sourceDirectory, final String location, String name) {
+        if (!directoryExists(sourceDirectory)) {
+            throw new IllegalArgumentException("Directory does not exist " + sourceDirectory);
+        }
+        try {
+            final Path sourcePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + sourceDirectory));
+
+            if (name == null) {
+                name = sourcePath.getFileName().toString();
+            }
+            final String destinationPathRoot = getRepositoryRoot() + location + fileSystem.getSeparator() + name;
+
+            Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult visitFile(Path currentFile, BasicFileAttributes basicFileAttributes) throws IOException {
+                    Path destinationPath = fileSystem.provider().getPath(URI.create(destinationPathRoot
+                            + fileSystem.getSeparator() + sourcePath.relativize(currentFile)));
+                    createIfNotExists(destinationPath);
+                    fileSystem.provider().move(currentFile, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+                    return FileVisitResult.CONTINUE;
+                }
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
+                    if (e == null) {
+                        fileSystem.provider().deleteIfExists(dir);
+                        return FileVisitResult.CONTINUE;
+                    } else {
+                        // directory iteration failed
+                        throw e;
+                    }
+                }
+
+            });
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
     public Collection<Asset> listAssets(String location) {
         Path path = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location));
         DirectoryStream<Path> directories = ioService.newDirectoryStream(path, new DirectoryStream.Filter<Path>() {
@@ -201,13 +275,7 @@ public class VFSRepository implements Repository {
 
     public String createAsset(Asset asset) {
         Path filePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()) + "/" +asset.getFullName()));
-        if (!ioService.exists(filePath.getParent())) {
-            try {
-                fileSystem.provider().createDirectory(filePath.getParent(), null);
-            } catch (FileAlreadyExistsException e) {
-                // TODO currently git provider does not properly check existence of directories
-            }
-        }
+        createIfNotExists(filePath);
         try {
             OutputStream outputStream = fileSystem.provider().newOutputStream(filePath, StandardOpenOption.TRUNCATE_EXISTING);
             if(((AbstractAsset)asset).acceptBytes()) {
@@ -259,6 +327,47 @@ public class VFSRepository implements Repository {
             return ioService.exists(fileSystem.provider().getPath(URI.create(uniqueId)));
         } catch (Exception e) {
             return ioService.exists(fileSystem.provider().getPath(URI.create(getRepositoryRoot() + assetUniqueId)));
+        }
+    }
+
+    public boolean copyAsset(String uniqueId, String location) {
+        String decodedUniqueId = decodeUniqueId(uniqueId);
+        if (!assetExists(decodedUniqueId)) {
+            throw new IllegalArgumentException("Asset does not exist");
+        }
+        try {
+            Path sourcePath = fileSystem.provider().getPath(URI.create(decodedUniqueId));
+            Path destinationPath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location
+                    + fileSystem.getSeparator() + sourcePath.getFileName().toString()));
+            createIfNotExists(destinationPath);
+            fileSystem.provider().copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean moveAsset(String uniqueId, String location, String name) {
+        String decodedUniqueId = decodeUniqueId(uniqueId);
+        if (!assetExists(decodedUniqueId)) {
+            throw new IllegalArgumentException("Asset does not exist");
+        }
+        try {
+            Path sourcePath = fileSystem.provider().getPath(URI.create(decodedUniqueId));
+            if (name == null) {
+                name = sourcePath.getFileName().toString();
+            }
+
+            Path destinationPath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location + fileSystem.getSeparator() + name));
+            createIfNotExists(destinationPath);
+            fileSystem.provider().move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
         }
     }
 
@@ -332,5 +441,15 @@ public class VFSRepository implements Repository {
         }
 
         return location;
+    }
+
+    private void createIfNotExists(Path filePath) {
+        if (!ioService.exists(filePath.getParent())) {
+            try {
+                fileSystem.provider().createDirectory(filePath.getParent(), null);
+            } catch (FileAlreadyExistsException e) {
+                // TODO currently git provider does not properly check existence of directories
+            }
+        }
     }
 }

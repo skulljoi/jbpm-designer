@@ -55,6 +55,24 @@ public interface Repository {
     boolean deleteDirectory(String directory, boolean failIfNotEmpty);
 
     /**
+     * Copy directory given by <code>uniqueId</code> into destination given by <code>location</code>
+     * @param uniqueId - source directory unique id
+     * @param location - destination where directory will be copied to
+     * @return - true when copy operation was successful otherwise false
+     */
+    boolean copyDirectory(String uniqueId, String location);
+
+    /**
+     * Moves directory given by <code>uniqueId</code> into destination given by <code>location</code>
+     * and renames it with given <code>name</code>
+     * @param uniqueId - source directory unique id
+     * @param location - final destination where directory should be moved to
+     * @param name - name of the directory after move, if null is given name is not changed
+     * @return - returns true if move operation was successful otherwise false
+     */
+    boolean moveDirectory(String uniqueId, String location, String name);
+
+    /**
      * Retrieves all assets stored in the given location.
      * NOTE: This will not load the actual content of the asset but only its meta data
      * @param location - location that assets should be collected from
@@ -123,5 +141,23 @@ public interface Repository {
      * @return true if and only if asset exists otherwise false
      */
     boolean assetExists(String assetUniqueId);
+
+    /**
+     * Copy asset given by <code>uniqueId</code> into destination given by <code>location</code>
+     * @param uniqueId - source asset unique id
+     * @param location - destination where asset will be copied to
+     * @return - true when copy operation was successful otherwise false
+     */
+    boolean copyAsset(String uniqueId, String location);
+
+    /**
+     * Moves asset given by <code>uniqueId</code> into destination given by <code>location</code>
+     * and renames it with given <code>name</code>
+     * @param uniqueId - source asset unique id
+     * @param location - final destination where asset should be moved to
+     * @param name - name of the asset after move, if null is given name is not changed
+     * @return - returns true if move operation was successful otherwise false
+     */
+    boolean moveAsset(String uniqueId, String location, String name);
 
 }

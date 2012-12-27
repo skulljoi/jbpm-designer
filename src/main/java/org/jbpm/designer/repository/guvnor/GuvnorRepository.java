@@ -35,6 +35,14 @@ public class GuvnorRepository implements Repository {
         throw new UnsupportedOperationException();
     }
 
+    public boolean copyDirectory(String uniqueId, String location) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean moveDirectory(String uniqueId, String location, String name) {
+        throw new UnsupportedOperationException();
+    }
+
     public Collection<Asset> listAssets(String location) {
         throw new UnsupportedOperationException();
     }
@@ -68,6 +76,14 @@ public class GuvnorRepository implements Repository {
     }
 
     public boolean assetExists(String assetUniqueId) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean copyAsset(String uniqueId, String location) {
+        throw new UnsupportedOperationException();
+    }
+
+    public boolean moveAsset(String uniqueId, String location, String name) {
         throw new UnsupportedOperationException();
     }
 }
