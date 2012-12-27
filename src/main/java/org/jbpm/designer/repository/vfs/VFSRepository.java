@@ -105,14 +105,16 @@ public class VFSRepository implements Repository {
     public boolean directoryExists(String directory) {
         Path path = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + directory));
 
-        return ioService.exists(path);
+        return ioService.exists(path) && Files.isDirectory(path);
     }
 
     public boolean deleteDirectory(String directory, boolean failIfNotEmpty) {
 
         try {
             Path path = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + directory));
-
+            if (!Files.isDirectory(path)) {
+                return false;
+            }
             Files.walkFileTree(path, new SimpleFileVisitor<Path>() {
                 @Override
                 public FileVisitResult visitFile(Path paths, BasicFileAttributes basicFileAttributes) throws IOException {
@@ -146,6 +148,9 @@ public class VFSRepository implements Repository {
         try {
 
             final Path sourcePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + sourceDirectory));
+            if (!Files.isDirectory(sourcePath)) {
+                return false;
+            }
             final String destinationPathRoot = getRepositoryRoot() + location + fileSystem.getSeparator() + sourcePath.getFileName().toString();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
 
@@ -177,7 +182,9 @@ public class VFSRepository implements Repository {
         }
         try {
             final Path sourcePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + sourceDirectory));
-
+            if (!Files.isDirectory(sourcePath)) {
+                return false;
+            }
             if (name == null) {
                 name = sourcePath.getFileName().toString();
             }

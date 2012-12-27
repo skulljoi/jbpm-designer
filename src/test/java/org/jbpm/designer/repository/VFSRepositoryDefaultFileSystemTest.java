@@ -66,6 +66,36 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
     }
 
     @Test
+    public void testDirectoryExists() {
+        Repository repository = new VFSRepository(profile);
+
+        boolean rootFolderExists = repository.directoryExists("/test");
+        assertFalse(rootFolderExists);
+
+        Directory directoryId = repository.createDirectory("/test");
+        assertNotNull(directoryId);
+        assertEquals("test", directoryId.getName());
+        assertEquals("/", directoryId.getLocation());
+        assertNotNull(directoryId.getUniqueId());
+
+        rootFolderExists = repository.directoryExists("/test");
+        assertTrue(rootFolderExists);
+
+        AssetBuilder builder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
+        builder.content("simple content".getBytes())
+                .type("png")
+                .name("test")
+                .location("/test");
+
+        String id = repository.createAsset(builder.getAsset());
+
+        assertNotNull(id);
+
+        boolean assetPathShouldNotExists = repository.directoryExists("/test/test.png");
+        assertFalse(assetPathShouldNotExists);
+    }
+
+    @Test
     public void testListDirectories() {
         Repository repository = new VFSRepository(profile);
 
