@@ -56,21 +56,21 @@ public interface Repository {
 
     /**
      * Copy directory given by <code>uniqueId</code> into destination given by <code>location</code>
-     * @param uniqueId - source directory unique id
+     * @param sourceDirectory - source directory path relative to repository root
      * @param location - destination where directory will be copied to
      * @return - true when copy operation was successful otherwise false
      */
-    boolean copyDirectory(String uniqueId, String location);
+    boolean copyDirectory(String sourceDirectory, String location);
 
     /**
      * Moves directory given by <code>uniqueId</code> into destination given by <code>location</code>
      * and renames it with given <code>name</code>
-     * @param uniqueId - source directory unique id
+     * @param sourceDirectory - source directory path relative to repository root
      * @param location - final destination where directory should be moved to
      * @param name - name of the directory after move, if null is given name is not changed
      * @return - returns true if move operation was successful otherwise false
      */
-    boolean moveDirectory(String uniqueId, String location, String name);
+    boolean moveDirectory(String sourceDirectory, String location, String name);
 
     /**
      * Retrieves all assets stored in the given location.

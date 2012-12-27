@@ -196,7 +196,14 @@ public class VFSRepository implements Repository {
                 @Override
                 public FileVisitResult postVisitDirectory(Path dir, IOException e) throws IOException {
                     if (e == null) {
-                        fileSystem.provider().deleteIfExists(dir);
+                        try {
+                            Path destinationPath = fileSystem.provider().getPath(URI.create(destinationPathRoot
+                                    + fileSystem.getSeparator() + sourcePath.relativize(dir)));
+                            createIfNotExists(destinationPath);
+                            fileSystem.provider().move(dir, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+                        } catch (Exception e1) {
+                            fileSystem.provider().deleteIfExists(dir);
+                        }
                         return FileVisitResult.CONTINUE;
                     } else {
                         // directory iteration failed
