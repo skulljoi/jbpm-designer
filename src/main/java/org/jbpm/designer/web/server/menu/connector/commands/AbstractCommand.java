@@ -41,6 +41,9 @@ public abstract class AbstractCommand {
         } else if(!current.startsWith("/")) {
             current = "/" + current;
         }
+        if(current.startsWith("//")) {
+            current = current.substring(1, current.length());
+        }
 
         if(target.startsWith("//")) {
             target = target.substring(1, target.length());
@@ -49,7 +52,6 @@ public abstract class AbstractCommand {
         Repository repository = profile.getRepository();
 
         if(repository.directoryExists(target)) {
-            System.out.println(target + " - " + current + " - " + name);
             boolean moved = repository.moveDirectory(target, current, name);
             if(!moved) {
                 logger.error("Unable to move directory: " + target);
@@ -62,6 +64,9 @@ public abstract class AbstractCommand {
                 logger.error("Unable to retrieve asset: " + target);
             }
             if(tobeRenamedAsset != null) {
+                if(name.indexOf(".") < 0) {
+                    name += "." + tobeRenamedAsset.getAssetType();
+                }
                 boolean moved = repository.moveAsset(tobeRenamedAsset.getUniqueId(), current, name);
                 if(!moved) {
                     logger.error("Unable to move asset: " + target);
@@ -73,7 +78,7 @@ public abstract class AbstractCommand {
         retObj.put("cwd", getCwd(profile, current, tree));
         retObj.put("cdc", getCdc(profile, current, tree));
         retObj.put("tree", getTree(profile, "/", tree));
-        retObj.put("select", "");
+        retObj.put("select", current);
 
         return retObj;
     }
