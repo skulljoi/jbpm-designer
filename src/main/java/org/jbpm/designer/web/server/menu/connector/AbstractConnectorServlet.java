@@ -12,10 +12,7 @@ import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.jbpm.designer.web.server.ServletUtil;
-import org.jbpm.designer.web.server.menu.connector.commands.MakeDirCommand;
-import org.jbpm.designer.web.server.menu.connector.commands.MakeFileCommand;
-import org.jbpm.designer.web.server.menu.connector.commands.OpenCommand;
-import org.jbpm.designer.web.server.menu.connector.commands.RemoveAssetCommand;
+import org.jbpm.designer.web.server.menu.connector.commands.*;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -96,10 +93,9 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
             } else if(cmd != null && cmd.equals("rename")) {
-                // TODO FINISH
-                // name is new name
-                // target is full path of current dir to be renamed
-                // current is current "parent" dir
+                RenameCommand command = new RenameCommand();
+                command.init(request, response, profile, repository, requestParams);
+                output(response, false, command.execute());
             } else if(cmd != null && cmd.equals("copy")) {
                 // TODO FINISH
             } else if(cmd != null && cmd.equals("paste")) {

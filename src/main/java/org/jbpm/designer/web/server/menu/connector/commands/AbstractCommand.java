@@ -1,10 +1,7 @@
 package org.jbpm.designer.web.server.menu.connector.commands;
 
 import org.apache.log4j.Logger;
-import org.jbpm.designer.repository.Asset;
-import org.jbpm.designer.repository.AssetBuilderFactory;
-import org.jbpm.designer.repository.AssetTypeMapper;
-import org.jbpm.designer.repository.Directory;
+import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
 import org.json.JSONArray;
@@ -37,6 +34,58 @@ public abstract class AbstractCommand {
             logger.error(e.getMessage());
             return new JSONObject();
         }
+    }
+    public JSONObject moveDirectoryOrAsset(IDiagramProfile profile, String name, String target, String current, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
+
+        if(target.startsWith("//")) {
+            target = target.substring(1, target.length());
+        }
+
+        Repository repository = profile.getRepository();
+
+//        *********************************** COMMAND: rename
+//                ******************************* PARAM: cmd -- val: rename
+//                ******************************* PARAM: name -- val: myotherdir
+//                ******************************* PARAM: target -- val: //mydir
+//        ******************************* PARAM: current -- val: /
+//        ******************************* PARAM: _ -- val: 1356625001744
+
+
+        if(repository.directoryExists(target)) {
+            System.out.println("******** MOVIND DIRECTORY!");
+            System.out.println(target + " - " + current + " - " + name);
+            boolean moved = repository.moveDirectory(target, current, name);
+            if(!moved) {
+                logger.error("Unable to move directory: " + target);
+            }
+        } else {
+            System.out.println("******** MOVING ASSET!");
+            Asset tobeRenamedAsset = null;
+            try {
+                tobeRenamedAsset = repository.loadAssetFromPath(target);
+            } catch (AssetNotFoundException e) {
+                logger.error("Unable to retrieve asset: " + target);
+            }
+            if(tobeRenamedAsset != null) {
+                boolean moved = repository.moveAsset(tobeRenamedAsset.getUniqueId(), current, name);
+                if(!moved) {
+                    logger.error("Unable to move asset: " + target);
+                }
+            }
+        }
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, "/", tree));
+        retObj.put("select", "");
+
+        return retObj;
     }
 
     public JSONObject removeAssets(IDiagramProfile profile, String current, List<String> targets, boolean tree) throws Exception {
