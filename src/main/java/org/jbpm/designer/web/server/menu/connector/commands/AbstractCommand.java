@@ -155,7 +155,12 @@ public abstract class AbstractCommand {
                 if(target.startsWith("//")) {
                     target = target.substring(1, target.length());
                 }
-                boolean deleted = profile.getRepository().deleteAssetFromPath(target);
+                boolean deleted;
+                if (profile.getRepository().directoryExists(target)) {
+                    deleted = profile.getRepository().deleteDirectory(target, false);
+                } else {
+                    deleted = profile.getRepository().deleteAssetFromPath(target);
+                }
                 if(!deleted) {
                     logger.error("Unable to delete asset: " + target);
                 }

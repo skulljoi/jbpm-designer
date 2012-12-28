@@ -736,4 +736,32 @@ public class VFSRepositoryDefaultFileSystemTest extends RepositoryBaseTest {
         assertNotNull(foundAsset);
         assertEquals(0, foundAsset.size());
     }
+
+    @Test
+    public void testCopyEmptyDirectory() throws AssetNotFoundException {
+        Repository repository = new VFSRepository(profile);
+
+        Directory sourceDir = repository.createDirectory("/source");
+
+        boolean directoryExists = repository.directoryExists(sourceDir.getLocation()+sourceDir.getName());
+        assertTrue(directoryExists);
+        Collection<Asset> foundAsset = repository.listAssets("/source", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(0, foundAsset.size());
+
+
+        boolean copied = repository.copyDirectory("/source", "/target");
+        assertTrue(copied);
+
+        boolean movedDirectoryExists = repository.directoryExists("/source");
+        assertTrue(movedDirectoryExists);
+        movedDirectoryExists = repository.directoryExists("/target");
+        assertTrue(movedDirectoryExists);
+
+        foundAsset = repository.listAssets("/target", new FilterByExtension("bpmn2"));
+
+        assertNotNull(foundAsset);
+        assertEquals(0, foundAsset.size());
+    }
 }

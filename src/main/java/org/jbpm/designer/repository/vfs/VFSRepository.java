@@ -153,6 +153,14 @@ public class VFSRepository implements Repository {
             }
             final String destinationPathRoot = getRepositoryRoot() + location + fileSystem.getSeparator() + sourcePath.getFileName().toString();
             Files.walkFileTree(sourcePath, new SimpleFileVisitor<Path>() {
+                @Override
+                public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+                    Path destinationPath = fileSystem.provider().getPath(URI.create(destinationPathRoot +
+                            fileSystem.getSeparator() + sourcePath.relativize(dir)));
+                    fileSystem.provider().createDirectory(destinationPath);
+
+                    return FileVisitResult.CONTINUE;
+                }
 
                 @Override
                 public FileVisitResult visitFile(Path currentFile, BasicFileAttributes basicFileAttributes) throws IOException {
