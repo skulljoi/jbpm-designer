@@ -35,6 +35,66 @@ public abstract class AbstractCommand {
             return new JSONObject();
         }
     }
+
+    public JSONObject pasteDirectoriesOrAssets(IDiagramProfile profile, String current, List<String> targets, String cut, String dst, String src, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
+        if(current.startsWith("//")) {
+            current = current.substring(1, current.length());
+        }
+
+        if(targets != null) {
+            for(String target : targets) {
+                if(target.startsWith("//")) {
+                    target = target.substring(1, target.length());
+                }
+                if(profile.getRepository().directoryExists(target)) {
+                    boolean copied = profile.getRepository().copyDirectory(target, dst);
+                    if(!copied) {
+                        logger.error("Unable to copy directory: " + target + " to " + dst);
+                    } else {
+                        if(cut != null && cut.equals("1")) {
+                            boolean deleted = profile.getRepository().deleteDirectory(target, false);
+                            if(!deleted) {
+                                logger.error("Unable to delete directory: " + target);
+                            }
+                        }
+                    }
+                } else {
+                    Asset toPasteAsset = null;
+                    try {
+                        toPasteAsset = profile.getRepository().loadAssetFromPath(target);
+                        boolean copied = profile.getRepository().copyAsset(toPasteAsset.getUniqueId(), dst);
+                        if(!copied) {
+                            logger.error("Unable to copy asset: " + toPasteAsset.getUniqueId() + " to " + dst);
+                        } else {
+                            if(cut != null && cut.equals("1")) {
+                                boolean deleted = profile.getRepository().deleteAsset(toPasteAsset.getUniqueId());
+                                if(!deleted) {
+                                    logger.error("Unable to delete asset: " + toPasteAsset.getUniqueId());
+                                }
+                            }
+                        }
+                    } catch (AssetNotFoundException e) {
+                        logger.error("Unable to retrieve asset: " + target);
+                    }
+                }
+            }
+        }
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, "/", tree));
+        retObj.put("select", current);
+
+        return retObj;
+    }
+
+
     public JSONObject moveDirectoryOrAsset(IDiagramProfile profile, String name, String target, String current, boolean tree) throws Exception {
         if(current == null || current.length() < 1) {
             current = "/";
@@ -92,6 +152,9 @@ public abstract class AbstractCommand {
 
         if(profile.getRepository().directoryExists(current)) {
             for(String target : targets) {
+                if(target.startsWith("//")) {
+                    target = target.substring(1, target.length());
+                }
                 boolean deleted = profile.getRepository().deleteAssetFromPath(target);
                 if(!deleted) {
                     logger.error("Unable to delete asset: " + target);

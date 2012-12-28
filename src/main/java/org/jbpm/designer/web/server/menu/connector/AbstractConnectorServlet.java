@@ -96,10 +96,10 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 RenameCommand command = new RenameCommand();
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
-            } else if(cmd != null && cmd.equals("copy")) {
-                // TODO FINISH
             } else if(cmd != null && cmd.equals("paste")) {
-
+                PasteCommand command = new PasteCommand();
+                command.init(request, response, profile, repository, requestParams);
+                output(response, false, command.execute());
             }
         } catch (Exception e) {
             e.printStackTrace();
