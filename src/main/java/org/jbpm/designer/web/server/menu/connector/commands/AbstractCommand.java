@@ -1,5 +1,6 @@
 package org.jbpm.designer.web.server.menu.connector.commands;
 
+import org.apache.commons.fileupload.FileItemStream;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AssetBuilder;
@@ -9,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import sun.net.idn.StringPrep;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.util.*;
 
 public abstract class AbstractCommand {
@@ -149,6 +152,9 @@ public abstract class AbstractCommand {
         } else if(!current.startsWith("/")) {
             current = "/" + current;
         }
+        if(current.startsWith("//")) {
+            current = current.substring(1, current.length());
+        }
 
         if(profile.getRepository().directoryExists(current)) {
             for(String target : targets) {
@@ -175,6 +181,58 @@ public abstract class AbstractCommand {
 
         return retObj;
     }
+
+    public JSONObject uploadFiles(IDiagramProfile profile, String current, List<FileItemStream> listFiles, List<ByteArrayOutputStream> listFileStreams, boolean tree) throws Exception {
+        if(current == null || current.length() < 1) {
+            current = "/";
+        } else if(!current.startsWith("/")) {
+            current = "/" + current;
+        }
+        if(current.startsWith("//")) {
+            current = current.substring(1, current.length());
+        }
+
+        if(profile.getRepository().directoryExists(current)) {
+            try {
+                int i = 0;
+                for (FileItemStream uplFile : listFiles) {
+                    String fileName = uplFile.getName();
+                    String fileContentType = uplFile.getContentType();
+
+                    ByteArrayOutputStream os = listFileStreams.get(i);
+                    checkUploadFile(fileName, os);
+                    checkAlreadyExists(profile, fileName,  current);
+
+                    String[] fileParts = fileName.split("\\.");
+                    String fileType = fileParts[fileParts.length-1];
+                    String fileNameOnly = fileName.substring(0, fileName.length() - (fileType.length() + 1));
+
+                    AssetBuilder assetBuilder = AssetBuilderFactory.getAssetBuilder(Asset.AssetType.Byte);
+                    assetBuilder.content(os.toByteArray())
+                            .location(current)
+                            .name(fileNameOnly)
+                            .type(fileType)
+                            .version("1.0");
+                    Asset newAsset = assetBuilder.getAsset();
+                    profile.getRepository().createAsset(newAsset);
+                    i++;
+                }
+            } catch (Exception e) {
+                logger.error("Unable to upload file: " + e.getMessage());
+            }
+        } else {
+            logger.error("Directory does not exist: " + current);
+        }
+
+        JSONObject retObj = new JSONObject();
+        retObj.put("cwd", getCwd(profile, current, tree));
+        retObj.put("cdc", getCdc(profile, current, tree));
+        retObj.put("tree", getTree(profile, current, tree));
+        retObj.put("select", current);
+        addParams(retObj);
+        return retObj;
+    }
+
 
     public JSONObject makeDirectory(IDiagramProfile profile, String current, String name, boolean tree) throws Exception {
         if(current == null || current.length() < 1) {
@@ -324,12 +382,48 @@ public abstract class AbstractCommand {
         info.put("name", asset.getFullName());
         info.put("hash", asset.getAssetLocation() + "/" + asset.getFullName());
         info.put("mime", AssetTypeMapper.findMimeType(asset));
-        info.put("date", asset.getLastModificationDate());
+        info.put("date", "");
         info.put("size", "");
         info.put("read", true);
         info.put("write", true);
         info.put("rm",  true);
         info.put("url", asset.getAssetType() + "|" + asset.getUniqueId());
         return info;
+    }
+
+    protected void checkUploadFile(String fileName, ByteArrayOutputStream os) throws Exception {
+        if (!_checkName(fileName)) {
+            throw new Exception("Invalid upload file name: " + fileName);
+        }
+        int uploadSizeOctets = os.size();
+        checkUploadSizes(uploadSizeOctets);
+    }
+
+    protected void checkAlreadyExists(IDiagramProfile profile, String fileName, String current) throws Exception {
+        Collection<Asset> assets = profile.getRepository().listAssets(current);
+        for(Asset asset : assets) {
+            String assetFull = asset.getName() + "." + asset.getAssetType();
+            if(assetFull.equals(fileName)) {
+                throw new Exception("File name " + fileName + " already exists in directory " + current);
+            }
+        }
+    }
+
+    protected void checkUploadSizes(int uploadSizeOctets) throws Exception {
+        if (uploadSizeOctets > (100 * 1024 * 1024)) {
+            throw new Exception("File exceeds the maximum allowed filesize.");
+        }
+    }
+
+    public boolean _checkName(String n) {
+        if (n == null) {
+            return false;
+        }
+        n = n.trim();
+        if ("".equals(n)) {
+            return false;
+        }
+
+        return n.matches("|^[^\\\\/\\<\\>:]+$|");
     }
 }

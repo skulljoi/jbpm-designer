@@ -2101,6 +2101,7 @@ elFinder.prototype.ui.prototype.commands = {
 						/* get server response */
 						html = $(doc.body).html();
 						if (self.fm.jquery>=141) {
+                            html = html.substring(5, html.length - 6);
 							data = $.parseJSON(html);
 						} else if ( /^[\],:{}\s]*$/.test(html.replace(/\\(?:["\\\/bfnrt]|u[0-9a-fA-F]{4})/g, "@")
 							.replace(/"[^"\\\n\r]*"|true|false|null|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?/g, "]")

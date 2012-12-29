@@ -100,6 +100,10 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 PasteCommand command = new PasteCommand();
                 command.init(request, response, profile, repository, requestParams);
                 output(response, false, command.execute());
+            } else if(cmd != null && cmd.equals("upload")) {
+                UploadCommand command = new UploadCommand();
+                command.init(request, response, profile, repository, requestParams, listFiles, listFileStreams);
+                output(response, false, command.execute());
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -186,126 +190,6 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
             }
         }
     }
-
-    /**
-     * Instanciate command implementation and prepare it before execution.
-     * @param commandStr
-     * @param request
-     * @param response
-     * @param config
-     * @return
-     */
-//    protected AbstractCommand prepareCommand(String commandStr, HttpServletRequest request, HttpServletResponse response, AbstractConnectorConfig config) {
-//        if (commandStr != null) {
-//            commandStr = commandStr.trim();
-//        }
-//
-//        if (commandStr == null && "POST".equals(request.getMethod())) {
-//            putResponse("error", "Data exceeds the maximum allowed size");
-//        }
-//
-//        if (!config.isCommandAllowed(commandStr)) {
-//            putResponse("error", "Permission denied");
-//        }
-//
-//        AbstractCommand command = null;
-//        if (commandStr != null) {
-//            command = instanciateCommand(commandStr);
-//            if (command == null) {
-//                putResponse("error", "Unknown command");
-//            }
-//        } else {
-//            String current = (String) request.getParameterMap().get("current");
-//            if (current != null) {
-//                command = new OpenCommand();
-//            } else {
-//                command = new ContentCommand();
-//            }
-//        }
-//
-//        command.setRequest(request);
-//        command.setResponse(response);
-//        command.setJson(json);
-//        command.setRequestParameters(requestParams);
-//        command.setListFiles(listFiles);
-//        command.setListFileStreams(listFileStreams);
-//        command.setConfig(config);
-//
-//        command.init();
-//
-//        return command;
-//    }
-
-    /**
-     * Instanciate a command from its name.
-     * @param commandName
-     * @return
-     */
-//    protected AbstractCommand instanciateCommand(String commandName) {
-//        AbstractCommand instance = null;
-//        try {
-//            Class<AbstractCommand> clazz = getCommandClass(commandName);
-//            if (clazz != null) {
-//                instance = clazz.newInstance();
-//                if (instance == null) {
-//                    throw new Exception("Command not found : " + commandName);
-//                }
-//            }
-//        } catch (Exception e) {
-//            // instance will be null
-//            logger.error("Could not instance connector configuration", e);
-//        }
-//        return instance;
-//    }
-
-    /**
-     * Get command class for a command name.
-     * @param commandName
-     * @return
-     */
-//    protected Class<AbstractCommand> getCommandClass(String commandName) {
-//        // do we have override for command?
-//        Class<AbstractCommand> clazz = getCommandClassOverride(commandName);
-//        if (clazz == null) {
-//            // no override, use the default command
-//            clazz = getCommandClassDefault(commandName);
-//        }
-//        return clazz;
-//    }
-
-    /**
-     * Get default implementation class for a command.
-     * @param commandName
-     * @return
-     */
-//    @SuppressWarnings("unchecked")
-//    protected Class<AbstractCommand> getCommandClassDefault(String commandName) {
-//        String className = AbstractConnectorServlet.class.getPackage().getName() + ".commands." + StringUtils.capitalize(commandName) + "Command";
-//        Class<AbstractCommand> clazz = null;
-//        try {
-//            clazz = (Class<AbstractCommand>) Class.forName(className);
-//        } catch (ClassNotFoundException e) {
-//            // not found
-//        }
-//        return clazz;
-//    }
-
-    /**
-     * Get override implementation class for a command.
-     * @param commandName
-     * @return
-     */
-//    @SuppressWarnings("unchecked")
-//    protected Class<AbstractCommand> getCommandClassOverride(String commandName) {
-//        String className = AbstractConnectorServlet.class.getPackage().getName() + ".commands." + StringUtils.capitalize(commandName) + "CommandOverride";
-//        Class<AbstractCommand> clazz = null;
-//        try {
-//            clazz = (Class<AbstractCommand>) Class.forName(className);
-//        } catch (ClassNotFoundException e) {
-//            // not found
-//        }
-//        return clazz;
-//    }
 
     /**
      * Append data to JSON response.
