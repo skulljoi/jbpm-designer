@@ -2,16 +2,19 @@ package org.jbpm.designer.web.server.menu.connector.commands;
 
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.log4j.Logger;
+import org.eclipse.bpmn2.Definitions;
+import org.eclipse.bpmn2.RootElement;
+import org.eclipse.bpmn2.Process;
+import org.jboss.drools.impl.DroolsFactoryImpl;
 import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
+import org.jbpm.designer.web.profile.impl.JbpmProfileImpl;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import sun.net.idn.StringPrep;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.util.*;
 
 public abstract class AbstractCommand {
@@ -388,6 +391,28 @@ public abstract class AbstractCommand {
         info.put("write", true);
         info.put("rm",  true);
         info.put("url", asset.getAssetType() + "|" + asset.getUniqueId());
+
+        if(asset.getAssetType().equals("bpmn") | asset.getAssetType().equals("bpmn2")) {
+            try {
+                info.put("processlocation", asset.getAssetLocation());
+                Asset ab = profile.getRepository().loadAssetFromPath(asset.getAssetLocation() + "/" + asset.getFullName());
+
+                DroolsFactoryImpl.init();
+                Definitions def = ((JbpmProfileImpl) profile).getDefinitions((String) ab.getAssetContent());
+
+                List<RootElement> rootElements = def.getRootElements();
+                for(RootElement root : rootElements) {
+                    if(root instanceof Process) {
+                        Process process = (Process) root;
+                        info.put("processid", process.getId());
+                    }
+                }
+            } catch (Exception e) {
+                logger.warn("Unable to extract process id from: " + asset.getFullName());
+                info.put("processid", "");
+            }
+        }
+
         return info;
     }
 

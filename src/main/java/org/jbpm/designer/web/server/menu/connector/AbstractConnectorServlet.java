@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.jbpm.designer.repository.Asset;
 import org.jbpm.designer.repository.AssetBuilderFactory;
+import org.jbpm.designer.repository.AssetNotFoundException;
 import org.jbpm.designer.repository.Repository;
 import org.jbpm.designer.repository.impl.AssetBuilder;
 import org.jbpm.designer.web.profile.IDiagramProfile;
@@ -104,6 +105,18 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
                 UploadCommand command = new UploadCommand();
                 command.init(request, response, profile, repository, requestParams, listFiles, listFileStreams);
                 output(response, false, command.execute());
+            } else if(cmd != null && cmd.equals("getsvg")) {
+                try {
+                    Asset asset = profile.getRepository().loadAssetFromPath((String) requestParams.get("current"));
+                    if(asset != null && asset.getAssetContent() != null) {
+                        outputPlain(response, false, (String) asset.getAssetContent(), "image/svg+xml");
+                    } else {
+                        outputPlain(response, true, "<p><b>Process image not available.</p><p>You can generate the process image in the process editor.</b></p>", null);
+                    }
+                } catch (AssetNotFoundException e) {
+                    logger.warn("Error loading process image: " + e.getMessage());
+                    outputPlain(response, true, "<p><b>Could not find process image.</p><p>You can generate the process image in the process editor.</b></p>", null);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -128,6 +141,25 @@ public abstract class AbstractConnectorServlet extends HttpServlet {
         System.out.println("******************* RESPONSE\n: " + json.toString());
         try {
             json.write(response.getWriter());
+        } catch (Exception e) {
+            logger.error("", e);
+        }
+    }
+
+    public static void outputPlain(HttpServletResponse response, boolean isResponseTextHtml, String txt, String ctype) {
+        if (isResponseTextHtml) {
+            response.setContentType("text/html; charset=UTF-8");
+        } else {
+            if(ctype != null) {
+                response.setContentType(ctype + "; charset=UTF-8");
+            } else {
+                response.setContentType("text/plain; charset=UTF-8");
+            }
+        }
+
+        try {
+            PrintWriter out = response.getWriter();
+            out.print(txt);
         } catch (Exception e) {
             logger.error("", e);
         }

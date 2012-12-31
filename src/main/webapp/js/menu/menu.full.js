@@ -1528,7 +1528,7 @@ elFinder.prototype.ui.prototype.commands = {
         this.isAllowed = function() {
             if (self.fm.selected.length == 1) {
                 var f = this.fm.getSelected()[0];
-                return f.write && f.read && (f.mime.indexOf('xml') == 0 || f.mime == 'text/xml');
+                return f.write && f.read && (f.name.match(/bpmn$/) || f.name.match(/bpmn2$/)) && (f.mime.indexOf('xml') == 0 || f.mime == 'text/xml');
             }
         }
 		
@@ -2584,7 +2584,8 @@ elFinder.prototype.quickLook = function(fm, el) {
 			resize    : function() {
 				if (self.media.children().length) {
 					var t = self.media.children(':first');
-					switch (t[0].nodeName) {
+
+                    switch (t[0].nodeName) {
 						case 'IMG':
 							var w = t.width(),
 								h = t.height(),
@@ -2760,14 +2761,14 @@ elFinder.prototype.quickLook = function(fm, el) {
 		self._hash = f.hash;
 		self.title.text(f.name);
 		self.win.addClass(self.fm.view.mime2class(f.mime));
-		self.name.text(f.name);
-		self.kind.text(self.fm.view.mime2kind(f.link ? 'symlink' : f.mime)); 
-		self.size.text(self.fm.view.formatSize(f.size));
-		self.date.text(self.fm.i18n('Modified')+': '+self.fm.view.formatDate(f.date));
-		f.dim && self.add.append('<span>'+f.dim+' px</span>').show();
+		self.name.text("Process Image for: " + f.name);
+		//self.kind.text(self.fm.view.mime2kind(f.link ? 'symlink' : f.mime));
+		//self.size.text(self.fm.view.formatSize(f.size));
+		//self.date.text(self.fm.i18n('Modified')+': '+self.fm.view.formatDate(f.date));
+		//f.dim && self.add.append('<span>'+f.dim+' px</span>').show();
 		f.tmb && self.ico.css('background', 'url("'+f.tmb+'") 0 0 no-repeat');
 		if (f.url) {
-			self.url.text(f.url).attr('href', f.url).show();
+			//self.url.text(f.url).attr('href', f.url).show();
 			for (var i in self.plugins) {
 				if (self.plugins[i].test && self.plugins[i].test(f.mime, self.mimes, f.name)) {
 					self.plugins[i].show(self, f);
@@ -2777,7 +2778,7 @@ elFinder.prototype.quickLook = function(fm, el) {
 		} else {
 			self.url.hide();
 		}
-		
+
 		self.win.css({
 			width  : '420px',
 			height : 'auto'
@@ -2810,7 +2811,7 @@ elFinder.prototype.quickLook.prototype.plugins = {
 				var w = img.width(),
 					h = img.height(),
 					a = ql.win.is(':animated'),
-					_w = a ? 420 : ql.win.width(), 
+					_w = a ? 420 : ql.win.width(),
 					_h = a || ql.win.css('height') == 'auto' ? 315 : ql.win.height()-ql.content.height()-ql.th,
 					r = w>_w || h>_h 
 						? Math.min(Math.min(_w, w)/w, Math.min(_h, h)/h)
@@ -2839,15 +2840,18 @@ elFinder.prototype.quickLook.prototype.plugins = {
 		}
 		
 		this.show = function(ql, f) {
+
+            var qlurl = '/designer/menuconnector?cmd=getsvg&current=' + f.processlocation + "/" + f.processid + "-svg.svg";
+
 			if (f.hash == ql._hash) {
 				ql.ico.hide();
-				ql.media.append('<iframe src="'+f.url+'" style="height:'+ql.mediaHeight()+'px" />').show();
+				ql.media.append('<iframe height="450" src="'+qlurl+'" />').show();
 			}
 		}
 	},
 	
 	swf : new function() {
-		
+
 		this.test = function(mime, mimes) {
 			return mime == 'application/x-shockwave-flash' && mimes[mime];
 		}
@@ -2868,7 +2872,7 @@ elFinder.prototype.quickLook.prototype.plugins = {
 	},
 	
 	audio : new function() {
-		
+
 		this.test = function(mime, mimes) {
 			return mime.indexOf('audio') == 0 && mimes[mime];
 		}
@@ -2883,7 +2887,7 @@ elFinder.prototype.quickLook.prototype.plugins = {
 	},
 	
 	video : new function() {
-		
+
 		this.test = function(mime, mimes) {
 			return mime.indexOf('video') == 0 && mimes[mime];
 		}
@@ -2898,7 +2902,7 @@ elFinder.prototype.quickLook.prototype.plugins = {
 	},
 	
 	pdf : new function() {
-		
+
 		this.test = function(mime, mimes) {
 			return mime == 'application/pdf' && mimes[mime];
 		}
