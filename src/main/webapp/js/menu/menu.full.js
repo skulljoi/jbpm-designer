@@ -675,6 +675,14 @@
 	elFinder.prototype.i18n = function(m) {
 		return this.options.i18n[this.options.lang] && this.options.i18n[this.options.lang][m] ? this.options.i18n[this.options.lang][m] :  m;
 	}
+
+    elFinder.prototype.applyVersion = function(v) {
+        if(v) {
+            return v;
+        } else {
+            return '';
+        }
+    }
 	
 	/**
 	 * Default config
@@ -984,7 +992,7 @@ elFinder.prototype.view = function(fm, el) {
 		if (this.fm.options.view == 'icons') {
 			this.cwd.append(html);
 		} else {
-			this.cwd.append('<table><tr><th colspan="2">'+this.fm.i18n('Name')+'</th><th>'+this.fm.i18n('Permissions')+'</th><th>'+this.fm.i18n('Kind')+'</th></tr>'+html+'</table>');
+			this.cwd.append('<table><tr><th colspan="2">'+this.fm.i18n('Name')+'</th><th>'+this.fm.i18n('Permissions')+'</th><th>'+this.fm.i18n('Kind')+'</th><th>'+this.fm.i18n('Version')+'</th></tr>'+html+'</table>');
 		}
 		
 		this.pth.text(fm.cwd.rel);
@@ -1022,7 +1030,7 @@ elFinder.prototype.view = function(fm, el) {
 		} else if (!f.read && f.write) {
 			str += '<em class="'+(f.mime == 'directory' ? 'dropbox' :'noread')+'" />';
 		}
-		return '<tr key="'+f.hash+'" class="'+self.mime2class(f.mime)+(odd ? ' el-finder-row-odd' : '')+'"><td class="icon"><p>'+str+'</p></td><td>'+f.name+'</td><td>'+self.formatPermissions(f.read, f.write, f.rm)+'</td><td>'+self.mime2kind(f.link ? 'symlink' : f.mime)+'</td></tr>';
+		return '<tr key="'+f.hash+'" class="'+self.mime2class(f.mime)+(odd ? ' el-finder-row-odd' : '')+'"><td class="icon"><p>'+str+'</p></td><td>'+f.name+'</td><td>'+self.formatPermissions(f.read, f.write, f.rm)+'</td><td>'+self.mime2kind(f.link ? 'symlink' : f.mime)+'</td><td>'+ self.applyVersion(f.assetversion)+'</td></tr>';
 	}
 
 	/*
@@ -1108,6 +1116,14 @@ elFinder.prototype.view = function(fm, el) {
         }
         return Math.round(s/n)+' '+u;
 	}
+
+    this.applyVersion = function(v) {
+        if(v) {
+            return v;
+        } else {
+            return '';
+        }
+    }
 
 	/*
 	 * Return localized string with file permissions
@@ -1564,7 +1580,7 @@ elFinder.prototype.ui.prototype.commands = {
 			
 			function info(f) {
 				var p = ['50%', '50%'], x, y, d, 
-					tb = '<table cellspacing="0"><tr><td>'+self.fm.i18n('Name')+'</td><td>'+f.name+'</td></tr><tr><td>'+self.fm.i18n('Kind')+'</td><td>'+self.fm.view.mime2kind(f.link ? 'symlink' : f.mime)+'</td></tr><tr><td>'+self.fm.i18n('Permissions')+'</td><td>'+self.fm.view.formatPermissions(f.read, f.write, f.rm)+'</td></tr>';
+					tb = '<table cellspacing="0"><tr><td>'+self.fm.i18n('Name')+'</td><td>'+f.name+'</td></tr><tr><td>'+self.fm.i18n('Kind')+'</td><td>'+self.fm.view.mime2kind(f.link ? 'symlink' : f.mime)+'</td></tr><tr><td>'+self.fm.i18n('Permissions')+'</td><td>'+self.fm.view.formatPermissions(f.read, f.write, f.rm)+'</td><td>'+ self.fm.applyVersion(f.assetversion) +'</td></tr>';
 				
 				if (f.link) {
 					tb += '<tr><td>'+self.fm.i18n('Link to')+'</td><td>'+f.linkTo+'</td></tr>';

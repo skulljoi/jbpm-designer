@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import org.eclipse.bpmn2.Definitions;
 import org.eclipse.bpmn2.RootElement;
 import org.eclipse.bpmn2.Process;
+import org.eclipse.emf.ecore.util.FeatureMap;
 import org.jboss.drools.impl.DroolsFactoryImpl;
 import org.jbpm.designer.repository.*;
 import org.jbpm.designer.repository.impl.AssetBuilder;
@@ -405,12 +406,28 @@ public abstract class AbstractCommand {
                     if(root instanceof Process) {
                         Process process = (Process) root;
                         info.put("processid", process.getId());
+
+                        boolean foundVersion = false;
+                        Iterator<FeatureMap.Entry> iter = process.getAnyAttribute().iterator();
+                        while(iter.hasNext()) {
+                            FeatureMap.Entry entry = iter.next();
+                            if(entry.getEStructuralFeature().getName().equals("version")) {
+                                info.put("assetversion", entry.getValue());
+                                foundVersion = true;
+                            }
+                        }
+                        if(!foundVersion) {
+                            info.put("assetversion", "");
+                        }
                     }
                 }
             } catch (Exception e) {
-                logger.warn("Unable to extract process id from: " + asset.getFullName());
+                logger.warn("Unable to extract process id and version from: " + asset.getFullName());
                 info.put("processid", "");
+                info.put("assetversion", "");
             }
+        } else {
+            info.put("assetversion", "");
         }
 
         return info;
