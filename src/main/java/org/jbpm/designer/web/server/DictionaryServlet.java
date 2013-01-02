@@ -86,8 +86,13 @@ public class DictionaryServlet extends HttpServlet {
 	private String getFromRepository(String uuid, IDiagramProfile profile, Repository repository) {
         try {
             Asset<String> dictionaryAsset = repository.loadAssetFromPath(profile.getRepositoryGlobalDir()+"/"+DICTIONARY_FNAME+"."+DICTIONARY_FEXT);
-            return dictionaryAsset.getAssetContent();
+            if(dictionaryAsset != null) {
+                return dictionaryAsset.getAssetContent();
+            } else {
+                return "false";
+            }
 		} catch (Exception e) {
+            e.printStackTrace();
             _logger.error(e.getMessage());
         } 
 		return "false";
