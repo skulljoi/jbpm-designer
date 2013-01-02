@@ -74,10 +74,14 @@ public class TaskFormsServlet extends HttpServlet {
         
 
             storeInRepository(templateManager, processAsset.getAssetLocation(), repository);
-            displayResponse( templateManager, resp, profile );
+            //displayResponse( templateManager, resp, profile );
+            resp.setContentType("text/plain");
+            resp.getWriter().write("success");
         } catch (Exception e) {
             _logger.error(e.getMessage());
-            displayErrorResponse(resp, e.getMessage());
+            //displayErrorResponse(resp, e.getMessage());
+            resp.setContentType("text/plain");
+            resp.getWriter().write("fail");
         }
     }
     
