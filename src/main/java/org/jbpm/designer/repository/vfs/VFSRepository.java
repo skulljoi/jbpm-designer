@@ -9,6 +9,7 @@ import org.kie.commons.io.IOService;
 import org.kie.commons.io.impl.IOServiceDotFileImpl;
 import org.kie.commons.io.impl.IOServiceNio2WrapperImpl;
 import org.kie.commons.java.nio.IOException;
+import org.kie.commons.java.nio.base.options.CommentedOption;
 import org.kie.commons.java.nio.file.*;
 import org.kie.commons.java.nio.file.attribute.BasicFileAttributes;
 
@@ -299,7 +300,8 @@ public class VFSRepository implements Repository {
         Path filePath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + (asset.getAssetLocation().equals("/")?"":asset.getAssetLocation()) + "/" +asset.getFullName()));
         createIfNotExists(filePath);
         try {
-            OutputStream outputStream = fileSystem.provider().newOutputStream(filePath, StandardOpenOption.TRUNCATE_EXISTING);
+            CommentedOption commentedOption = new CommentedOption("admin", "Created asset " + asset.getFullName());
+            OutputStream outputStream = fileSystem.provider().newOutputStream(filePath, StandardOpenOption.TRUNCATE_EXISTING, commentedOption);
             if(((AbstractAsset)asset).acceptBytes()) {
                 outputStream.write(((Asset<byte[]>)asset).getAssetContent());
             } else {
@@ -318,10 +320,11 @@ public class VFSRepository implements Repository {
         if (!ioService.exists(filePath)) {
             throw new AssetNotFoundException();
         }
+        CommentedOption commentedOption = new CommentedOption("admin", "Updated asset " + asset.getFullName());
         if(((AbstractAsset)asset).acceptBytes()) {
-            ioService.write(filePath, ((Asset<byte[]>)asset).getAssetContent(), StandardOpenOption.TRUNCATE_EXISTING);
+            ioService.write(filePath, ((Asset<byte[]>)asset).getAssetContent(), StandardOpenOption.TRUNCATE_EXISTING, commentedOption);
         } else {
-            ioService.write(filePath, asset.getAssetContent().toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING);
+            ioService.write(filePath, asset.getAssetContent().toString().getBytes(), StandardOpenOption.TRUNCATE_EXISTING, commentedOption);
         }
 
         return asset.getUniqueId();
@@ -362,7 +365,11 @@ public class VFSRepository implements Repository {
             Path destinationPath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location
                     + fileSystem.getSeparator() + sourcePath.getFileName().toString()));
             createIfNotExists(destinationPath);
-            fileSystem.provider().copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            System.out.println("Copy asset");
+            CommentedOption commentedOption = new CommentedOption("admin", "Copied asset " + sourcePath.getFileName()
+                    + " into " + location);
+
+            fileSystem.provider().copy(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING,commentedOption);
 
             return true;
         } catch (Exception e) {
@@ -384,7 +391,9 @@ public class VFSRepository implements Repository {
 
             Path destinationPath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location + fileSystem.getSeparator() + name));
             createIfNotExists(destinationPath);
-            fileSystem.provider().move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            CommentedOption commentedOption = new CommentedOption("admin", "Moved asset " + sourcePath.getFileName()
+                    + " into " + location);
+            fileSystem.provider().move(sourcePath, destinationPath, StandardCopyOption.REPLACE_EXISTING, commentedOption);
 
             return true;
         } catch (Exception e) {
