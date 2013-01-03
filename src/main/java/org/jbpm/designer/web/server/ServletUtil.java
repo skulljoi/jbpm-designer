@@ -149,7 +149,7 @@ public class ServletUtil {
         Repository repository = profile.getRepository();
         Collection<Directory> directories = repository.listDirectories("/");
         for (Directory directory : directories) {
-            packages.add(directory.getName());
+            packages.add(directory.getLocation() + directory.getName());
         }
 
         return packages;
@@ -158,14 +158,14 @@ public class ServletUtil {
 	public static List<String> getAllProcessesInPackage(String pkgName, IDiagramProfile profile) {
 
         Repository repository = profile.getRepository();
-        Collection<Asset> processesAssets = repository.listAssets(pkgName, new FilterByExtension(EXT_BPMN));
-        processesAssets.addAll(repository.listAssets(pkgName, new FilterByExtension(EXT_BPMN2)));
+        Collection<Asset> processesAssets = repository.listAssetsRecursively(pkgName, new FilterByExtension(EXT_BPMN));
+        processesAssets.addAll(repository.listAssetsRecursively(pkgName, new FilterByExtension(EXT_BPMN2)));
 
 
         List<String> processes = new ArrayList<String>();
 
         for (Asset processAsset : processesAssets) {
-            processes.add(processAsset.getName());
+            processes.add(processAsset.getUniqueId());
         }
         return processes;
     }
@@ -189,16 +189,16 @@ public class ServletUtil {
         return repository.listAssetsRecursively("/", new FilterByFileName(assetName));
     }
 	
-	public static String getProcessSourceContent(String uuid, IDiagramProfile profile) {
+	public static Asset getProcessSourceContent(String uuid, IDiagramProfile profile) {
 		try {
             Repository repository = profile.getRepository();
 
             Asset<String> processAsset = repository.loadAsset(uuid);
 
-            return processAsset.getAssetContent();
+            return processAsset;
         } catch (Exception e) {
         	_logger.error("Error retrieving asset content: " + e.getMessage());
-            return "";
+            return null;
         }
     }
 	
