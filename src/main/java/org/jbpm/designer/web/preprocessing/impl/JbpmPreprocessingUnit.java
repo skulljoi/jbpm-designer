@@ -107,6 +107,15 @@ public class JbpmPreprocessingUnit implements IDiagramPreprocessingUnit {
 
             // figure out which package our uuid belongs in and get back the list of configs
             Collection<Asset> workitemConfigInfo = findWorkitemInfoForUUID(asset.getAssetLocation(), repository);
+            // also get all from globals package
+            Collection<Asset> globalWorkitemConfigInfo = findWorkitemInfoForUUID("/global", repository);
+            if(workitemConfigInfo != null) {
+                if(globalWorkitemConfigInfo != null) {
+                    workitemConfigInfo.addAll(globalWorkitemConfigInfo);
+                }
+            } else {
+                workitemConfigInfo = globalWorkitemConfigInfo;
+            }
             if(workitemConfigInfo != null) {
                 setupDefaultWorkitemConfigs(asset.getAssetLocation(), repository);
 
