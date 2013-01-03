@@ -77,6 +77,12 @@ ORYX.Plugins.SyntaxChecker = ORYX.Plugins.AbstractPlugin.extend({
                 }.bind(this),
                 onErrors: function(){
                     this.enableDeactivationHandler(button);
+                    this.facade.raiseEvent({
+                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                        ntype		: 'error',
+                        msg         : ORYX.I18N.SyntaxChecker.hasErrors,
+                        title       : ''
+                    });
                 }.bind(this),
                 onFailure: function(){
                     this.setActivated(button, false);
