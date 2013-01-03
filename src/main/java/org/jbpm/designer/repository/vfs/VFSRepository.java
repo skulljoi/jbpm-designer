@@ -365,7 +365,7 @@ public class VFSRepository implements Repository {
             Path destinationPath = fileSystem.provider().getPath(URI.create(getRepositoryRoot() + location
                     + fileSystem.getSeparator() + sourcePath.getFileName().toString()));
             createIfNotExists(destinationPath);
-            System.out.println("Copy asset");
+
             CommentedOption commentedOption = new CommentedOption("admin", "Copied asset " + sourcePath.getFileName()
                     + " into " + location);
 

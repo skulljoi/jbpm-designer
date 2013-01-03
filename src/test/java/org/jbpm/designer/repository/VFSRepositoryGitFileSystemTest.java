@@ -87,7 +87,7 @@ public class VFSRepositoryGitFileSystemTest {
 
         Collection<Directory> directories = repository.listDirectories("/");
         assertNotNull(directories);
-        assertEquals(2, directories.size());
+        assertEquals(3, directories.size());
 
         directories = repository.listDirectories("/processes");
         assertNotNull(directories);
@@ -197,7 +197,7 @@ public class VFSRepositoryGitFileSystemTest {
 
         Collection<Asset> assets = repository.listAssets("/processes");
         assertNotNull(assets);
-        assertEquals(1, assets.size());
+        assertEquals(2, assets.size());
     }
 
     @Test
@@ -210,7 +210,7 @@ public class VFSRepositoryGitFileSystemTest {
 
         Collection<Asset> assets = repository.listAssets("/processes");
         assertNotNull(assets);
-        assertEquals(1, assets.size());
+        assertEquals(2, assets.size());
         Asset<String> asset = assets.iterator().next();
 
         assertEquals("bpmn2", asset.getAssetType());
@@ -369,7 +369,7 @@ public class VFSRepositoryGitFileSystemTest {
         Collection<Asset> foundAsset = repository.listAssetsRecursively("/", new FilterByExtension("bpmn2"));
 
         assertNotNull(foundAsset);
-        assertEquals(3, foundAsset.size());
+        assertEquals(4, foundAsset.size());
     }
 
     @Test
