@@ -469,7 +469,7 @@ ORYX.Plugins.View = {
 	},
 	
 	showInFullScreen : function() {
-		this.goFullscreen('jbpmdesigner');
+		this.goFullscreen();
 	},
 	
 	/**
@@ -1552,40 +1552,23 @@ ORYX.Plugins.View = {
 			this.zoomLevel = this.maxZoomLevel;			
 		}
 	},
-	goFullscreen : function(id) {
-		if(parent && parent.frames) {
-			if(parent.frames.length < 2) {
-				if(document.getElementById(id).requestFullScreen) {
-					document.getElementById(id).requestFullScreen();
-				} else if(document.getElementById(id).mozRequestFullScreen) {
-					document.getElementById(id).mozRequestFullScreen();
-				} else if(document.getElementById(id).webkitRequestFullScreen) {
-					document.documentElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-				} else {
-					Ext.Msg.minWidth = 400;
-	        		Ext.Msg.alert("Browser does not support full screen mode.");
-				}
-			} else {
-				for (var i = 0;i < parent.frames.length;i++) {
-					if(parent.frames[i].ORYX) {
-						parent.frames[i].frameElement.setAttribute('allowFullScreen', 'true');
-						parent.frames[i].frameElement.setAttribute('mozallowfullscreen', 'true');
-						parent.frames[i].frameElement.setAttribute('webkitallowfullscreen', 'true');
-						if(parent.frames[i].frameElement.contentDocument.getElementById(id).requestFullScreen) {
-							parent.frames[i].frameElement.contentDocument.getElementById(id).requestFullScreen();
-						} else if(parent.frames[i].frameElement.contentDocument.getElementById(id).mozRequestFullScreen) {
-							parent.frames[i].frameElement.contentDocument.getElementById(id).mozRequestFullScreen();
-						} else if(parent.frames[i].frameElement.contentDocument.getElementById(id).webkitRequestFullScreen) {
-							parent.frames[i].frameElement.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-						} else {
-							Ext.Msg.minWidth = 400;
-			        		Ext.Msg.alert("Browser does not support full screen mode.");
-						}
-					}
-				}
-			}
-			
-		}
+	goFullscreen : function() {
+        var docEle = document.documentElement;
+        if(docEle.requestFullScreen) {
+            docEle.requestFullScreen();
+        } else if(docEle.mozRequestFullScreen) {
+            docEle.mozRequestFullScreen();
+        } else if(docEle.webkitRequestFullScreen) {
+            docEle.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+        } else {
+            this.facade.raiseEvent({
+                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                ntype		: 'error',
+                msg         : 'Browser does not support full screen mode.',
+                title       : ''
+
+            });
+        }
 	}
 };
 
