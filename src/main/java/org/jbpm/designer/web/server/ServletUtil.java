@@ -15,10 +15,7 @@ import org.jbpm.designer.web.profile.impl.RepositoryInfo;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
-import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -122,7 +119,7 @@ public class ServletUtil {
 		}
     }
 	
-	public static boolean assetExistsInGuvnor(String packageName, String assetName, IDiagramProfile profile) {
+	public static boolean assetExistsInRepository(String packageName, String assetName, IDiagramProfile profile) {
     	try {
             Repository repository = profile.getRepository();
 
@@ -134,7 +131,7 @@ public class ServletUtil {
         return false;
     }
 	
-	public static boolean existsProcessImageInGuvnor(String assetURL, IDiagramProfile profile) {
+	public static boolean existsProcessImageInRepository(String assetURL, IDiagramProfile profile) {
 		try {	
 			return profile.getRepository().assetExists(assetURL);
 		} catch (Exception e) {
@@ -143,7 +140,7 @@ public class ServletUtil {
         return false;
 	}
 	
-	public static List<String> getPackageNamesFromGuvnor(IDiagramProfile profile) {
+	public static List<String> getPackageNamesFromRepository(IDiagramProfile profile) {
         List<String> packages = new ArrayList<String>();
 
         Repository repository = profile.getRepository();
@@ -170,13 +167,20 @@ public class ServletUtil {
         return processes;
     }
 	
-	public static String getProcessImagePath(String packageName, String processid, IDiagramProfile profile) {
+	public static String getProcessImageContent(String packageName, String processid, IDiagramProfile profile) {
 
         Repository repository = profile.getRepository();
-        Collection<Asset> imageAssets = repository.listAssets(packageName, new FilterByFileName(processid + "-image.png"));
+
+        Collection<Asset> imageAssets = repository.listAssets(packageName, new FilterByFileName(processid + "-svg.svg"));
         if (imageAssets != null && imageAssets.size() > 0) {
             Asset image = imageAssets.iterator().next();
-            return image.getUniqueId();
+            try {
+                Asset toGetAsset = profile.getRepository().loadAsset(image.getUniqueId());
+                return  Base64.encodeBase64String( ((String) toGetAsset.getAssetContent()).getBytes("UTF-8") );
+            } catch (Exception e) {
+                _logger.error(e.getMessage());
+                return "";
+            }
         } else {
             return "";
         }

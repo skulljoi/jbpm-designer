@@ -1,7 +1,6 @@
 package org.jbpm.designer.web.server;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,7 +45,7 @@ public class CalledElementServlet extends HttpServlet {
         IDiagramProfile profile = ServletUtil.getProfile(req, profileName, getServletContext());
         if(action != null && action.equals("imageview")) {
         	String retValue = "";
-        	List<String> allPackageNames = ServletUtil.getPackageNamesFromGuvnor(profile);
+        	List<String> allPackageNames = ServletUtil.getPackageNamesFromRepository(profile);
         	if(allPackageNames != null && allPackageNames.size() > 0) {
         		for(String packageName : allPackageNames) {
         			List<String> allProcessesInPackage = ServletUtil.getAllProcessesInPackage(packageName, profile);
@@ -57,9 +56,9 @@ public class CalledElementServlet extends HttpServlet {
         		            Matcher idMatcher = idPattern.matcher(processContent.getAssetContent());
         		            if(idMatcher.find()) {
         		            	String pid = idMatcher.group(1);
-        		            	String pidpath = ServletUtil.getProcessImagePath(packageName, pid, profile);
+        		            	String pidcontent = ServletUtil.getProcessImageContent(packageName, pid, profile);
         		            	if(pid != null && pid.equals(processId)) {
-        		            		retValue = ServletUtil.existsProcessImageInGuvnor(pidpath, profile) ? pidpath : "";
+        		            		retValue = pidcontent != null ? pidcontent : "";
         		            		break;
         		            	}
         		            }
@@ -72,7 +71,7 @@ public class CalledElementServlet extends HttpServlet {
 	        resp.getWriter().write(retValue);
         } else {
 	        String retValue = "false";
-	        List<String> allPackageNames = ServletUtil.getPackageNamesFromGuvnor(profile);
+	        List<String> allPackageNames = ServletUtil.getPackageNamesFromRepository(profile);
 	        Map<String, String> processInfo = new HashMap<String, String>();
 	        if(allPackageNames != null && allPackageNames.size() > 0) {
 	        	for(String packageName : allPackageNames) {
@@ -84,9 +83,9 @@ public class CalledElementServlet extends HttpServlet {
 	    		            Matcher idMatcher = idPattern.matcher(processContent.getAssetContent());
 	    		            if(idMatcher.find()) {
 	    		            	String pid = idMatcher.group(1);
-	    		            	String pidpath = ServletUtil.getProcessImagePath(processContent.getAssetLocation(), pid, profile);
+	    		            	String pidcontent = ServletUtil.getProcessImageContent(processContent.getAssetLocation(), pid, profile);
 	    		            	if(pid != null && !(packageName.equals(processPackage) && pid.equals(processId))) {
-	    		            		processInfo.put(pid+"|"+processContent.getAssetLocation(), ServletUtil.existsProcessImageInGuvnor(pidpath, profile) ? pidpath : "");
+	    		            		processInfo.put(pid+"|"+processContent.getAssetLocation(), pidcontent != null ? pidcontent : "");
 	    		            	}
 	    		            }
 	    				}
