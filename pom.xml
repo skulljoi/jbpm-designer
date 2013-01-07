@@ -8,13 +8,6 @@
 
     <description>jBPM Designer</description>
     <url>https://github.com/droolsjbpm/jbpm-designer</url>
-    <developers>
-        <developer>
-            <id>tsurdilo</id>
-            <name>Tihomir Surdilovic</name>
-            <email>tsurdilo@redhat.com</email>
-        </developer>
-    </developers>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
