@@ -53,32 +53,32 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
         var simInfo = jsonPath(options.results.evalJSON(), "$.siminfo.*");
         var infomarkup = '<table border="0" width="100%"> \
                           <tr>\
-                          <td><b>Process id: </b></td> \
-                          <td>' + simInfo[0].id  + '</td> \
+                          <td><span style="font-size: 10px"><b>Process id: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].id  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Process name: </b></td> \
-                          <td>' + simInfo[0].name  + '</td> \
+                          <td><span style="font-size: 10px"><b>Process name: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].name  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Process version: </b></td> \
-                          <td>' + simInfo[0].version  + '</td> \
+                          <td><span style="font-size: 10px"><b>Process version: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].version  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Simulation start: </b></td> \
-                          <td>' + simInfo[0].starttime  + '</td> \
+                          <td><span style="font-size: 10px"><b>Simulation start: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].starttime  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Simulation end: </b></td> \
-                          <td>' + simInfo[0].endtime  + '</td> \
+                          <td><span style="font-size: 10px"><b>Simulation end: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].endtime  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Num. of Executions: </b></td> \
-                          <td>' + simInfo[0].executions  + '</td> \
+                          <td><span style="font-size: 10px"><b>Num. of Executions: </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].executions  + '</span></td> \
                           </tr> \
                           <tr> \
-                          <td><b>Interval </b></td> \
-                          <td>' + simInfo[0].interval  + '</td> \
+                          <td><span style="font-size: 10px"><b>Interval </b></span></td> \
+                          <td><span style="font-size: 10px">' + simInfo[0].interval  + '</span></td> \
                           </tr> \
                           </table>';
         if(simInfo) {
@@ -217,6 +217,14 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
 		var jsonSimObj = jsonPath(jsonstr.evalJSON(), "$.timeline");
 		var jsonInstancesObj = jsonPath(jsonstr.evalJSON(), "$.activityinstances.*");
 		var jsonEventAggregationsObj = jsonPath(jsonstr.evalJSON(), "$.eventaggregations.*");
+
+        var htobjarray = [];
+        var htobj = jsonPath(jsonstr.evalJSON(), "$.htsim.*");
+        for(var i=0; i < htobj.length; i++ ) {
+            var inner = htobj[i];
+            htobjarray.push(inner.costvalues);
+        }
+
 		var jsonSimObjWrapper = {
 			"timeline": jsonSimObj[0]
 		};
@@ -224,10 +232,11 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
 		ORYX.EDITOR.simulationEventData = jsonSimObjWrapper;
 		ORYX.EDITOR.simulationEventAggregationData = jsonEventAggregationsObj;
 		ORYX.EDITOR.simulationInstancesData = jsonInstancesObj;
+        ORYX.EDITOR.simulationHTCostData = htobjarray;
 		ORYX.EDITOR.simulationChartTitle = "Process Simulation Results";
 		ORYX.EDITOR.simulationChartId = jsonObj[0].id;
 		ORYX.EDITOR.simulationChartNodeName = jsonObj[0].name;
-		Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/processchart.htm";
+		Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/processchart.jsp";
 
 	},
 	showTaskAveragesGraph : function(nodeid, jsonstr) {
@@ -242,7 +251,7 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
 				ORYX.EDITOR.simulationChartTitle = "Task Simulation Results";
 				ORYX.EDITOR.simulationChartId = innerWrapper[0].id;
 				ORYX.EDITOR.simulationChartNodeName = innerWrapper[0].name;
-				Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/taskchart.htm";
+				Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/taskchart.jsp";
 			}
 		}
 	},
@@ -256,7 +265,7 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
 				ORYX.EDITOR.simulationChartTitle = "Human Task Simulation Results";
 				ORYX.EDITOR.simulationChartId = inner.id;
 				ORYX.EDITOR.simulationChartNodeName = inner.name;
-				Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/humantaskchart.htm";
+				Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH + "simulation/humantaskchart.jsp";
 			}
 		}
 	},
@@ -273,7 +282,7 @@ ORYX.Plugins.SimulationResults = Clazz.extend({
 	},
 	pathSvgGenerated : function() {
 		ORYX.EDITOR.simulationPathSVG = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-		Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH+ "simulation/pathschart.htm";
+		Ext.getDom('simchartframe').src = ORYX.BASE_FILE_PATH+ "simulation/pathschart.jsp";
 		this.facade.raiseEvent({
             type: ORYX.CONFIG.EVENT_SIMULATION_CLEAR_PATH_SVG
 		});

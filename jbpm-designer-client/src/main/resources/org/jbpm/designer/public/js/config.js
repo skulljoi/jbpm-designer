@@ -21,7 +21,7 @@ ORYX.CONFIG.WEB_URL = "org.jbpm.designer.jBPMDesigner";
 
 
 
-ORYX.CONFIG.MENU_INDEX = {"File" : 1, "Edit" : 2, "Z-Order" : 3, "Undo" : 4, "Docker" : 5, "Help" : "ZZZZZZ"};
+ORYX.CONFIG.MENU_INDEX = {"File" : 1, "Edit" : 2, "Undo": 3, "localstorage": 4, "Z-Order" : 5,  "Alignment": 6, "Grouping": 7, "lockunlockgroup": 8, "Docker" : 9, "colorpickergroup": 'AAA', "editprocessforms": 'BBB', 'sharegroup': 'CCC', "importgroup": 'DDD', "validationandsimulation": 'EEE', "servicerepogroup": 'FFF', "fullscreengroup": 'GGG', "Help" : "ZZZZZZ"};
 
 ORYX.CONFIG.UUID_URL = function(uuid, profile) {
   if (uuid === undefined) {
@@ -165,6 +165,7 @@ ORYX.CONFIG.TYPE_CHOICE =				"choice";
 ORYX.CONFIG.TYPE_DYNAMICCHOICE =	    "dynamicchoice";
 ORYX.CONFIG.TYPE_DYNAMICDATAINPUT=      "dynamicdatainput";
 ORYX.CONFIG.TYPE_DYNAMICDATAOUTPUT=     "dynamicdatoutput";
+ORYX.CONFIG.TYPE_DYNAMICGATEWAYCONNECTIONS = "dynamicgatewayconnections";
 ORYX.CONFIG.TYPE_URL =					"url";
 ORYX.CONFIG.TYPE_DIAGRAM_LINK =			"diagramlink";
 ORYX.CONFIG.TYPE_COMPLEX =				"complex";

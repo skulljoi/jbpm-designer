@@ -5,6 +5,7 @@
 		<plugin source="footer.js" name="ORYX.Plugins.Footer" core="true" />
 		<plugin source="syntaxchecker.js" name="ORYX.Plugins.SyntaxChecker"
 			core="true" />
+        <plugin source="visualvalidation.js" name="ORYX.Plugins.VisualValidation" core="true" />
 		<!-- <plugin source="toolbar2.js" name="ORYX.Plugins.Toolbar2" /> -->
 
 		<plugin source="shapemenu.js" name="ORYX.Plugins.ShapeMenuPlugin"
@@ -91,6 +92,8 @@
 		<plugin source="edit.js" name="ORYX.Plugins.Edit" />
 		<plugin source="keysMove.js" name="ORYX.Plugins.KeysMove" />
 		<plugin source="Layouter/containerLayouter.js" name="ORYX.Plugins.ContainerLayouter" />
+
+        <plugin source="formeditingplugin.js" name="ORYX.Plugins.FormEditing" />
 
 		<!-- plugin for PNML export and deployment -->
 		<plugin source="pnmlexport.js" name="ORYX.Plugins.Pnmlexport">

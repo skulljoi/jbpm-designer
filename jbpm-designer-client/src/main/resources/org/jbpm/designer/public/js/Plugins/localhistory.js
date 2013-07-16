@@ -162,7 +162,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
                 dataIndex: 'svg',
                 renderer: function(val) {
                     if(val && val.length > 0) {
-                        return '<center><img src="'+ ORYX.PATH+'images/page_white_picture.png" onclick="resetSVGView(\''+val+'\');new SVGViewer({title: \'Local History Process Image\', width: \'650\', height: \'450\', autoScroll: true, fixedcenter: true, src: \''+'\',hideAction: \'close\'}).show();" alt="Click to view Process Image"/></center>';
+                        return '<center><img src="'+ ORYX.BASE_FILE_PATH +'images/page_white_picture.png" onclick="resetSVGView(\''+val+'\');new SVGViewer({title: \'Local History Process Image\', width: \'650\', height: \'450\', autoScroll: true, fixedcenter: true, src: \''+'\',hideAction: \'close\'}).show();" alt="Click to view Process Image"/></center>';
                     } else {
                         return "<center>Process image not available.</center>";
                     }
@@ -329,7 +329,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
     addToHistory : function() {
         var processJSON = ORYX.EDITOR.getSerializedJSON();
         var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-        var processName = jsonPath(processJSON.evalJSON(), "$.properties.name");
+        var processName = jsonPath(processJSON.evalJSON(), "$.properties.processn");
         var processPackage = jsonPath(processJSON.evalJSON(), "$.properties.package");
         var processId = jsonPath(processJSON.evalJSON(), "$.properties.id");
         var processVersion = jsonPath(processJSON.evalJSON(), "$.properties.version");

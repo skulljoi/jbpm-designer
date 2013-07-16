@@ -62,6 +62,7 @@ import javax.xml.stream.FactoryConfigurationError;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 import java.io.*;
+import java.net.URLDecoder;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -97,8 +98,8 @@ public class TransformerServlet extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        String formattedSvg = req.getParameter("fsvg");
-        String rawSvg = req.getParameter("rsvg");
+        String formattedSvgEncoded = req.getParameter("fsvg");
+        String rawSvgEncoded = req.getParameter("rsvg");
         String uuid = req.getParameter("uuid");
         String profileName = req.getParameter("profile");
         String transformto = req.getParameter("transformto");
@@ -108,8 +109,18 @@ public class TransformerServlet extends HttpServlet {
         String respaction = req.getParameter("respaction");
         String pp = req.getParameter("pp");
         String processid = req.getParameter("processid");
+        String sourceEnc = req.getParameter("enc");
 
+        String formattedSvg = ( formattedSvgEncoded == null ? "" : new String(Base64.decodeBase64(formattedSvgEncoded), "UTF-8") );
+        //formattedSvg = URLDecoder.decode(formattedSvg, "UTF-8");
+        String rawSvg = ( rawSvgEncoded == null ? "" : new String(Base64.decodeBase64(rawSvgEncoded), "UTF-8") );
+        //rawSvg = URLDecoder.decode(rawSvg, "UTF-8");
+
+        if(sourceEnc != null && sourceEnc.equals("true")) {
+            bpmn2in = new String(Base64.decodeBase64(bpmn2in), "UTF-8");
+        }
         IDiagramProfile profile = _profileService.findProfile(req, profileName);
+
         DroolsFactoryImpl.init();
         BpsimFactoryImpl.init();
 
@@ -207,43 +218,55 @@ public class TransformerServlet extends HttpServlet {
             resp.setContentType("application/json");
             resp.getWriter().print(json);
         }  else if (transformto != null && transformto.equals(BPMN2_TO_JSON)) {
-            // fix package name if needed
-            String packageName = null;
-            try {
-                Asset<String> processAsset = repository.loadAsset(uuid);
-
-                // build package name based on the asset location
-                packageName = processAsset.getAssetLocation().replaceAll(File.separator, ".");
-            } catch (AssetNotFoundException e) {
-                _logger.error("Process with uuid " + uuid + " was not found");
-            }
             Definitions def = ((JbpmProfileImpl) profile).getDefinitions(bpmn2in);
-            List<RootElement> rootElements =  def.getRootElements();
-            for(RootElement root : rootElements) {
-                if(root instanceof Process) {
-                    Process process = (Process) root;
-                    Iterator<FeatureMap.Entry> iter = process.getAnyAttribute().iterator();
-                    FeatureMap.Entry toDeleteFeature = null;
-                    while(iter.hasNext()) {
-                        FeatureMap.Entry entry = iter.next();
-                        if(entry.getEStructuralFeature().getName().equals("packageName")) {
-                            String pname = (String) entry.getValue();
-                            if(pname == null || !pname.equals(packageName)) {
-                                toDeleteFeature = entry;
+            if(uuid != null && sourceEnc == null) {
+                // fix package name if needed
+                String packageName = null;
+                try {
+                    Asset<String> processAsset = repository.loadAsset(uuid);
+
+                    // build package name based on the asset location
+                    packageName = processAsset.getAssetLocation();
+                    if(packageName.startsWith("/")) {
+                        packageName = packageName.substring(1, packageName.length());
+                    }
+                    packageName = packageName.replaceAll("/", ".");
+                    // final check in odd cases
+                    if(packageName.startsWith(".")) {
+                        packageName = packageName.substring(1, packageName.length());
+                    }
+
+                } catch (AssetNotFoundException e) {
+                    _logger.error("Process with uuid " + uuid + " was not found");
+                }
+                List<RootElement> rootElements =  def.getRootElements();
+                for(RootElement root : rootElements) {
+                    if(root instanceof Process) {
+                        Process process = (Process) root;
+                        Iterator<FeatureMap.Entry> iter = process.getAnyAttribute().iterator();
+                        FeatureMap.Entry toDeleteFeature = null;
+                        while(iter.hasNext()) {
+                            FeatureMap.Entry entry = iter.next();
+                            if(entry.getEStructuralFeature().getName().equals("packageName")) {
+                                String pname = (String) entry.getValue();
+                                if(pname == null || !pname.equals(packageName)) {
+                                    toDeleteFeature = entry;
+                                }
                             }
                         }
-                    }
-                    if(toDeleteFeature != null) {
-                        process.getAnyAttribute().remove(toDeleteFeature);
-                        ExtendedMetaData metadata = ExtendedMetaData.INSTANCE;
-                        EAttributeImpl extensionAttribute = (EAttributeImpl) metadata.demandFeature(
-                                "http://www.jboss.org/drools", "packageName", false, false);
-                        EStructuralFeatureImpl.SimpleFeatureMapEntry extensionEntry = new EStructuralFeatureImpl.SimpleFeatureMapEntry(extensionAttribute,
-                                packageName);
-                        process.getAnyAttribute().add(extensionEntry);
+                        if(toDeleteFeature != null) {
+                            process.getAnyAttribute().remove(toDeleteFeature);
+                            ExtendedMetaData metadata = ExtendedMetaData.INSTANCE;
+                            EAttributeImpl extensionAttribute = (EAttributeImpl) metadata.demandFeature(
+                                    "http://www.jboss.org/drools", "packageName", false, false);
+                            EStructuralFeatureImpl.SimpleFeatureMapEntry extensionEntry = new EStructuralFeatureImpl.SimpleFeatureMapEntry(extensionAttribute,
+                                    packageName);
+                            process.getAnyAttribute().add(extensionEntry);
+                        }
                     }
                 }
             }
+
             // get the xml from Definitions
             ResourceSet rSet = new ResourceSetImpl();
             rSet.getResourceFactoryRegistry().getExtensionToFactoryMap().put("bpmn2", new JBPMBpmn2ResourceFactoryImpl());
@@ -256,22 +279,6 @@ public class TransformerServlet extends HttpServlet {
             String json = profile.createUnmarshaller().parseModel(revisedXmlModel, profile, pp);
             resp.setContentType("application/json");
             resp.getWriter().print(json);
-        } else if(transformto == null && respaction != null && respaction.equals(RESPACTION_SHOWEMBEDDABLE)) {
-            resp.setCharacterEncoding("UTF-8");
-            resp.setContentType("text/plain");
-
-            // TODO what is this???
-
-            String editorURL = RepositoryInfo.getRepositoryProtocol(profile)
-                    + "://"
-                    + RepositoryInfo.getRepositoryHost(profile)
-                    + "/"
-                    + RepositoryInfo.getRepositorySubdomain(profile).substring(0,
-                    RepositoryInfo.getRepositorySubdomain(profile).indexOf("/"))
-                    + "/org.drools.guvnor.Guvnor/standaloneEditorServlet?assetsUUIDs="
-                    + uuid
-                    + "&client=oryx";
-            resp.getWriter().write("<iframe id=\"processFrame\" src=\"" + editorURL + "\" width=\"650\" height=\"580\"/>");
         }
     }
 
@@ -459,8 +466,6 @@ public class TransformerServlet extends HttpServlet {
         try {
             if(processid != null) {
                 Asset<byte[]> processAsset = repository.loadAsset(uuid);
-
-
                 String assetExt = "";
                 String assetFileExt = "";
                 if(transformto.equals(TO_PDF)) {
@@ -475,9 +480,13 @@ public class TransformerServlet extends HttpServlet {
                     assetExt = "-svg";
                     assetFileExt = ".svg";
                 }
-                String assetFullName = processid + assetExt + assetFileExt;
-                repository.deleteAssetFromPath(processAsset.getAssetLocation() + assetFullName);
 
+                if(processid.startsWith(".")) {
+                    processid = processid.substring(1, processid.length());
+                }
+                String assetFullName = processid + assetExt + assetFileExt;
+
+                repository.deleteAssetFromPath(processAsset.getAssetLocation() + assetFullName);
 
                 ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
@@ -519,6 +528,7 @@ public class TransformerServlet extends HttpServlet {
         } catch (Exception e) {
             // we dont want to barf..just log that error happened
             _logger.error(e.getMessage());
+            e.printStackTrace();
         }
     }
 
