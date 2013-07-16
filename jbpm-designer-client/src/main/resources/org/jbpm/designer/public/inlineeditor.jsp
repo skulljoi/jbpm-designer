@@ -1,8 +1,5 @@
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:b3mn="http://b3mn.org/2007/b3mn"
-      xmlns:ext="http://b3mn.org/2007/ext"
-      xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-      xmlns:atom="http://b3mn.org/2007/atom+xhtml">
+<%@ page contentType="text/html;charset=UTF-8" %>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:b3mn="http://b3mn.org/2007/b3mn" xmlns:ext="http://b3mn.org/2007/ext" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns:atom="http://b3mn.org/2007/atom+xhtml">
 <head profile="http://purl.org/NET/erdf/profile">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <link xmlns="http://www.w3.org/1999/xhtml" rel="icon" href="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/jbpm.gif" />
@@ -89,7 +86,7 @@
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/js/imageviewer.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/js/svgviewer.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/js/panelcollapsedtitle.js" type="text/javascript"></script>
-    <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/i18n/translation_en.js" type="text/javascript"></script>
+    <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/i18n/translation_<%=request.getParameter("locale")%>.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.SelectStencilSetPerspective.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.Toolbar.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.ProcessInfo.js" type="text/javascript"></script>
@@ -114,7 +111,7 @@
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.Edit.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.KeysMove.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.Layouter.EdgeLayouter.js" type="text/javascript"></script>
-    <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.SyntaxChecker.js" type="text/javascript"></script>
+    <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.VisualValidation.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.RegexTextEditor.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.ConstraintExpressionEditor.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.Overlay.js" type="text/javascript"></script>
@@ -135,8 +132,9 @@
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.LocalHistory.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.NotificationsPlugin.js" type="text/javascript"></script>
     <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.ActiveNodesHighlighter" type="text/javascript"></script>
+    <script xmlns="http://www.w3.org/1999/xhtml" src="<%=request.getContextPath()%>/plugin/ORYX.Plugins.FormEditing" type="text/javascript"></script>
 </head>
-<body style="overflow:hidden;">
+<body style="overflow:hidden;" onload="startit();">
     <div id="Definition"></div>
 </body>
 </html>

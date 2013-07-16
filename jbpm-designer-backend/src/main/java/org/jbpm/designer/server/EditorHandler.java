@@ -84,23 +84,6 @@ public class EditorHandler extends HttpServlet {
     private static final Logger _logger = 
         Logger.getLogger(EditorHandler.class);
     
-    public static IDiagramPreferenceService PREFERENCE_FACTORY = new IDiagramPreferenceService() {
-
-        public IDiagramPreference createPreference(HttpServletRequest req) {
-            //later we could read the parameters from the URL as well.
-            return new IDiagramPreference() {
-
-                public boolean isAutoSaveEnabled() {
-                    return true;
-                }
-
-                public int getAutosaveInterval() {
-                    return 120000;
-                }
-            };
-        }
-    };
-
     /**
      * The base path under which the application will be made available at runtime.
      * This constant should be used throughout the application.
@@ -116,11 +99,6 @@ public class EditorHandler extends HttpServlet {
      * The designer PREPROCESS flag looked up from system properties.
      */
     public static final String PREPROCESS = "designer.preprocess";
-    
-    /**
-     * The designer locale param.
-     */
-    public static final String LOCALE = "designer.locale";
     
     /**
      * The designer skin param.
@@ -143,11 +121,6 @@ public class EditorHandler extends HttpServlet {
     private boolean _preProcess;
     
     /**
-     * The designer locale setting.
-     */
-    private String _locale;
-    
-    /**
      * The designer skin setting.
      */
     private String _skin;
@@ -156,7 +129,7 @@ public class EditorHandler extends HttpServlet {
      * The designer version setting.
      */
     private String _designerVersion;
-    
+
     /**
      * The profile service, a global registry to get the
      * profiles.
@@ -200,9 +173,9 @@ public class EditorHandler extends HttpServlet {
         
         _devMode = Boolean.parseBoolean( System.getProperty(DEV) == null ? config.getInitParameter(DEV) : System.getProperty(DEV) );
         _preProcess = Boolean.parseBoolean( System.getProperty(PREPROCESS) == null ? config.getInitParameter(PREPROCESS) : System.getProperty(PREPROCESS) );
-        _locale = System.getProperty(LOCALE) == null ? config.getInitParameter(LOCALE) : System.getProperty(LOCALE);
         _skin = System.getProperty(SKIN) == null ? config.getInitParameter(SKIN) : System.getProperty(SKIN);
         _designerVersion = readDesignerVersion(config.getServletContext());
+
         
         String editor_file = config.
             getServletContext().getRealPath(designer_path + "editor.html");
@@ -248,7 +221,6 @@ public class EditorHandler extends HttpServlet {
         }
     
         // generate script to setup the languages
-        _envFiles.add("i18n/translation_" + _locale + ".js");
         if (!_devMode) {
         	if (_logger.isInfoEnabled()) {
                 _logger.info(
@@ -305,18 +277,24 @@ public class EditorHandler extends HttpServlet {
         Document doc = (Document) _doc.clone();
         String profileName = request.getParameter("profile");
         String uuid = request.getParameter("uuid");
+
         String editorID = request.getParameter("editorid");
+
         String encodedActiveNodes = request.getParameter("activenodes");
-
-
         byte[] activeNodesByteArray = Base64.decodeBase64(encodedActiveNodes);
         String activeNodes = new String(activeNodesByteArray, "UTF-8");
+
         String encodedCompletedNodes = request.getParameter("completednodes");
-
-
         byte[] completedNodesByteArray = Base64.decodeBase64(encodedCompletedNodes);
         String completedNodes = new String(completedNodesByteArray, "UTF-8");
+
+        String encodedProcessSource = request.getParameter("processsource");
+        if(encodedProcessSource == null) {
+            encodedProcessSource = "";
+        }
+
         String readOnly = request.getParameter("readonly");
+
 
         if(profileName == null || profileName.length() < 1) {
         	profileName = "jbpm";
@@ -324,10 +302,10 @@ public class EditorHandler extends HttpServlet {
         IDiagramProfile profile = _profileService.findProfile(
                 request, profileName);
         if (profile == null) {
-            _logger.error("No profile with the name " + profileName 
+            _logger.error("No profile with the name " + profileName
                     + " was registered");
             throw new IllegalArgumentException(
-                    "No profile with the name " + profileName + 
+                    "No profile with the name " + profileName +
                         " was registered");
         }
 
@@ -353,20 +331,20 @@ public class EditorHandler extends HttpServlet {
             scriptsArray = new JSONArray();
             scriptsArray.put(designer_path + "jsc/env_combined.js");
         }
-        
+
         // generate script tags for plugins.
         // they are located after the initialization script.
-        
+
         if (_pluginfiles.get(profileName) == null) {
             List<IDiagramPlugin> compressed = new ArrayList<IDiagramPlugin>();
             List<IDiagramPlugin> uncompressed = new ArrayList<IDiagramPlugin>();
             _pluginfiles.put(profileName, compressed);
             _uncompressedPlugins.put(profileName, uncompressed);
             for (String pluginName : profile.getPlugins()) {
-                IDiagramPlugin plugin = _pluginService.findPlugin(request, 
+                IDiagramPlugin plugin = _pluginService.findPlugin(request,
                         pluginName);
                 if (plugin == null) {
-                    _logger.warn("Could not find the plugin " + pluginName + 
+                    _logger.warn("Could not find the plugin " + pluginName +
                             " requested by the profile " + profile.getName());
                     continue;
                 }
@@ -376,10 +354,10 @@ public class EditorHandler extends HttpServlet {
                     uncompressed.add(plugin);
                 }
             }
-            
+
             if (!_devMode) {
                 // let's call the compression routine
-                String rs = compressJS(_pluginfiles.get(profileName), 
+                String rs = compressJS(_pluginfiles.get(profileName),
                         getServletContext());
                 try {
                     FileWriter w = new FileWriter(getServletContext().
@@ -401,12 +379,12 @@ public class EditorHandler extends HttpServlet {
         } else {
             pluginsArray.put(designer_path + "jsc/plugins_" + profileName + ".js");
         }
-        
-        for (IDiagramPlugin uncompressed : 
+
+        for (IDiagramPlugin uncompressed :
                 _uncompressedPlugins.get(profileName)) {
             pluginsArray.put(designer_path + "plugin/" + uncompressed.getName() + ".js");
         }
-        
+
         XMLOutputter outputter = new XMLOutputter();
         Format format = Format.getPrettyFormat();
         format.setExpandEmptyElements(true);
@@ -418,10 +396,6 @@ public class EditorHandler extends HttpServlet {
         StringBuilder resultHtml = new StringBuilder();
         boolean tokenFound = false;
         boolean replacementMade = false;
-      
-        IDiagramPreference pref = PREFERENCE_FACTORY.createPreference(request);
-        int autoSaveInt = pref.getAutosaveInterval();
-        boolean autoSaveOn = pref.isAutoSaveEnabled();
 
         while(tokenizer.hasMoreTokens()) {
             String elt = tokenizer.nextToken();
@@ -440,7 +414,10 @@ public class EditorHandler extends HttpServlet {
             } else if ("completednodes".equals(elt)) {
                 resultHtml.append(completedNodes);
                 replacementMade = true;
-            } else if ("readonly".equals(elt)) {
+            } else if ("processsource".equals(elt)) {
+                resultHtml.append(encodedProcessSource);
+                replacementMade = true;
+            }else if ("readonly".equals(elt)) {
                 resultHtml.append(readOnly);
                 replacementMade = true;
             } else if ("allscripts".equals(elt)) {
@@ -458,21 +435,15 @@ public class EditorHandler extends HttpServlet {
             } else if ("debug".equals(elt)) {
                 resultHtml.append(_devMode);
                 replacementMade = true;
-            } else if ("autosaveinterval".equals(elt)) {
-                resultHtml.append(autoSaveInt);
-                replacementMade = true;
-            } else if ("autosavedefault".equals(elt)) {
-                resultHtml.append(autoSaveOn);
-                replacementMade = true;    
             } else if ("preprocessing".equals(elt)) {
                 resultHtml.append(preprocessingUnit == null ? "" : preprocessingUnit.getOutData());
-                replacementMade = true;    
+                replacementMade = true;
             } else if ("externalprotocol".equals(elt)) {
                 resultHtml.append(RepositoryInfo.getRepositoryProtocol(profile) == null ? "" : RepositoryInfo.getRepositoryProtocol(profile));
-                replacementMade = true;    
+                replacementMade = true;
             } else if ("externalhost".equals(elt)) {
                 resultHtml.append(RepositoryInfo.getRepositoryHost(profile));
-                replacementMade = true;    
+                replacementMade = true;
             } else if ("externalsubdomain".equals(elt)) {
                 resultHtml.append(RepositoryInfo.getRepositorySubdomain(profile) != null ? RepositoryInfo.getRepositorySubdomain(profile).substring(0,
                     RepositoryInfo.getRepositorySubdomain(profile).indexOf("/")) : "");
@@ -486,10 +457,10 @@ public class EditorHandler extends HttpServlet {
             } else if ("designerversion".equals(elt)) {
                 resultHtml.append(_designerVersion);
                 replacementMade = true;
-            } else if("designerlocale".equals(elt)) {
-            	resultHtml.append(_locale);
+            } else if ("storesvgonsave".equals(elt)) {
+                resultHtml.append(profile.getStoreSVGonSaveOption());
                 replacementMade = true;
-            } else if ("defaultSkin".equals(elt)) { 
+            } else if ("defaultSkin".equals(elt)) {
                 resultHtml.append(designer_path + "css/theme-default.css");
                 replacementMade = true;
             } else if("overlaySkin".equals(elt)) {

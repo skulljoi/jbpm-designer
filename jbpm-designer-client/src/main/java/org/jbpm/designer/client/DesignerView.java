@@ -7,6 +7,7 @@ import com.google.gwt.dom.client.DivElement;
 import com.google.gwt.dom.client.Style;
 import com.google.gwt.event.dom.client.LoadEvent;
 import com.google.gwt.event.dom.client.LoadHandler;
+import com.google.gwt.i18n.client.LocaleInfo;
 import com.google.gwt.user.client.DOM;
 import com.google.gwt.user.client.Event;
 import com.google.gwt.user.client.Window;
@@ -45,8 +46,10 @@ public class DesignerView
     }
 
     private void setupInlineFrame() {
-        inlineFrame.setWidth("92%");
-        inlineFrame.setHeight("650");
+        inlineFrame.setWidth("85%");
+        inlineFrame.setHeight("600");
+        inlineFrame.getElement().setPropertyBoolean("webkitallowfullscreen", true);
+        inlineFrame.getElement().setPropertyBoolean("mozallowfullscreen", true);
         inlineFrame.getElement().setPropertyBoolean("allowfullscreen", true);
         inlineFrame.getElement().getStyle().setBorderWidth(0, Style.Unit.PX);
         inlineFrame.getElement().getStyle().setOverflowX(Style.Overflow.AUTO);
@@ -54,7 +57,16 @@ public class DesignerView
         inlineFrame.getElement().getStyle().setOverflow(Style.Overflow.AUTO);
         inlineFrame.getElement().getStyle().setWidth(100, Style.Unit.PCT);
         inlineFrame.getElement().getStyle().setHeight(680, Style.Unit.PX);
-        inlineFrame.setUrl(GWT.getModuleBaseURL() + "inlineeditor.jsp");
+
+        // fix locale if needed (for "default")
+        String locale = LocaleInfo.getCurrentLocale().getLocaleName();
+        if(locale == null) {
+            locale = "en";
+        } else if(locale.equals("default")) {
+            locale = "en";
+        }
+
+        inlineFrame.setUrl(GWT.getModuleBaseURL() + "inlineeditor.jsp?locale=" + locale);
     }
 
     @Override
