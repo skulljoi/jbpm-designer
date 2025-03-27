@@ -37,9 +37,12 @@ ORYX.Plugins.ShapeRepository = {
 		this._canAttach  = undefined;
         this._patternData;
 
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_STENCIL_SET_LOADED, this.setStencilSets.bind(this));
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_STENCIL_SET_RELOAD, this.setStencilSets.bind(this));
+
 		this.shapeList = new Ext.tree.TreeNode({
 			
-		})
+		});
 
 		var panel = new Ext.tree.TreePanel({
             cls:'shaperepository',
@@ -51,16 +54,16 @@ ORYX.Plugins.ShapeRepository = {
 			anchors: '0, -30'
 		});
 		
-		var sorter = new Ext.tree.TreeSorter(panel, {
-		    folderSort: true,
-		    dir: "asc",
-		    sortType: function(node) {
-		        return node.text;
-		    }
-		});
+//		var sorter = new Ext.tree.TreeSorter(panel, {
+//		    folderSort: true,
+//		    dir: "asc",
+//		    sortType: function(node) {
+//		        return node.text;
+//		    }
+//		});
 		
 		var region = this.facade.addToRegion("west", panel, ORYX.I18N.ShapeRepository.title);
-		
+
 //		Ext.Ajax.request({
 //            url: ORYX.PATH + "processinfo",
 //            method: 'POST',
@@ -102,7 +105,7 @@ ORYX.Plugins.ShapeRepository = {
             },
             params: {
                 profile: ORYX.PROFILE,
-                uuid : ORYX.UUID
+                uuid :  window.btoa(encodeURI(ORYX.UUID))
             }
         });
 
@@ -114,7 +117,6 @@ ORYX.Plugins.ShapeRepository = {
 		
 		// Load all Stencilssets
 		this.setStencilSets();
-		this.facade.registerOnEvent(ORYX.CONFIG.EVENT_STENCIL_SET_LOADED, this.setStencilSets.bind(this));
 	},
 	
 	
@@ -135,7 +137,7 @@ ORYX.Plugins.ShapeRepository = {
 			// For each Stencilset create and add a new Tree-Node
 			var stencilSetNode
 			
-			var typeTitle = sset.title();
+			var typeTitle = ORYX.I18N.propertyNames[sset.title()];
 			var extensions = sset.extensions();
 //			if (extensions && extensions.size() > 0) {
 //				typeTitle += " / " + ORYX.Core.StencilSet.getTranslation(extensions.values()[0], "title");
@@ -158,29 +160,6 @@ ORYX.Plugins.ShapeRepository = {
 			// Sort the stencils according to their position and add them to the repository
 			stencils = stencils.sortBy(function(value) { return value.position(); } );
 			stencils.each((function(value) {
-				
-				// Show stencils in no group if there is less than 15 shapes
-				if(stencils.length <= ORYX.CONFIG.MAX_NUM_SHAPES_NO_GROUP) {
-					var stencilOrder = ORYX.CONFIG.STENCIL_GROUP_ORDER();
-					if(stencilOrder[sset.namespace()]) {
-						stencilSetNode.sort(function(a, b) {
-							if(!stencilOrder[sset.namespace()][a.text]) {
-								stencilOrder[sset.namespace()][a.text] = ORYX.CONFIG.STENCIL_MAX_ORDER;
-							}
-							if(!stencilOrder[sset.namespace()][b.text]) {
-								stencilOrder[sset.namespace()][b.text] = ORYX.CONFIG.STENCIL_MAX_ORDER;
-							}
-							return stencilOrder[sset.namespace()][a.text] - stencilOrder[sset.namespace()][b.text];
-						});
-					} else {
-						stencilSetNode.sort(function(a, b) {
-							return a.text > b.text ? 1 : a.text < b.text ? -1 : 0;
-						});
-					}
-					
-					this.createStencilTreeNode(stencilSetNode, value);	
-					return;					
-				}
 				if (value.hidden()) {
 					return;
 				}
@@ -190,17 +169,33 @@ ORYX.Plugins.ShapeRepository = {
 				
 				// For each Group-Entree
 				groups.each((function(group) {
-					
+                    var groupText = group;
+                    if(ORYX.I18N.propertyNames[group] && ORYX.I18N.propertyNames[group].length > 0) {
+                        groupText = ORYX.I18N.propertyNames[group];
+                    }
 					// If there is a new group
-					if(!treeGroups[group]) {
-						// Create a new group
-						treeGroups[group] = new Ext.tree.TreeNode({
-							text:group,					// Group-Name
-							allowDrag:false,
-        					allowDrop:false,            
-							iconCls:'headerShapeRepImg', // Css-Class for Icon
-				            cls:'headerShapeRepChild',  // CSS-Class for Stencil-Group
-							singleClickExpand:true});
+                    if(!treeGroups[group]) {
+                        if(Ext.isIE) {
+                            // Create a new group
+                            treeGroups[group] = new Ext.tree.TreeNode({
+                                text: groupText,					// Group-Name
+                                allowDrag:false,
+                                allowDrop:false,
+                                iconCls:'headerShapeRepImg', // Css-Class for Icon
+                                cls:'headerShapeRepChild',  // CSS-Class for Stencil-Group
+                                singleClickExpand:true,
+                                expanded:true});
+                            treeGroups[group].expand();
+                        } else {
+                            // Create a new group
+                            treeGroups[group] = new Ext.tree.TreeNode({
+                                text: groupText,					// Group-Name
+                                allowDrag:false,
+                                allowDrop:false,
+                                iconCls:'headerShapeRepImg', // Css-Class for Icon
+                                cls:'headerShapeRepChild',  // CSS-Class for Stencil-Group
+                                singleClickExpand:true});
+                        }
 						// Add the Group to the ShapeRepository
 						stencilSetNode.appendChild(treeGroups[group]);
 						treeGroups[group].render();	
@@ -221,38 +216,56 @@ ORYX.Plugins.ShapeRepository = {
 
 				// sort the groups
 				var stencilOrder = ORYX.CONFIG.STENCIL_GROUP_ORDER();
-				if(stencilOrder[sset.namespace()]) {
-					stencilSetNode.sort(function(a, b) {
-						return stencilOrder[sset.namespace()][a.text] - stencilOrder[sset.namespace()][b.text];
-					});
-				} else {
-					stencilSetNode.sort(function(a, b) {
-						return a.text > b.text ? 1 : a.text < b.text ? -1 : 0;
-					});
-				}
-	
+                stencilSetNode.sort(function(a, b) {
+                    return stencilOrder[sset.namespace()][a.text] - stencilOrder[sset.namespace()][b.text];
+                });
+
 			}).bind(this));
 		}).bind(this));
-			
 		//if (this.shapeList.firstChild.firstChild) {
 		//	this.shapeList.firstChild.firstChild.expand(false, true);
 		//}	
 	},
 
 	createStencilTreeNode: function(parentTreeNode, stencil) {
+        try {
 		// Create and add the Stencil to the Group
-		var newElement = new Ext.tree.TreeNode({
-				text:		stencil.title(), 		// Text of the stencil
-				icon:		decodeURIComponent(stencil.icon()),			// Icon of the stencil
-				allowDrag:	false,					// Don't use the Drag and Drop of Ext-Tree
-				allowDrop:	false,
-				iconCls:	'ShapeRepEntreeImg', 	// CSS-Class for Icon
-				cls:		'ShapeRepEntree'		// CSS-Class for the Tree-Entree
-				});
+        var IdParts = stencil.id().split("#");
+        var textTitle = ORYX.I18N.propertyNames[IdParts[1]];
+        if(!textTitle) {
+            textTitle = stencil.title();
+        } else {
+            if(textTitle.length <= 0) {
+                textTitle = stencil.title();
+            }
+        }
+        var newElement;
+        // if stencil.icon() is a .png or .gif file, load from image sprite
+        if (window.SpriteUtils.isIconFile(stencil.icon())) {
+            newElement = new Ext.tree.TreeNode({
+                text: textTitle, 		// Text of the stencil
+                iconCls: window.SpriteUtils.toUniqueId(stencil.icon()), // set iconCls to sprite css class
+                allowDrag: false,					// Don't use the Drag and Drop of Ext-Tree
+                allowDrop: false
+            });
+        }
+        else {
+            newElement = new Ext.tree.TreeNode({
+                text: textTitle, 		// Text of the stencil
+                icon:		decodeURIComponent(stencil.icon()),			// Icon of the stencil
+                allowDrag: false,					// Don't use the Drag and Drop of Ext-Tree
+                allowDrop: false,
+                iconCls:	'ShapeRepEntreeImg', 	// CSS-Class for Icon
+                cls:		'ShapeRepEntree'		// CSS-Class for the Tree-Entree
+            });
+        }
 
-		parentTreeNode.appendChild(newElement);		
-		newElement.render();	
-				
+        if(parentTreeNode === undefined) {
+        } else {
+            parentTreeNode.appendChild(newElement);
+            newElement.render();
+        }
+
 		var ui = newElement.getUI();
 		
 		// Set the tooltip
@@ -263,10 +276,14 @@ ORYX.Plugins.ShapeRepository = {
 				node: 		ui.node,
 		        handles: 	[ui.elNode, ui.textNode].concat($A(ui.elNode.childNodes)), // Set the Handles
 		        isHandle: 	false,
-				type:		stencil.id(),			// Set Type of stencil 
+				type:		stencil.id(),			// Set Type of stencil
+                title:      stencil.title(),
 				namespace:	stencil.namespace()		// Set Namespace of stencil
 				});
-								
+
+        }catch(e) {
+            // ignore errrors for now
+        }
 	},
 	
 	drop: function(dragZone, target, event) {
@@ -314,7 +331,7 @@ ORYX.Plugins.ShapeRepository = {
 		
 		
 		var commandClass = ORYX.Core.Command.extend({
-			construct: function(option, currentParent, canAttach, position, facade){
+			construct: function(option, currentParent, canAttach, position, facade, ttype){
 				this.option = option;
 				this.currentParent = currentParent;
 				this.canAttach = canAttach;
@@ -348,6 +365,11 @@ ORYX.Plugins.ShapeRepository = {
 				//this.currentParent.update();
 				//this.shape.update();
 
+                if(ttype && ttype.length > 0 && this.shape instanceof ORYX.Core.Node) {
+                    this.shape.setProperty("oryx-tasktype", ttype);
+                    this.shape.refresh();
+                }
+
 				this.facade.setSelection([this.shape]);
 				this.facade.getCanvas().update();
 				this.facade.updateSelection();
@@ -369,16 +391,44 @@ ORYX.Plugins.ShapeRepository = {
 
 		var position = this.facade.eventCoordinates( event.browserEvent );
         var typeParts = option.type.split("#");
-        if(typeParts[1].startsWith("wp-")) {
+        var isCustom = false;
+        if(ORYX.PREPROCESSING) {
+            var customParts = ORYX.PREPROCESSING.split(",");
+            for (var i = 0; i < customParts.length; i++) {
+                if(customParts[i] == typeParts[1]) {
+                    isCustom = true;
+                }
+            }
+        }
+        if(typeParts[1].startsWith("wp-") && !isCustom) {
             this.facade.raiseEvent({
                 type: ORYX.CONFIG.CREATE_PATTERN,
                 pid: typeParts[1],
                 pdata: this._patternData,
                 pos: position
             });
-        } else {
-            var command = new commandClass(option, this._currentParent, this._canAttach, position, this.facade);
+        } else if(typeParts[1].endsWith("Task") && !isCustom) {
+            var ttype = typeParts[1];
+            ttype = ttype.substring(0, ttype.length - 4);
+            option.type = typeParts[0] + "#Task";
+
+            if(ttype.length < 1) {
+                if(option.title == "User" ||
+                    option.title == "Send" ||
+                    option.title == "Receive" ||
+                    option.title == "Manual" ||
+                    option.title == "Service" ||
+                    option.title == "Business Rule" ||
+                    option.title == "Script") {
+                    ttype = option.title;
+                }
+            }
+
+            var command = new commandClass(option, this._currentParent, this._canAttach, position, this.facade, ttype);
             this.facade.executeCommands([command]);
+        } else {
+           var command = new commandClass(option, this._currentParent, this._canAttach, position, this.facade);
+           this.facade.executeCommands([command]);
         }
 		this._currentParent = undefined;
 	},
@@ -437,6 +487,9 @@ ORYX.Plugins.ShapeRepository = {
 												edgeStencil: stencil,
 												targetStencil: stencil
 											});
+                        if(parentCandidate && parentCandidate.properties['oryx-tasktype'] && parentCandidate.properties['oryx-tasktype'] == "Script") {
+                            this._canAttach = false;
+                        }
 						
 						if( this._canAttach ){
 							// Show Highlight

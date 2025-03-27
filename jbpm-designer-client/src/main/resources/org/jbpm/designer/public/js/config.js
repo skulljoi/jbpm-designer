@@ -1,5 +1,5 @@
 /*
- * Copyright 2010 JBoss Inc
+ * Copyright 2010 Red Hat, Inc. and/or its affiliates.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ ORYX.CONFIG.WEB_URL = "org.jbpm.designer.jBPMDesigner";
 
 
 
-ORYX.CONFIG.MENU_INDEX = {"File" : 1, "Edit" : 2, "Undo": 3, "localstorage": 4, "Z-Order" : 5,  "Alignment": 6, "Grouping": 7, "lockunlockgroup": 8, "Docker" : 9, "colorpickergroup": 'AAA', "editprocessforms": 'BBB', 'sharegroup': 'CCC', "importgroup": 'DDD', "validationandsimulation": 'EEE', "servicerepogroup": 'FFF', "fullscreengroup": 'GGG', "Help" : "ZZZZZZ"};
+ORYX.CONFIG.MENU_INDEX = {"File" : 1, "Edit" : 2, "Undo": 3, "localstorage": 4, "Z-Order" : 5,  "Alignment": 6, "Grouping": 7, "lockunlockgroup": 8, "Docker" : 9, "colorpickergroup": 'AAA', "editprocessforms": 'BBB', 'sharegroup': 'CCC', "importgroup": 'DDD', "validationandsimulation": 'EEE', "servicerepogroup": 'FFF', "paintgroup": 'GGG', "fullscreengroup": 'HHH', "Help" : "ZZZZZZ"};
 
 ORYX.CONFIG.UUID_URL = function(uuid, profile) {
   if (uuid === undefined) {
@@ -31,8 +31,30 @@ ORYX.CONFIG.UUID_URL = function(uuid, profile) {
     profile = ORYX.PROFILE;
   }
 
-  return ORYX.PATH + "uuidRepository?uuid="+ uuid + "&profile=" + profile + "&pp=" + ORYX.PREPROCESSING;
+  if(ORYX.PATH === undefined) {
+      ORYX.PATH = "designer/";
+  }
+
+  return ORYX.PATH + "uuidRepository?uuid="+ Base64.encode(encodeURI(uuid)) + "&profile=" + profile + "&pp=" + ORYX.PREPROCESSING + "&ts=" + new Date().getTime();
 };
+
+ORYX.FULL_PERSPECTIVE = "http://b3mn.org/stencilset/bpmn2.0#";
+ORYX.SIMPLE_PERSPECTIVE = "http://b3mn.org/stencilset/bpmn2.0simple#";
+ORYX.RULEFLOW_PERSPECTIVE = "http://b3mn.org/stencilset/bpmn2.0ruleflow#";
+
+ORYX.CURRENT_PERSPECTIVE;
+ORYX.CALCULATE_CURRENT_PERSPECTIVE = function () {
+    if (!ORYX.CURRENT_PERSPECTIVE) {
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length && !ORYX.CURRENT_PERSPECTIVE; i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf("designerperspective=") == 0) ORYX.CURRENT_PERSPECTIVE = c.substring("designerperspective=".length,c.length);
+        }
+        if (!ORYX.CURRENT_PERSPECTIVE) ORYX.CURRENT_PERSPECTIVE = ORYX.FULL_PERSPECTIVE;
+    }
+    return ORYX.CURRENT_PERSPECTIVE;
+}
 
 ORYX.CONFIG.TRANSFORMER_URL = function(uuid, profile) {
    if (uuid === undefined) {
@@ -41,7 +63,7 @@ ORYX.CONFIG.TRANSFORMER_URL = function(uuid, profile) {
    if (profile === undefined) {
       profile = ORYX.PROFILE;
    }
-   return ORYX.PATH + "transformer?uuid="+ uuid + "&profile=" + profile;
+   return ORYX.PATH + "transformer?uuid="+ window.btoa(encodeURI(uuid)) + "&profile=" + profile;
 };
 
 ORYX.CONFIG.TASKFORMS_URL = function(uuid, profile) {
@@ -51,7 +73,7 @@ ORYX.CONFIG.TASKFORMS_URL = function(uuid, profile) {
 	if (profile === undefined) {
 	   profile = ORYX.PROFILE;
 	}
-	return ORYX.PATH + "taskforms?uuid="+ uuid + "&profile=" + profile;
+	return ORYX.PATH + "taskforms?uuid="+ window.btoa(encodeURI(uuid)) + "&profile=" + profile;
 };
 ORYX.CONFIG.UUID_AUTOSAVE_INTERVAL = 120000;
 ORYX.CONFIG.UUID_AUTOSAVE_DEFAULT = false;
@@ -112,8 +134,6 @@ ORYX.CONFIG.CPNTOOLSIMPORTER = 			ORYX.CONFIG.ROOT_PATH + "cpntoolsimporter";
 ORYX.CONFIG.BPMN2XPDLPATH =				ORYX.CONFIG.ROOT_PATH + "bpmn2xpdl";
 ORYX.CONFIG.TBPMIMPORT =				ORYX.CONFIG.ROOT_PATH + "tbpmimport";
 
-
-
 	/* Namespaces */
 ORYX.CONFIG.NAMESPACE_ORYX =			"http://www.b3mn.org/oryx";
 ORYX.CONFIG.NAMESPACE_SVG =				"http://www.w3.org/2000/svg";
@@ -130,7 +150,7 @@ ORYX.CONFIG.ZOOM_OFFSET =				0.1;
 ORYX.CONFIG.DEFAULT_SHAPE_MARGIN =		60;
 ORYX.CONFIG.SCALERS_SIZE =				7;
 ORYX.CONFIG.MINIMUM_SIZE =				20;
-ORYX.CONFIG.MAXIMUM_SIZE =				10000;
+ORYX.CONFIG.MAXIMUM_SIZE =				30000;
 ORYX.CONFIG.OFFSET_MAGNET =				15;
 ORYX.CONFIG.OFFSET_EDGE_LABEL_TOP =		14;
 ORYX.CONFIG.OFFSET_EDGE_LABEL_BOTTOM =	12;
@@ -140,7 +160,7 @@ ORYX.CONFIG.SHOW_GRIDLINE =             true;
 
 ORYX.CONFIG.BORDER_OFFSET =				14;
 
-ORYX.CONFIG.MAX_NUM_SHAPES_NO_GROUP	=	14;
+ORYX.CONFIG.MAX_NUM_SHAPES_NO_GROUP	=	5;
 
 ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET_CORNER = 30;
 ORYX.CONFIG.SHAPEMENU_CREATE_OFFSET = 45;
@@ -170,8 +190,11 @@ ORYX.CONFIG.TYPE_URL =					"url";
 ORYX.CONFIG.TYPE_DIAGRAM_LINK =			"diagramlink";
 ORYX.CONFIG.TYPE_COMPLEX =				"complex";
 ORYX.CONFIG.TYPE_TEXT =					"text";
+ORYX.CONFIG.TYPE_ENCODED_TEXT =         "encodedtext";
 ORYX.CONFIG.TYPE_VARDEF =               "vardef";
 ORYX.CONFIG.TYPE_EXPRESSION =           "expression";
+ORYX.CONFIG.TYPE_TEXT_EXPRESSION =      "textexpression";
+ORYX.CONFIG.TYPE_DOCS_EXPRESSION =      "docsexpression";
 ORYX.CONFIG.TYPE_ACTION =               "action";
 ORYX.CONFIG.TYPE_GLOBAL =               "global";
 ORYX.CONFIG.TYPE_IMPORT =               "import";
@@ -185,7 +208,13 @@ ORYX.CONFIG.TYPE_CALLEDELEMENT  =       "calledelement";
 ORYX.CONFIG.TYPE_CUSTOM =               "custom";
 ORYX.CONFIG.TYPE_REASSIGNMENT =         "reassignment";
 ORYX.CONFIG.TYPE_NOTIFICATIONS =        "notifications";
-	
+ORYX.CONFIG.TYPE_DTYPE_VARDEF =         "vardef";
+ORYX.CONFIG.TYPE_DTYPE_DINPUT =         "dinput";
+ORYX.CONFIG.TYPE_DTYPE_DOUTPUT =        "doutput";
+ORYX.CONFIG.TYPE_DTYPE_GLOBAL =         "global";
+ORYX.CONFIG.TYPE_RULEFLOW_GROUP =       "ruleflowgroup";
+ORYX.CONFIG.TYPE_CASE_ROLES =           "caseroles";
+
 /* Vertical line distance of multiline labels */
 ORYX.CONFIG.LABEL_LINE_DISTANCE =		2;
 ORYX.CONFIG.LABEL_DEFAULT_LINE_HEIGHT =	12;
@@ -216,6 +245,7 @@ ORYX.CONFIG.EVENT_LOADED =				"editorloaded";
 	
 ORYX.CONFIG.EVENT_EXECUTE_COMMANDS =		"executeCommands";
 ORYX.CONFIG.EVENT_STENCIL_SET_LOADED =		"stencilSetLoaded";
+ORYX.CONFIG.EVENT_STENCIL_SET_RELOAD =      "stencilSetReLoad";
 ORYX.CONFIG.EVENT_SELECTION_CHANGED =		"selectionchanged";
 ORYX.CONFIG.EVENT_SHAPEADDED =				"shapeadded";
 ORYX.CONFIG.EVENT_PROPERTY_CHANGED =		"propertyChanged";
@@ -225,6 +255,8 @@ ORYX.CONFIG.EVENT_DRAGDROP_END =			"dragdrop.end";
 ORYX.CONFIG.EVENT_RESIZE_START =			"resize.start";
 ORYX.CONFIG.EVENT_RESIZE_END =				"resize.end";
 ORYX.CONFIG.EVENT_DRAGDOCKER_DOCKED =		"dragDocker.docked";
+ORYX.CONFIG.EVENT_DRAGDOCKER_MOVE_FINISHED = "dragDocker.move.finished";
+ORYX.CONFIG.EVENT_DOCKER_EVENT =            "docker.event";
 ORYX.CONFIG.EVENT_HIGHLIGHT_SHOW =			"highlight.showHighlight";
 ORYX.CONFIG.EVENT_HIGHLIGHT_HIDE =			"highlight.hideHighlight";
 ORYX.CONFIG.EVENT_LOADING_ENABLE =			"loading.enable";
@@ -234,11 +266,14 @@ ORYX.CONFIG.EVENT_OVERLAY_SHOW =			"overlay.show";
 ORYX.CONFIG.EVENT_OVERLAY_HIDE =			"overlay.hide";
 ORYX.CONFIG.EVENT_DICTIONARY_ADD =          "dictionary.add";
 ORYX.CONFIG.EVENT_TASKFORM_EDIT =           "taskform.edit";
+ORYX.CONFIG.EVENT_TASKFORM_GENERATE =        "taskform.generate";
+ORYX.CONFIG.EVENT_TASKFORM_GENERATE_ALL =        "taskform.generate.all";
 ORYX.CONFIG.EVENT_ARRANGEMENT_TOP =			"arrangement.setToTop";
 ORYX.CONFIG.EVENT_ARRANGEMENT_BACK =		"arrangement.setToBack";
 ORYX.CONFIG.EVENT_ARRANGEMENT_FORWARD =		"arrangement.setForward";
 ORYX.CONFIG.EVENT_ARRANGEMENT_BACKWARD =	"arrangement.setBackward";
 ORYX.CONFIG.EVENT_PROPWINDOW_PROP_CHANGED =	"propertyWindow.propertyChanged";
+ORYX.CONFIG.EVENT_KEYBIND_MOVE_FINISHED =    "keybind.move.finished";
 ORYX.CONFIG.EVENT_LAYOUT_ROWS =				"layout.rows";
 ORYX.CONFIG.EVENT_LAYOUT_BPEL =				"layout.BPEL";
 ORYX.CONFIG.EVENT_LAYOUT_BPEL_VERTICAL =    "layout.BPEL.vertical";
@@ -257,8 +292,11 @@ ORYX.CONFIG.EVENT_DRAG_TRACKER_DRAG =       "dragTracker.drag";
 ORYX.CONFIG.EVENT_DRAG_TRACKER_RESIZE =     "dragTracker.resize";
 ORYX.CONFIG.EVENT_DROP_SHAPE =				"drop.shape";
 ORYX.CONFIG.EVENT_SHAPE_DELETED =				"shape.deleted";
+ORYX.CONFIG.EVENT_SHAPE_CREATED =             "shape.created";
+ORYX.CONFIG.EVENT_SHAPE_ADDED =				"shape.added";
 ORYX.CONFIG.EVENT_FACADE_SELECTION_DELETION_REQUEST =				"facade_selection.deletion.request";
 ORYX.CONFIG.EVENT_NODEXML_SHOW = "nodexml.show";
+ORYX.CONFIG.EVENT_DATAIOEDITOR_SHOW = "dataioeditor.show";
 ORYX.CONFIG.EVENT_VOICE_COMMAND = "voice.command";
 ORYX.CONFIG.EVENT_SIMULATION_SHOW_RESULTS = "simulation.showresults";
 ORYX.CONFIG.EVENT_SIMULATION_DISPLAY_GRAPH = "simulation.displaygraph";
@@ -268,6 +306,31 @@ ORYX.CONFIG.EVENT_SIMULATION_PATH_SVG_GENERATED = "simulation.pathsvggenerated";
 ORYX.CONFIG.EVENT_SIMULATION_ANNOTATE_PROCESS = "simulation.annotateprocess";
 ORYX.CONFIG.EVENT_SIMULATION_SHOW_ANNOTATED_PROCESS = "simulation.showannotatedprocess";
 ORYX.CONFIG.EVENT_NOTIFICATION_SHOW = "notification.show";
+ORYX.CONFIG.EVENT_DEF_DELETED = "notification.def.deleted";
+ORYX.CONFIG.EVENT_UPDATE_TASK_TYPE = "updatetaskevent";
+ORYX.CONFIG.EVENT_PASTE_NOTEMPTY_END = "paste.notempty.end";
+ORYX.CONFIG.EVENT_PASTE_END = "paste.end";
+ORYX.CONFIG.EVENT_DOCELEMENT_TO_MODEL = "docelementtomodelevent";
+ORYX.CONFIG.EVENT_INSTALL_WORKITEM = "workitem.install";
+ORYX.CONFIG.EVENT_EDIT_PROPS = "props.edit";
+
+// paint
+ORYX.CONFIG.EVENT_PAINT_NEWSHAPE = "paint.newshape";
+ORYX.CONFIG.EVENT_PAINT_REMOVESHAPE = "paint.removeshape";
+ORYX.CONFIG.EVENT_CANVAS_RESIZED = "canvas.resized";
+ORYX.CONFIG.EVENT_CANVAS_RESIZE_SHAPES_MOVED = "canvas.resizeshapemoved";
+ORYX.CONFIG.EVENT_CANVAS_ZOOMED = "canvas.zoomed";
+ORYX.CONFIG.EVENT_MODE_CHANGED = "mode.changed";
+ORYX.CONFIG.EVENT_PAINT_CANVAS_TOGGLED  = "canvas.toggled";
+// save-cancel-reload
+ORYX.CONFIG.EVENT_DO_SAVE = "designereventdosave";
+ORYX.CONFIG.EVENT_DO_UPDATE = "designereventdoupdate";
+ORYX.CONFIG.EVENT_DO_CHECKSAVE = "designereventdochecksave";
+ORYX.CONFIG.EVENT_CANCEL_SAVE = "designereventcancelsave";
+ORYX.CONFIG.EVENT_DO_RELOAD = "designereventreloads";
+ORYX.CONFIG.EVENT_UPDATE_LOCK = "designerupdatelock";
+
+ORYX.CONFIG.EVENT_OPEN_XML_EDITOR = "designeropeninxmleditor";
 
 // voice commands
 ORYX.CONFIG.VOICE_COMMAND_GENERATE_FORMS = "voice.command.generate.forms";
@@ -321,6 +384,9 @@ ORYX.CONFIG.EDIT_OFFSET_PASTE =			10;
 ORYX.CONFIG.KEY_CODE_X = 				88;
 ORYX.CONFIG.KEY_CODE_C = 				67;
 ORYX.CONFIG.KEY_CODE_V = 				86;
+ORYX.CONFIG.KEY_CODE_P = 				80;
+ORYX.CONFIG.KEY_CODE_M = 				77;
+ORYX.CONFIG.KEY_CODE_D = 				68;
 ORYX.CONFIG.KEY_CODE_DELETE = 			46;
 ORYX.CONFIG.KEY_CODE_META =				224;
 ORYX.CONFIG.KEY_CODE_BACKSPACE =		8;
@@ -350,59 +416,156 @@ ORYX.CONFIG.KEY_ACTION_UP = 			"up";
 ORYX.CONFIG.PANEL_RIGHT_COLLAPSED = true;
 ORYX.CONFIG.PANEL_LEFT_COLLAPSED = true;
 
+ORYX.CONFIG.PANEL_RIGHT_COLLAPSED_SWITCH = ORYX.CONFIG.PANEL_RIGHT_COLLAPSED;
+ORYX.CONFIG.PANEL_LEFT_COLLAPSED_SWITCH = ORYX.CONFIG.PANEL_LEFT_COLLAPSED;
+
 ORYX.CONFIG.STENCIL_MAX_ORDER = 999;
 ORYX.CONFIG.STENCIL_GROUP_ORDER = function() {
-	var stencilsHash = {};
-	// jbpm full perspective
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Activities"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Artifacts"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Catching Intermediate Events"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Connecting Objects"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Data Objects"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["End Events"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Gateways"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Service Tasks"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Start Events"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Swimlanes"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Throwing Intermediate Events"] = {};
-	
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Start Events"] = 1;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Catching Intermediate Events"] = 2;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Throwing Intermediate Events"] = 3;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["End Events"] = 4;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Gateways"] = 5;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Activities"] = 6;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Service Tasks"] = 7;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Connecting Objects"] = 8;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Data Objects"] = 9;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Swimlanes"] = 10;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Artifacts"] = 11;
-	
-	
-	// jbpm minimal perspective
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Task"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Reusable Subprocess"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Multiple instances"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Embedded Subprocess"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Data-based Exclusive (XOR) Gateway"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Start Event"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Timer Intermediate Event"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Signal Intermediate Event"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["End Event"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Error End Event"] = {};
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Sequence Flow"] = {};
-	
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Task"] = 7;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Reusable Subprocess"] = 8;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Multiple instances"] = 9;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Embedded Subprocess"] = 10;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Data-based Exclusive (XOR) Gateway"] = 6;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Start Event"] = 1;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Timer Intermediate Event"] = 2;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Signal Intermediate Event"] = 3;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["End Event"] = 4;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Error End Event"] = 5;
-	stencilsHash["http://b3mn.org/stencilset/bpmn2.0#"]["Sequence Flow"] = 11;
-	return stencilsHash;
+    var stencilObj = {
+        "http://b3mn.org/stencilset/bpmn2.0#" : {
+            "Tasks": 1,
+            "Start Events": 3,
+            "Catching Intermediate Events": 5,
+            "Throwing Intermediate Events": 6,
+            "End Events": 4,
+            "Gateways": 7,
+            "Subprocesses": 2,
+            "Service Tasks": 8,
+            "Connecting Objects": 9,
+            "Data Objects": 10,
+            "Swimlanes": 11,
+            "Artifacts": 12,
+            "Workflow Patterns": 13
+        }
+    }
+    return stencilObj;
 };
+
+var Base64 = {
+    _keyStr: "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=",
+
+    encode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3, enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = Base64._utf8_encode(input);
+
+        while (i < input.length) {
+
+            chr1 = input.charCodeAt(i++);
+            chr2 = input.charCodeAt(i++);
+            chr3 = input.charCodeAt(i++);
+
+            enc1 = chr1 >> 2;
+            enc2 = ((chr1 & 3) << 4) | (chr2 >> 4);
+            enc3 = ((chr2 & 15) << 2) | (chr3 >> 6);
+            enc4 = chr3 & 63;
+
+            if (isNaN(chr2)) {
+                enc3 = enc4 = 64;
+            } else if (isNaN(chr3)) {
+                enc4 = 64;
+            }
+
+            output = output + this._keyStr.charAt(enc1) + this._keyStr.charAt(enc2) + this._keyStr.charAt(enc3) + this._keyStr.charAt(enc4);
+
+        }
+
+        return output;
+    },
+
+
+    decode: function(input) {
+        var output = "";
+        var chr1, chr2, chr3;
+        var enc1, enc2, enc3, enc4;
+        var i = 0;
+
+        input = input.replace(/[^A-Za-z0-9\+\/\=]/g, "");
+
+        while (i < input.length) {
+
+            enc1 = this._keyStr.indexOf(input.charAt(i++));
+            enc2 = this._keyStr.indexOf(input.charAt(i++));
+            enc3 = this._keyStr.indexOf(input.charAt(i++));
+            enc4 = this._keyStr.indexOf(input.charAt(i++));
+
+            chr1 = (enc1 << 2) | (enc2 >> 4);
+            chr2 = ((enc2 & 15) << 4) | (enc3 >> 2);
+            chr3 = ((enc3 & 3) << 6) | enc4;
+
+            output = output + String.fromCharCode(chr1);
+
+            if (enc3 != 64) {
+                output = output + String.fromCharCode(chr2);
+            }
+            if (enc4 != 64) {
+                output = output + String.fromCharCode(chr3);
+            }
+
+        }
+
+        output = Base64._utf8_decode(output);
+
+        return output;
+
+    },
+
+    _utf8_encode: function(string) {
+        string = string.replace(/\r\n/g, "\n");
+        var utftext = "";
+
+        for (var n = 0; n < string.length; n++) {
+
+            var c = string.charCodeAt(n);
+
+            if (c < 128) {
+                utftext += String.fromCharCode(c);
+            }
+            else if ((c > 127) && (c < 2048)) {
+                utftext += String.fromCharCode((c >> 6) | 192);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+            else {
+                utftext += String.fromCharCode((c >> 12) | 224);
+                utftext += String.fromCharCode(((c >> 6) & 63) | 128);
+                utftext += String.fromCharCode((c & 63) | 128);
+            }
+
+        }
+
+        return utftext;
+    },
+
+    _utf8_decode: function(utftext) {
+        var string = "";
+        var i = 0;
+        var c = c1 = c2 = 0;
+
+        while (i < utftext.length) {
+
+            c = utftext.charCodeAt(i);
+
+            if (c < 128) {
+                string += String.fromCharCode(c);
+                i++;
+            }
+            else if ((c > 191) && (c < 224)) {
+                c2 = utftext.charCodeAt(i + 1);
+                string += String.fromCharCode(((c & 31) << 6) | (c2 & 63));
+                i += 2;
+            }
+            else {
+                c2 = utftext.charCodeAt(i + 1);
+                c3 = utftext.charCodeAt(i + 2);
+                string += String.fromCharCode(((c & 15) << 12) | ((c2 & 63) << 6) | (c3 & 63));
+                i += 3;
+            }
+
+        }
+
+        return string;
+    }
+
+}

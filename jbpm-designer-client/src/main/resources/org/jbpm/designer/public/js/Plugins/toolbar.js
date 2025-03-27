@@ -105,28 +105,30 @@ ORYX.Plugins.Toolbar = Clazz.extend({
         // Map used to store all drop down buttons of current group
         var currentGroupsDropDownButton = {};
 
-        if(('webkitSpeech' in document.createElement('input'))) {
-			var micfield = new Ext.form.TextField({
-				id: 'micinput'
-			});
-			this.toolbar.add(micfield);
-			this.toolbar.add('-');
-			
-			var attrib = {'x-webkit-speech':'true'};
-		    Ext.get('micinput').set(attrib);
-		    
-		    var mic = document.getElementById('micinput');
-		    mic.onfocus = mic.blur;
-		    mic.onwebkitspeechchange = function(e) {
-		    	var val = mic.value;
-		    	ORYX.EDITOR._pluginFacade.raiseEvent({
-		            type: ORYX.CONFIG.EVENT_VOICE_COMMAND,
-		            entry: val
-		        });
-		    	mic.blur;
-		    	mic.value = "";
-		    };
-		}
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            if(('webkitSpeech' in document.createElement('input'))) {
+                var micfield = new Ext.form.TextField({
+                    id: 'micinput'
+                });
+                this.toolbar.add(micfield);
+                this.toolbar.add('-');
+
+                var attrib = {'x-webkit-speech':'true'};
+                Ext.get('micinput').set(attrib);
+
+                var mic = document.getElementById('micinput');
+                mic.onfocus = mic.blur;
+                mic.onwebkitspeechchange = function(e) {
+                    var val = mic.value;
+                    ORYX.EDITOR._pluginFacade.raiseEvent({
+                        type: ORYX.CONFIG.EVENT_VOICE_COMMAND,
+                        entry: val
+                    });
+                    mic.blur;
+                    mic.value = "";
+                };
+            }
+        }
 		
 		plugs.each((function(value) {
 			if(!value.name) {return}
@@ -151,11 +153,12 @@ ORYX.Plugins.Toolbar = Clazz.extend({
             if(value.dropDownGroupIcon){
                 var splitButton = currentGroupsDropDownButton[value.dropDownGroupIcon];
                 
-                // Create a new split button if this is the first plugin using it 
+                // Create a new split button if this is the first plugin using it - drop-down toolbar button
                 if(splitButton === undefined){
                     splitButton = currentGroupsDropDownButton[value.dropDownGroupIcon] = new Ext.Toolbar.SplitButton({
-                        cls: "x-btn-icon", //show icon only
-                        icon: value.dropDownGroupIcon,
+                        //cls: "x-btn-icon", //show icon only
+                        //icon: value.dropDownGroupIcon,
+                        iconCls: window.SpriteUtils.toUniqueId(value.dropDownGroupIcon), // set iconCls to sprite css class
                         menu: new Ext.menu.Menu({
                             items: [] // items are added later on
                         }),
@@ -175,9 +178,10 @@ ORYX.Plugins.Toolbar = Clazz.extend({
                 }
                 
                 // General config button which will be used either to create a normal button
-                // or a check button (if toggling is enabled)
+                // or a check button (if toggling is enabled) - used for menu items in drop-down list
                 var buttonCfg = {
-                    icon: value.icon,
+                    //icon: value.icon,
+                    iconCls: window.SpriteUtils.toUniqueId(value.icon), // set iconCls to sprite css class
                     text: value.name,
                     itemId: value.id,
                     handler: value.toggle ? undefined : value.functionality,
@@ -204,10 +208,11 @@ ORYX.Plugins.Toolbar = Clazz.extend({
                 
                 splitButton.menu.add(button);
                 
-            } else { // create normal, simple button
+            } else { // create normal, simple button - used by top level toolbar buttons
                 var button = new Ext.Toolbar.Button({
-                    icon:           value.icon,         // icons can also be specified inline
-                    cls:            'x-btn-icon',       // Class who shows only the icon
+                    //icon:           value.icon,         // icons can also be specified inline
+                    //cls:            'x-btn-icon',       // Class who shows only the icon
+                    iconCls: window.SpriteUtils.toUniqueId(value.icon), // set iconCls to sprite css class
                     itemId:         value.id,
 					tooltip:        value.description,  // Set the tooltip
                     tooltipType:    'title',            // Tooltip will be shown as in the html-title attribute
@@ -286,8 +291,11 @@ Ext.ux.SlicedToolbar = Ext.extend(Ext.Toolbar, {
         this.sliceMap = {};
         var sliceWidth = 0;
         var toolbarWidth = this.getEl().getWidth();
+        var addedPrev = false;
+        var addedNext = false;
+        var itemIndex = -1;
 
-        this.items.getRange().each(function(item, index){
+        this.items.getRange().each(function(item, index) {
             //Remove all next and prev buttons
             if (item.helperItem) {
                 item.destroy();
@@ -297,12 +305,13 @@ Ext.ux.SlicedToolbar = Ext.extend(Ext.Toolbar, {
             var itemWidth = item.getEl().getWidth();
             
             if(sliceWidth + itemWidth + 5 * this.iconStandardWidth > toolbarWidth){
-                var itemIndex = this.items.indexOf(item);
-                
+                itemIndex = this.items.indexOf(item);
                 this.insertSlicingButton("next", slice, itemIndex);
+                addedNext = true;
                 
                 if (slice !== 0) {
                     this.insertSlicingButton("prev", slice, itemIndex);
+                    addedPrev = true;
                 }
                 
                 this.insertSlicingSeperator(slice, itemIndex);
@@ -314,13 +323,27 @@ Ext.ux.SlicedToolbar = Ext.extend(Ext.Toolbar, {
             this.sliceMap[item.id] = slice;
             sliceWidth += itemWidth;
         }.bind(this));
+
+        if(!addedPrev) {
+            this.insertSlicingButton("prev", slice, itemIndex);
+        }
+
+        if(!addedNext) {
+            if(addedPrev) {
+                this.insertSlicingButton("next", slice, itemIndex+1);
+            } else {
+                this.insertSlicingButton("next", slice, itemIndex);
+            }
+        }
+
         
         // Add prev button at the end
         if(slice > 0){
-            this.insertSlicingSeperator(slice, this.items.getCount()+1);
-            this.insertSlicingButton("prev", slice, this.items.getCount()+1);
+            // BZ1192460 - IE10 designer hangs on load - set index to -1 for append
+            this.insertSlicingSeperator(slice, -1);
+            this.insertSlicingButton("prev", slice, -1);
             var spacer = new Ext.Toolbar.Spacer();
-            this.insertSlicedHelperButton(spacer, slice, this.items.getCount()+1);
+            this.insertSlicedHelperButton(spacer, slice, -1);
             Ext.get(spacer.id).setWidth(this.iconStandardWidth);
         }
         
@@ -331,7 +354,12 @@ Ext.ux.SlicedToolbar = Ext.extend(Ext.Toolbar, {
     },
     
     insertSlicedButton: function(button, slice, index){
-        this.insertButton(index, button);
+        if (index == -1) {
+            this.addButton(button);
+        }
+        else {
+            this.insertButton(index, button);
+        }
         this.sliceMap[button.id] = slice;
     },
     
@@ -349,7 +377,6 @@ Ext.ux.SlicedToolbar = Ext.extend(Ext.Toolbar, {
     insertSlicingButton: function(type, slice, index){
         var nextHandler = function(){this.setCurrentSlice(this.currentSlice+1)}.bind(this);
         var prevHandler = function(){this.setCurrentSlice(this.currentSlice-1)}.bind(this);
-        
         var button = new Ext.Toolbar.Button({
             cls: "x-btn-icon",
             icon: ORYX.BASE_FILE_PATH + "images/toolbar_"+type+".png",

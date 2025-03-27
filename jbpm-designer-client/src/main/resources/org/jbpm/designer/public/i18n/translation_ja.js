@@ -15,7 +15,7 @@ ORYX.I18N.Oryx.editorOpenTimeout = "エディターはまだ開始していま�
 
 if(!ORYX.I18N.AddDocker) ORYX.I18N.AddDocker = {};
 
-ORYX.I18N.AddDocker.group = "ドッカー";
+ORYX.I18N.AddDocker.group = "Docker";
 ORYX.I18N.AddDocker.add = "ドッカーに追加";
 ORYX.I18N.AddDocker.addDesc = "クリックして接線にドッカーを追加";
 ORYX.I18N.AddDocker.del = "削除";
@@ -85,7 +85,7 @@ ORYX.I18N.AMLSupport.ok = "OK";
 
 if(!ORYX.I18N.Arrangement) ORYX.I18N.Arrangement = {};
 
-ORYX.I18N.Arrangement.groupZ = "Z-順序";
+ORYX.I18N.Arrangement.groupZ = "Z-Order";
 ORYX.I18N.Arrangement.btf = "前面に移動";
 ORYX.I18N.Arrangement.btfDesc = "前面に移動";
 ORYX.I18N.Arrangement.btb = "背面に移動";
@@ -94,7 +94,7 @@ ORYX.I18N.Arrangement.bf = "前方に移動";
 ORYX.I18N.Arrangement.bfDesc = "前方に移動";
 ORYX.I18N.Arrangement.bb = "後方に移動";
 ORYX.I18N.Arrangement.bbDesc = "後方に移動";
-ORYX.I18N.Arrangement.groupA = "整列";
+ORYX.I18N.Arrangement.groupA = "Alignment";
 ORYX.I18N.Arrangement.ab = "下揃え";
 ORYX.I18N.Arrangement.abDesc = "下揃え";
 ORYX.I18N.Arrangement.am = "上下中央揃え";
@@ -220,7 +220,7 @@ ORYX.I18N.DesynchronizabilityOverlay.invalid = "サーバーからの不正な�
 
 if(!ORYX.I18N.Edit) ORYX.I18N.Edit = {};
 
-ORYX.I18N.Edit.group = "編集";
+ORYX.I18N.Edit.group = "Edit";
 ORYX.I18N.Edit.cut = "カット";
 ORYX.I18N.Edit.cutDesc = "Oryxクリップボードへカット";
 ORYX.I18N.Edit.copy = "コピー";
@@ -325,7 +325,7 @@ ORYX.I18N.Bpmn2Bpel.ApacheOdeUrlInputPanelText = "Apache ODE BPEL-EngineのURL�
 
 if(!ORYX.I18N.Save) ORYX.I18N.Save = {};
 
-ORYX.I18N.Save.group = "ファイル";
+ORYX.I18N.Save.group = "File"; // do not translate group names
 ORYX.I18N.Save.save = "保存";
 ORYX.I18N.Save.autosave = "自動保存";
 ORYX.I18N.Save.saveDesc = "保存";
@@ -362,7 +362,7 @@ ORYX.I18N.File.printMsg = "現在印刷機能に問題があります。ダイ�
 
 if(!ORYX.I18N.Grouping) ORYX.I18N.Grouping = {};
 
-ORYX.I18N.Grouping.grouping = "グルーピング";
+ORYX.I18N.Grouping.grouping = "Grouping";
 ORYX.I18N.Grouping.group = "グループ";
 ORYX.I18N.Grouping.groupDesc = "選択した全てのシェイプをグループ化";
 ORYX.I18N.Grouping.ungroup = "グループ化を解除";
@@ -398,6 +398,35 @@ ORYX.I18N.PropertyWindow.ok = "OK";
 ORYX.I18N.PropertyWindow.cancel = "キャンセル";
 ORYX.I18N.PropertyWindow.dateFormat = "m/d/y";
 
+if (!ORYX.I18N.ConditionExpressionEditorField) ORYX.I18N.ConditionExpressionEditorField = {};
+
+ORYX.I18N.ConditionExpressionEditorField.simpleTitle = "エクスプレッションエディター - 自動補完を有効にするには [Ctrl-Z] を押してください";
+ORYX.I18N.ConditionExpressionEditorField.sequenceFlowTitle = "シーケンスフロー条件";
+ORYX.I18N.ConditionExpressionEditorField.sequenceFlowFullTitle = "シーケンスフロー条件 - 自動補完を有効にするには [Ctrl-Z] を押してください";
+ORYX.I18N.ConditionExpressionEditorField.scriptTab = "スクリプト";
+ORYX.I18N.ConditionExpressionEditorField.editorTab = "エディター";
+ORYX.I18N.ConditionExpressionEditorField.editorDescription = "以下の条件が合えばシーケンスフローを実行"
+ORYX.I18N.ConditionExpressionEditorField.processVariable = "プロセス変数:"
+ORYX.I18N.ConditionExpressionEditorField.condition = "条件:"
+ORYX.I18N.ConditionExpressionEditorField.between = "は次の値の間にある";
+ORYX.I18N.ConditionExpressionEditorField.contains = "は次の値を含む";
+ORYX.I18N.ConditionExpressionEditorField.endsWith = "は次の値で終了する";
+ORYX.I18N.ConditionExpressionEditorField.equalsTo = "は次の値に等しい";
+ORYX.I18N.ConditionExpressionEditorField.greaterThan = "は次の値より大きい";
+ORYX.I18N.ConditionExpressionEditorField.greaterThanOrEqual = "は次の値以上";
+ORYX.I18N.ConditionExpressionEditorField.isEmpty = "は空";
+ORYX.I18N.ConditionExpressionEditorField.isFalse = "は false";
+ORYX.I18N.ConditionExpressionEditorField.isNull = "は null";
+ORYX.I18N.ConditionExpressionEditorField.isTrue = "は true";
+ORYX.I18N.ConditionExpressionEditorField.lessThan = "は次の値より小さい";
+ORYX.I18N.ConditionExpressionEditorField.lessThanOrEqual = "は次の値以下";
+ORYX.I18N.ConditionExpressionEditorField.startsWith = "は次の値で開始する";
+ORYX.I18N.ConditionExpressionEditorField.paramsError = "スクリプト式を生成できませんでした。フォームパラメーターを正しく入力してください";
+ORYX.I18N.ConditionExpressionEditorField.saveError = "プロパティの値を保存できませんでした。値を確認し、もう一度行ってください";
+ORYX.I18N.ConditionExpressionEditorField.scriptParseError = "スクリプトのパース中にエラーが見つかりました: <br/>{0}<br/><br/>OK を押せばエクスプレッションエディターに戻りますが、現在のスクリプトは失われます。Cancel を押せばスクリプトエディターに戻ります";
+ORYX.I18N.ConditionExpressionEditorField.scriptGenerationError = "スクリプトの生成中にエラーが見つかりました: <br/>{0}<br/><br/>エクスプレッションエディターに入力したデータを確認してください";
+ORYX.I18N.ConditionExpressionEditorField.nonExistingVariable = "このプロセスは \"{0}\" という変数を持っていません";
+
 if(!ORYX.I18N.ShapeMenuPlugin) ORYX.I18N.ShapeMenuPlugin = {};
 
 ORYX.I18N.ShapeMenuPlugin.drag = "ドラッグ";
@@ -432,7 +461,7 @@ ORYX.I18N.SyntaxChecker.checkingMessage = "検証中 ...";
 
 if(!ORYX.I18N.Undo) ORYX.I18N.Undo = {};
 
-ORYX.I18N.Undo.group = "元に戻す";
+ORYX.I18N.Undo.group = "Undo";
 ORYX.I18N.Undo.undo = "元に戻す";
 ORYX.I18N.Undo.undoDesc = "最後のアクションを元に戻す";
 ORYX.I18N.Undo.redo = "やり直す";
@@ -480,6 +509,54 @@ ORYX.I18N.View.installingRepoItem = "レポジトリからアイテムをイン�
 ORYX.I18N.View.shareProcess = "プロセスを共有";
 ORYX.I18N.View.shareProcessDesc = "プロセスを共有";
 ORYX.I18N.View.infogroup = "情報";
+
+if(!ORYX.I18N.View.tabs) ORYX.I18N.View.tabs = {};
+ORYX.I18N.View.tabs.modelling = "プロセスモデリング";
+ORYX.I18N.View.tabs.simResults = "シミュレーション結果";
+
+if(!ORYX.I18N.View.sim) ORYX.I18N.View.sim = {};
+ORYX.I18N.View.sim.processPaths = "プロセスパス表示";
+ORYX.I18N.View.sim.runSim = "プロセスシミュレーション実行";
+ORYX.I18N.View.sim.calculatingPaths = "プロセスパス計算中";
+ORYX.I18N.View.sim.dispColor = "表示色";
+ORYX.I18N.View.sim.numElements = "要素数";
+ORYX.I18N.View.sim.processPathsTitle = "プロセスパス";
+ORYX.I18N.View.sim.subProcessPathsTitle = "サブプロセスパス";
+ORYX.I18N.View.sim.select = "以下から ";
+ORYX.I18N.View.sim.display = " を選択し、「パス表示」をクリック";
+ORYX.I18N.View.sim.showPath = "パス表示";
+ORYX.I18N.View.sim.selectPath = "プロセスパスを選択してください";
+ORYX.I18N.View.sim.numInstances = "インスタンス数";
+ORYX.I18N.View.sim.interval = "間隔";
+ORYX.I18N.View.sim.intervalUnits = "間隔の単位";
+ORYX.I18N.View.sim.runSim = "プロセスシミュレーション実行";
+ORYX.I18N.View.sim.runningSim = "プロセスシミュレーション実行中...";
+ORYX.I18N.View.sim.simNoResults = "シミュレーションエンジンが結果を返しませんでした: ";
+ORYX.I18N.View.sim.unableToPerform = "シミュレーションが実行できません:";
+ORYX.I18N.View.sim.resultsInfo = "シミュレーション情報";
+ORYX.I18N.View.sim.resultsGraphs = "シミュレーショングラフ";
+ORYX.I18N.View.sim.resultsProcessId = "プロセスID: ";
+ORYX.I18N.View.sim.resultsProcessName = "プロセス名: ";
+ORYX.I18N.View.sim.resultsProcessVersion = "プロセスバージョン: ";
+ORYX.I18N.View.sim.resultsSimStartTime = "シミュレーション開始: ";
+ORYX.I18N.View.sim.resultsSimEndTime = "シミュレーション終了: ";
+ORYX.I18N.View.sim.resultsNumOfExecutions = "実行数: ";
+ORYX.I18N.View.sim.resultsInterval = "間隔 "
+ORYX.I18N.View.sim.resultsGroupProcess = "プロセス";
+ORYX.I18N.View.sim.resultsGroupProcessElements = "プロセス要素";
+ORYX.I18N.View.sim.resultsGroupProcessPaths = "パス";
+ORYX.I18N.View.sim.resultsTitlesProcessSimResults = "プロセスシミュレーション結果";
+ORYX.I18N.View.sim.resultsTitlesTaskSimResults = "タスクシミュレーション結果";
+ORYX.I18N.View.sim.resultsTitlesHumanTaskSimResults = "ヒューマンタスクシミュレーション結果";
+ORYX.I18N.View.sim.resultsTitlesPathExecutionInfo = "パス実行情報";
+ORYX.I18N.View.sim.chartsExecutionTimes = "実行時間";
+ORYX.I18N.View.sim.chartsActivityInstances = "アクティビティインスタンス";
+ORYX.I18N.View.sim.chartsTotalCost = "トータルコスト";
+ORYX.I18N.View.sim.chartsTotalResourceUtilization = "Total Resource Utilization";
+ORYX.I18N.View.sim.chartsResourceUtilization = "リソース利用";
+ORYX.I18N.View.sim.chartsResourceCost = "リソースコスト";
+ORYX.I18N.View.sim.chartsPathImage = "パスイメージ";
+ORYX.I18N.View.sim.chartsPathInstanceExecution = "パスインスタンス実行";
 
 
 

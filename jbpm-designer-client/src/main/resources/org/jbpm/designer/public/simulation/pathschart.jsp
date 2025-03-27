@@ -10,10 +10,10 @@
 <script src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/lib/handlebars-1.0.0.beta.6.js" type="text/javascript"></script>
 <script>
 function clearChart() {
-	var cnt = "<h2>Path Image</h2> \
+	var cnt = "<h2>" + parent.ORYX.I18N.View.sim.chartsPathImage + "</h2> \
   			   <p id='chartcontent1'> \
 			   </p> \
-			   <h2>Path Instance Execution</h2> \
+			   <h2>" + parent.ORYX.I18N.View.sim.chartsPathInstanceExecution + "</h2> \
   			   <p id='chartcontent2'> \
   			   <svg id='chart2' style='height:300px;width:450px'></svg> \
 			   </p>";
@@ -26,15 +26,17 @@ function clearChart() {
 <center>
 <div style="margin:20;padding:0;">
 	<!-- <div class="timelineicon"><a href="#" onclick="clearChart(); showTimeline(); return false;"><img src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/images/simulation/timelineicon.png" title="Timeline"/></a></div> -->
-	<div class="tableicon"><a href="#" onclick="clearChart(); showTable(); return false;"><img src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/images/simulation/tableicon.png" title="Table"/></a></div>
-    <div class="pcharticon"><a href="#" onclick="clearChart(); showPieChart(); return false;"><img src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/images/simulation/piecharticon.png" title="Pie Chart"/></a></div>
-    <div class="charttitle"><script>document.write(parent.ORYX.EDITOR.simulationChartTitle);</script></div>
+	<div class="tableicon"><a href="#" onclick="clearChart(); showTable(); return false;"><img id="tableiconimg" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/images/simulation/tableicon.png" title="Table"/></a></div>
+	<script>document.getElementById('tableiconimg').title = parent.ORYX.I18N.View.sim.Table;</script>
+	<div class="pcharticon"><a href="#" onclick="clearChart(); showPieChart(); return false;"><img id="piecharticonimg" src="<%=request.getContextPath()%>/org.jbpm.designer.jBPMDesigner/images/simulation/piecharticon.png" title="Pie Chart"/></a></div>
+	<script>document.getElementById('piecharticonimg').title = parent.ORYX.I18N.View.sim.PieChart;</script>
+	<div class="charttitle"><script>document.write(parent.ORYX.EDITOR.simulationChartTitle);</script></div>
 </div><br/>
 <div id="outterchart" class="outterchart">
-    <h2>Path Image</h2>
+    <h2><script>document.write(parent.ORYX.I18N.View.sim.chartsPathImage);</script></h2>
   	<p id="chartcontent1">
 	</p>
-	<h2>Path Instance Execution</h2>
+	<h2><script>document.write(parent.ORYX.I18N.View.sim.chartsPathInstanceExecution);</script></h2>
   	<p id="chartcontent2">
   	<svg id="chart2" style='height:300px;width:450px'></svg>
 	</p>
@@ -87,13 +89,14 @@ function clearChart() {
 			for (var i = 0; i < pathData.length; i++) {
 				var nextData = pathData[i];
 				if(nextData.id == pathid) {
+					var nextPathLabel = nextData.id.replace('Path', parent.ORYX.I18N.View.sim.resultsPath);
 					var inc1 = {
 				               "value":nextData.numinstances,
-				               "label": nextData.id 
+				               "label": nextPathLabel
 				              };
 					var inc2 = {
 				               	"value": nextData.totalinstances - nextData.numinstances,
-				               	"label":"Other Paths"
+				               	"label":parent.ORYX.I18N.View.sim.resultsOtherPaths
 				               };
 					toshowData[0].values[0] = inc1;
 					toshowData[0].values[1] = inc2;

@@ -23,6 +23,16 @@
  **/
 if (!ORYX.Plugins) 
     ORYX.Plugins = new Object();
+if (typeof(Storage) !== "undefined") {
+    Storage.prototype.setObject = function(key, value) {
+        this.setItem(key, Ext.encode(value));
+    }
+
+    Storage.prototype.getObject = function(key) {
+        var value = this.getItem(key);
+        return Ext.decode(value);
+    }
+}
 
 ORYX.Plugins.Edit = Clazz.extend({
     
@@ -32,76 +42,88 @@ ORYX.Plugins.Edit = Clazz.extend({
         this.clipboard = new ORYX.Plugins.Edit.ClipBoard();
         
         //this.facade.registerOnEvent(ORYX.CONFIG.EVENT_KEYDOWN, this.keyHandler.bind(this));
-        
-        this.facade.offer({
-         name: ORYX.I18N.Edit.cut,
-         description: ORYX.I18N.Edit.cutDesc,
-         icon: ORYX.BASE_FILE_PATH + "images/cut.png",
-		 keyCodes: [{
-				metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-				keyCode: 88,
-				keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-			}
-		 ],
-         functionality: this.callEdit.bind(this, this.editCut),
-         group: ORYX.I18N.Edit.group,
-         index: 1,
-         minShape: 1
-         });
-         
-        this.facade.offer({
-         name: ORYX.I18N.Edit.copy,
-         description: ORYX.I18N.Edit.copyDesc,
-         icon: ORYX.BASE_FILE_PATH + "images/page_copy.png",
-		 keyCodes: [{
-				metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-				keyCode: 67,
-				keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-			}
-		 ],
-         functionality: this.callEdit.bind(this, this.editCopy, [true, false]),
-         group: ORYX.I18N.Edit.group,
-         index: 2,
-         minShape: 1
-         });
-         
-        this.facade.offer({
-         name: ORYX.I18N.Edit.paste,
-         description: ORYX.I18N.Edit.pasteDesc,
-         icon: ORYX.BASE_FILE_PATH + "images/page_paste.png",
-		 keyCodes: [{
-				metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-				keyCode: 86,
-				keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-			}
-		 ],
-         functionality: this.callEdit.bind(this, this.editPaste),
-         isEnabled: this.clipboard.isOccupied.bind(this.clipboard),
-         group: ORYX.I18N.Edit.group,
-         index: 3,
-         minShape: 0,
-         maxShape: 0
-         });
-         
-        this.facade.offer({
-            name: ORYX.I18N.Edit.del,
-            description: ORYX.I18N.Edit.delDesc,
-            icon: ORYX.BASE_FILE_PATH + "images/cross.png",
-			keyCodes: [{
-					metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
-					keyCode: 8,
-					keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-				},
-				{	
-					keyCode: 46,
-					keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
-				}
-			],
-            functionality: this.callEdit.bind(this, this.editDelete),
-            group: ORYX.I18N.Edit.group,
-            index: 4,
-            minShape: 1
-        });
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            this.facade.offer({
+             name: ORYX.I18N.Edit.cut,
+             description: ORYX.I18N.Edit.cutDesc,
+             icon: ORYX.BASE_FILE_PATH + "images/cut.png",
+             keyCodes: [{
+                    metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
+                    keyCode: 88,
+                    keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+                }
+             ],
+             functionality: this.callEdit.bind(this, this.editCut),
+             group: ORYX.I18N.Edit.group,
+             index: 1,
+             minShape: 1
+             });
+
+            this.facade.offer({
+             name: ORYX.I18N.Edit.copy,
+             description: ORYX.I18N.Edit.copyDesc,
+             icon: ORYX.BASE_FILE_PATH + "images/page_copy.png",
+             keyCodes: [{
+                    metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
+                    keyCode: 67,
+                    keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+                }
+             ],
+             functionality: this.callEdit.bind(this, this.editCopy, [true, false]),
+             group: ORYX.I18N.Edit.group,
+             index: 2,
+             minShape: 1
+             });
+
+            this.facade.offer({
+             name: ORYX.I18N.Edit.pasteClipboard,
+             description: ORYX.I18N.Edit.pasteClipboardDesc,
+             icon: ORYX.BASE_FILE_PATH + "images/page_paste.png",
+             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/page_paste.png",
+             keyCodes: [{
+                 metaKeys: [ORYX.CONFIG.META_KEY_META_CTRL],
+                 keyCode: 86,
+                 keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+             }
+             ],
+             functionality: this.callEdit.bind(this, this.editPaste),
+             group: ORYX.I18N.Edit.group,
+             index: 3,
+             minShape: 0,
+             maxShape: 0
+             });
+
+            this.facade.offer({
+                name: ORYX.I18N.Edit.pasteLocalStorage,
+                description: ORYX.I18N.Edit.pasteLocalStorageDesc,
+                icon: ORYX.BASE_FILE_PATH + "images/page_paste.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/page_paste.png",
+                functionality: this.callEdit.bind(this, this.editPasteLocalStore),
+                group: ORYX.I18N.Edit.group,
+                index: 3,
+                minShape: 0,
+                maxShape: 0,
+                'isEnabled': function(){
+                    return typeof(Storage) !== "undefined" && localStorage.getObject("designerclipboard") != null;
+                }.bind(this)
+            });
+
+            this.facade.offer({
+                name: ORYX.I18N.Edit.del,
+                description: ORYX.I18N.Edit.delDesc,
+                icon: ORYX.BASE_FILE_PATH + "images/cross.png",
+                keyCodes: [{
+                        metaKeys: [ORYX.CONFIG.META_KEY_ALT],
+                        keyCode: ORYX.CONFIG.KEY_CODE_D,
+                        keyAction: ORYX.CONFIG.KEY_ACTION_DOWN
+                    }
+                ],
+                functionality: this.callEdit.bind(this, this.editDelete),
+                group: ORYX.I18N.Edit.group,
+                index: 4,
+                minShape: 1
+            });
+        }
         
         this.facade.registerOnEvent(ORYX.CONFIG.EVENT_FACADE_SELECTION_DELETION_REQUEST, this.editDelete.bind(this));
     },
@@ -201,7 +223,7 @@ ORYX.Plugins.Edit = Clazz.extend({
                 return s2.hasChildShape(shape);
             });
             if(isChildShapeOfAnother) return;
-            
+
             // This shape should be considered
             shapesToConsider.push(shape);
             // Consider attached nodes (e.g. intermediate events)
@@ -211,17 +233,20 @@ ORYX.Plugins.Edit = Clazz.extend({
                 shapesToConsider = shapesToConsider.concat(attached);
             }
             childShapesToConsider = childShapesToConsider.concat(shape.getChildShapes(true));
-            
+
             
             if (considerConnections && !(shape instanceof ORYX.Core.Edge)){
                 //concat all incoming and outgoing shapes
                 var connections = shape.getIncomingShapes().concat(shape.getOutgoingShapes());
-                
                 connections.each(function(s) {
                     //we don't want to delete sequence flows with
                     //an existing 'conditionexpression'
                     //console.log(s);
                     if (s instanceof ORYX.Core.Edge && s.properties["oryx-conditionexpression"] && s.properties["oryx-conditionexpression"] != ""){
+                        return;
+                    }
+                    if( shape instanceof ORYX.Core.Node && s instanceof ORYX.Core.Node) {
+                        // dont remove nodes attached to nodes (boundary event scenario)
                         return;
                     }
                     shapesToConsider.push(s);
@@ -274,21 +299,47 @@ ORYX.Plugins.Edit = Clazz.extend({
         
         this.clipboard.refresh(selection, this.getAllShapesToConsider(selection), this.facade.getCanvas().getStencil().stencilSet().namespace(), useNoOffset);
 
+        this.editPaste(true);
+
         if( will_update ) this.facade.updateSelection();
+    },
+
+    editPasteLocalStore: function() {
+        // clear the local clipboard
+        this.clipboard.shapesAsJson = [];
+        this.editPaste();
     },
     
     /**
      * Performs the paste operation.
      */
-    editPaste: function(){
+    editPaste: function(storeCanvas){
         // Create a new canvas with childShapes 
-		//and stencilset namespace to be JSON Import conform
-		var canvas = {
-            childShapes: this.clipboard.shapesAsJson,
-			stencilset:{
-				namespace:this.clipboard.SSnamespace
-			}
+        //and stencilset namespace to be JSON Import conform
+
+        if (typeof(Storage) !== "undefined") {
+            if (this.clipboard.shapesAsJson.length <= 0 && localStorage.getObject("designerclipboard") != null) {
+                this.facade.importJSON(localStorage.getObject("designerclipboard"));
+
+                this.facade.raiseEvent({
+                    type: ORYX.CONFIG.EVENT_PASTE_NOTEMPTY_END
+                });
+
+                this.facade.raiseEvent({
+                    type: ORYX.CONFIG.EVENT_PASTE_END
+                });
+
+                return;
+            }
         }
+
+        var canvas = {
+            childShapes: this.clipboard.shapesAsJson,
+            stencilset:{
+                namespace:this.clipboard.SSnamespace
+            }
+        };
+
         // Apply json helper to iterate over json object
         Ext.apply(canvas, ORYX.Core.AbstractShape.JSONHelper);
         
@@ -415,7 +466,26 @@ ORYX.Plugins.Edit = Clazz.extend({
         }.bind(this), false, true);
 
         this.clipboard.useOffset = true;
-        this.facade.importJSON(canvas);
+
+        if(storeCanvas && storeCanvas == true) {
+            if (typeof(Storage) !== "undefined") {
+                localStorage.removeItem("designerclipboard");
+                localStorage.setObject("designerclipboard", canvas);
+            }
+        } else {
+            this.facade.importJSON(canvas);
+
+
+            if(this.clipboard.shapesAsJson.length > 0) {
+                this.facade.raiseEvent({
+                    type: ORYX.CONFIG.EVENT_PASTE_NOTEMPTY_END
+                });
+            }
+
+            this.facade.raiseEvent({
+                type: ORYX.CONFIG.EVENT_PASTE_END
+            });
+        }
     },
     
     /**
@@ -441,7 +511,16 @@ ORYX.Plugins.Edit.ClipBoard = Clazz.extend({
 		this.useOffset=true;
     },
     isOccupied: function(){
-        return this.shapesAsJson.length > 0;
+        if(this.shapesAsJson.length > 0) {
+            return true;
+        } else {
+            if (typeof(Storage) !== "undefined") {
+                if(localStorage.getObject("designerclipboard") != null) {
+                    return true;
+                }
+            }
+           return false;
+        }
     },
     refresh: function(selection, shapes, namespace, useNoOffset){
         this.selection = selection;

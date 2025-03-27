@@ -49,6 +49,13 @@ ORYX.Plugins.View = {
         this.facade.registerOnEvent(ORYX.CONFIG.VOICE_COMMAND_GENERATE_IMAGE, this.showAsPNG.bind(this));
         this.facade.registerOnEvent(ORYX.CONFIG.VOICE_COMMAND_VIEW_SOURCE, this.showProcessBPMN.bind(this));
 
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDROP_END, this.refreshCanvasForIE.bind(this));
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_SHAPE_ADDED, this.refreshCanvasForIE.bind(this));
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DRAGDOCKER_MOVE_FINISHED, this.refreshCanvasForIE.bind(this));
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_RESIZE_END, this.refreshCanvasForIE.bind(this));
+
+        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_DOCELEMENT_TO_MODEL, this.showDocElementInModel.bind(this));
+
         //Standard Values
         this.zoomLevel = 1.0;
         this.maxFitToScreenLevel=1.5;
@@ -138,18 +145,72 @@ ORYX.Plugins.View = {
 //			}.bind(this)
 //		});
 
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
         /* Register full screen to model */
         this.facade.offer({
-            'name':'Show in full screen',
-            'functionality': this.showInFullScreen.bind(this),
+            'name':ORYX.I18N.view.toggleFullScreen,
+            'functionality': function(context) {
+
+                var isParentInFullScreen = (parent.document.fullscreenElement && parent.document.fullscreenElement !== null) ||
+                    (parent.document.webkitFullscreenElement && parent.document.webkitFullscreenElement !== null) ||
+                    (parent.document.mozFullScreenElement && parent.document.mozFullScreenElement !== null) ||
+                    (parent.document.msFullscreenElement && parent.document.msFullscreenElement !== null);
+
+                var docElm = parent.document.documentElement;
+                if (!isParentInFullScreen) {
+                    if (docElm.requestFullscreen) {
+                        docElm.requestFullscreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (docElm.mozRequestFullScreen) {
+                        docElm.mozRequestFullScreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (docElm.webkitRequestFullScreen) {
+                        docElm.webkitRequestFullScreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (docElm.msRequestFullscreen) {
+                        docElm.msRequestFullscreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else {
+                        ORYX.EDITOR._pluginFacade.raiseEvent({
+                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                            ntype		: 'error',
+                            msg         : ORYX.I18N.view.failShowFullScreen,
+                            title       : ''
+
+                        });
+                    }
+                } else {
+                    if (parent.document.exitFullscreen) {
+                        parent.document.exitFullscreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (parent.document.webkitExitFullscreen) {
+                        parent.document.webkitExitFullscreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (parent.document.mozCancelFullScreen) {
+                        parent.document.mozCancelFullScreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else if (parent.document.msExitFullscreen) {
+                        parent.document.msExitFullscreen();
+                        setTimeout(function(){ parent.designercallonresize(); }, 2000);
+                    } else {
+                        ORYX.EDITOR._pluginFacade.raiseEvent({
+                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                            ntype		: 'error',
+                            msg         : ORYX.I18N.view.failShowFullScreen,
+                            title       : ''
+
+                        });
+                    }
+                }
+            }.bind(this),
             'group': 'fullscreengroup',
             'icon': ORYX.BASE_FILE_PATH + "images/fullscreen.png",
-            'description': 'Show in full screen mode',
+            'description': ORYX.I18N.view.toggleFullScreen_desc,
             'index': 2,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -163,17 +224,17 @@ ORYX.Plugins.View = {
 
         /* Register sharing to model 1*/
         this.facade.offer({
-            'name': "Share Process Image",
+            'name': ORYX.I18N.view.shareProcessImg,
             'functionality': this.shareProcessImage.bind(this),
             'group': 'sharegroup',
             'icon': ORYX.BASE_FILE_PATH + "images/share.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
-            'description': "Share Process Image",
+            'description': ORYX.I18N.view.shareProcessImg_desc,
             'index': 1,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -186,17 +247,17 @@ ORYX.Plugins.View = {
 
         /* Register sharing to model 2*/
         this.facade.offer({
-            'name': "Share Process PDF",
+            'name': ORYX.I18N.view.shareProcessPDF,
             'functionality': this.shareProcessPdf.bind(this),
             'group': 'sharegroup',
             'icon': ORYX.BASE_FILE_PATH + "images/share.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
-            'description': "Share Process PDF",
+            'description': ORYX.I18N.view.shareProcessPDF_desc,
             'index': 2,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -209,17 +270,17 @@ ORYX.Plugins.View = {
 
         /* Register import from BPMN2*/
         this.facade.offer({
-            'name': "Import from BPMN2",
+            'name': ORYX.I18N.view.importFromBPMN2,
             'functionality': this.importFromBPMN2.bind(this),
             'group': 'importgroup',
             'icon': ORYX.BASE_FILE_PATH + "images/import.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/import.png",
-            'description': "Import from existing BPMN2",
+            'description': ORYX.I18N.view.importFromBPMN2_desc,
             'index': 1,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -232,17 +293,17 @@ ORYX.Plugins.View = {
 
         /* Register import from JSON*/
         this.facade.offer({
-            'name': "Import from JSON",
+            'name': ORYX.I18N.view.importFromJSON,
             'functionality': this.importFromJSON.bind(this),
             'group': 'importgroup',
             'icon': ORYX.BASE_FILE_PATH + "images/import.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/import.png",
-            'description': "Import from existing JSON",
+            'description': ORYX.I18N.view.importFromJSON_desc,
             'index': 2,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -387,17 +448,17 @@ ORYX.Plugins.View = {
 //        });
 
         this.facade.offer({
-            'name': "Download Process PDF",
+            'name': ORYX.I18N.view.downloadProcPDF,
             'functionality': this.showAsPDF.bind(this),
             'group': 'sharegroup',
             'icon': ORYX.BASE_FILE_PATH + "images/share.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
-            'description': "Download Process PDF",
+            'description': ORYX.I18N.view.downloadProcPDF_desc,
             'index': 4,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -409,17 +470,17 @@ ORYX.Plugins.View = {
         });
 
         this.facade.offer({
-            'name': "Download Process PNG",
+            'name': ORYX.I18N.view.downloadProcPNG,
             'functionality': this.showAsPNG.bind(this),
             'group': 'sharegroup',
             'icon': ORYX.BASE_FILE_PATH + "images/share.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
-            'description': "Downlod Process PNG",
+            'description': ORYX.I18N.view.downloadProcPNG_desc,
             'index': 3,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -431,17 +492,17 @@ ORYX.Plugins.View = {
         });
 
         this.facade.offer({
-            'name': "View Process Sources",
-            'functionality': this.showProcessSources.bind(this),
+            'name': ORYX.I18N.view.downloadProcSVG,
+            'functionality': this.showAsSVG.bind(this),
             'group': 'sharegroup',
             'icon': ORYX.BASE_FILE_PATH + "images/share.png",
             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
-            'description': "View Process Sources",
+            'description': ORYX.I18N.view.downloadProcSVG_desc,
             'index': 5,
             'minShape': 0,
             'maxShape': 0,
             'isEnabled': function(){
-                return true;
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
 //				profileParamName = "profile";
 //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
 //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
@@ -451,6 +512,29 @@ ORYX.Plugins.View = {
 //				return profileParamValue == "jbpm";
             }.bind(this)
         });
+
+        this.facade.offer({
+            'name': ORYX.I18N.view.viewProcSources,
+            'functionality': this.showProcessSources.bind(this),
+            'group': 'sharegroup',
+            'icon': ORYX.BASE_FILE_PATH + "images/share.png",
+            dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/share.png",
+            'description': ORYX.I18N.view.viewProcSources_desc,
+            'index': 6,
+            'minShape': 0,
+            'maxShape': 0,
+            'isEnabled': function(){
+                return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+//				profileParamName = "profile";
+//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+//		        regexa = new RegExp( regexSa );
+//		        profileParams = regexa.exec( window.location.href );
+//		        profileParamValue = profileParams[1];
+//				return profileParamValue == "jbpm";
+            }.bind(this)
+        });
+        }
     },
 
     /**
@@ -480,10 +564,6 @@ ORYX.Plugins.View = {
         window.open (ORYX.EXTERNAL_PROTOCOL + "://" + ORYX.EXTERNAL_HOST + "/" + ORYX.EXTERNAL_SUBDOMAIN  + "/org.drools.guvnor.Guvnor/standaloneEditorServlet?assetsUUIDs=" + uuidParamValue + "&client=oryx" , "Process Editor","status=0,toolbar=0,menubar=0,resizable=0,location=no,width=1400,height=1000");
     },
 
-    showInFullScreen : function() {
-        this.goFullscreen();
-    },
-
     /**
      * Import from existing BPMN2
      */
@@ -511,14 +591,15 @@ ORYX.Plugins.View = {
             }]
         });
         // Create the panel
+        var dialogSize = ORYX.Utils.getDialogSize(350, 500);
         var dialog = new Ext.Window({
             autoCreate: true,
             layout: 	'fit',
             plain:		true,
             bodyStyle: 	'padding:5px;',
             title: 		ORYX.I18N.FromBPMN2Support.impBPMN2,
-            height: 	350,
-            width:		500,
+            height: 	dialogSize.height,
+            width:		dialogSize.width,
             modal:		true,
             fixedcenter:true,
             shadow:		true,
@@ -537,62 +618,74 @@ ORYX.Plugins.View = {
                             title       : ''
 
                         });
+                        var filename = form.items.items[1].getValue();
+                        var canimport = false;
+                        if(filename === undefined || filename.length <= 0) {
+                            canimport = true; // no file selected - cut/paste only
+                        } else {
+                            if(filename.endsWith(".bpmn") || filename.endsWith(".bpmn2")) {
+                                canimport = true;
+                            }
+                        }
 
-                        var bpmn2string =  form.items.items[2].getValue();
-                        Ext.Ajax.request({
-                            url: ORYX.PATH + "transformer",
-                            method: 'POST',
-                            success: function(request) {
-                                if(request.responseText.length < 1) {
-                                    this.facade.raiseEvent({
-                                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                        ntype		: 'error',
-                                        msg         : '<p>Failed to import BPMN2.</p><p>Check server logs for more details.</p>',
-                                        title       : ''
-                                    });
-                                    dialog.hide();
-                                } else {
-                                    try {
-                                        this._loadJSON( request.responseText );
-                                        this.facade.raiseEvent({
-                                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                            ntype		: 'success',
-                                            msg         : 'Successfully imported BPMN2',
-                                            title       : ''
 
-                                        });
-                                    } catch(e) {
+                        if(canimport) {
+                            var bpmn2string =  form.items.items[2].getValue();
+                            Ext.Ajax.request({
+                                url: ORYX.PATH + "transformer",
+                                method: 'POST',
+                                success: function(request) {
+                                    if(request.responseText.length < 1) {
                                         this.facade.raiseEvent({
                                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                             ntype		: 'error',
-                                            msg         : '<p>Failed to import BPMN2:</p><p>' + e + '</p>',
+                                            msg         : ORYX.I18N.view.importFromBPMN2Error+ ORYX.I18N.view.importFromBPMN2ErrorCheckLogs,
                                             title       : ''
                                         });
+                                        dialog.hide();
+                                    } else {
+                                        try {
+                                            this._loadJSON( request.responseText, "BPMN2", true );
+                                        } catch(e) {
+                                            this.facade.raiseEvent({
+                                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                                ntype		: 'error',
+                                                msg         : ORYX.I18N.view.importFromBPMN2Error+'<p>' + e + '</p>',
+                                                title       : ''
+                                            });
+                                        }
+                                        dialog.hide();
                                     }
+                                }.createDelegate(this),
+                                failure: function(){
+                                    this.facade.raiseEvent({
+                                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                        ntype		: 'error',
+                                        msg         :  ORYX.I18N.view.importFromBPMN2Error+ ORYX.I18N.view.importFromBPMN2ErrorCheckLogs,
+                                        title       : ''
+                                    });
                                     dialog.hide();
+                                }.createDelegate(this),
+                                params: {
+                                    profile: ORYX.PROFILE,
+                                    uuid :  window.btoa(encodeURI(ORYX.UUID)),
+                                    pp: ORYX.PREPROCESSING,
+                                    bpmn2 : bpmn2string,
+                                    transformto : "bpmn2json"
                                 }
-                            }.createDelegate(this),
-                            failure: function(){
-                                this.facade.raiseEvent({
-                                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                    ntype		: 'error',
-                                    msg         : '<p>Failed to import BPMN2.</p><p>Check server logs for more details.</p>',
-                                    title       : ''
-                                });
-                                dialog.hide();
-                            }.createDelegate(this),
-                            params: {
-                                profile: ORYX.PROFILE,
-                                uuid : ORYX.UUID,
-                                pp: ORYX.PREPROCESSING,
-                                bpmn2 : bpmn2string,
-                                transformto : "bpmn2json",
-                                uuid : ORYX.UUID
-                            }
-                        });
+                            });
+                        } else {
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'error',
+                                msg         : "Invalid file type. Must be .bpmn or .bpmn2",
+                                title       : ''
+
+                            });
+                        }
                     }.bind(this)
                 },{
-                    text:ORYX.I18N.FromBPMN2Support.close,
+                    text: ORYX.I18N.Save.close,
                     handler:function(){
 
                         dialog.hide();
@@ -645,14 +738,15 @@ ORYX.Plugins.View = {
             }]
         });
         // Create the panel
+        var dialogSize = ORYX.Utils.getDialogSize(350, 500);
         var dialog = new Ext.Window({
             autoCreate: true,
             layout: 	'fit',
             plain:		true,
             bodyStyle: 	'padding:5px;',
             title: 		ORYX.I18N.FromJSONSupport.impBPMN2,
-            height: 	350,
-            width:		500,
+            height: 	dialogSize.height,
+            width:		dialogSize.width,
             modal:		true,
             fixedcenter:true,
             shadow:		true,
@@ -672,22 +766,43 @@ ORYX.Plugins.View = {
 
                         });
 
-                        var jsonString =  form.items.items[2].getValue();
-                        try {
-                            this._loadJSON( jsonString );
-                        } catch(e) {
+                        var filename = form.items.items[1].getValue();
+                        var canimport = false;
+                        if(filename === undefined || filename.length <= 0) {
+                            canimport = true; // no file selected - cut/paste only
+                        } else {
+                            if(filename.endsWith(".json")) {
+                                canimport = true;
+                            }
+                        }
+
+
+                        if(canimport) {
+                            var jsonString =  form.items.items[2].getValue();
+                            try {
+                                this._loadJSON( jsonString, "JSON", false );
+                            } catch(e) {
+                                this.facade.raiseEvent({
+                                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                    ntype		: 'error',
+                                    msg         : ORYX.I18N.view.importFromJSONError+'\n' + e,
+                                    title       : ''
+
+                                });
+                            }
+                            dialog.hide();
+                        } else {
                             this.facade.raiseEvent({
                                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                 ntype		: 'error',
-                                msg         : 'Failed to import JSON :\n' + e,
+                                msg         : "Invalid file type. Must be .json",
                                 title       : ''
 
                             });
                         }
-                        dialog.hide();
                     }.bind(this)
                 },{
-                    text:ORYX.I18N.FromJSONSupport.close,
+                    text: ORYX.I18N.Save.close,
                     handler:function(){
                         dialog.hide();
                     }.bind(this)
@@ -719,7 +834,7 @@ ORYX.Plugins.View = {
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Creating Embeddable Process...',
+            msg         : ORYX.I18N.view.creatingEmbeddableProc,
             title       : ''
 
         });
@@ -730,7 +845,7 @@ ORYX.Plugins.View = {
                 try {
                     var cf = new Ext.form.TextArea({
                         id:"sharedEmbeddableArea",
-                        fieldLabel:"Embeddable Process",
+                        fieldLabel:ORYX.I18N.view.enbedableProc,
                         width:400,
                         height:250,
                         value:request.responseText
@@ -741,7 +856,7 @@ ORYX.Plugins.View = {
                         id:'sharedEmbeddableURL',
                         height:250,
                         autoScroll:true,
-                        title:'Embeddable Process',
+                        title:ORYX.I18N.view.enbedableProc,
                         items: [cf]
                     });
                     win.show();
@@ -749,7 +864,7 @@ ORYX.Plugins.View = {
                     this.facade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Failed to create embeddable process code: ' + e,
+                        msg         : ORYX.I18N.view.enbedableProcFailCreate+': ' + e,
                         title       : ''
 
                     });
@@ -759,14 +874,14 @@ ORYX.Plugins.View = {
                 this.facade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Failed to create embeddable process code.',
+                    msg         : ORYX.I18N.view.enbedableProcFailCreate+'.',
                     title       : ''
 
                 });
             },
             params: {
                 profile: ORYX.PROFILE,
-                uuid : ORYX.UUID,
+                uuid :  window.btoa(encodeURI(ORYX.UUID)),
                 respaction : "showembeddable"
             }
         });
@@ -776,62 +891,68 @@ ORYX.Plugins.View = {
      * Share the process PDF URL.
      */
     shareProcessPdf : function() {
+
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Creating the process PDF...',
+            msg         : ORYX.I18N.view.creatingProcPDF,
             title       : ''
 
         });
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-        var rawSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getRootNode().cloneNode(true));
+        var svg = ORYX.EDITOR.getCanvas().getSVGRepresentation(true, true);
+        var formattedSvgDOM = DataManager.serialize(svg);
+        var svgHeight = svg.getAttributeNS(null, 'height');
+        var svgWidth = svg.getAttributeNS(null, 'width');
 
         Ext.Ajax.request({
             url: ORYX.PATH + "transformer",
             method: 'POST',
             success: function(request){
                 try {
+                    var dialogSize = ORYX.Utils.getDialogSize(250, 400);
                     var cf = new Ext.form.TextArea({
                         id:"sharedPDFArea",
-                        fieldLabel:"Process Image PDF",
-                        width:400,
-                        height:250,
+                        fieldLabel:ORYX.I18N.view.processImgPDF,
+                        width:dialogSize.width,
+                        height:dialogSize.height,
                         value:request.responseText
                     });
 
                     var win = new Ext.Window({
-                        width:400,
+                        width:dialogSize.width,
                         id:'sharedPDFURL',
-                        height:250,
+                        height:dialogSize.height,
                         autoScroll:true,
-                        title:'Process PDF URL',
+                        layout: 'fit',
+                        title: ORYX.I18N.view.processPDFurl,
                         items: [cf]
                     });
                     win.show();
                 } catch(e) {
-                    this.facade.raiseEvent({
+                    ORYX.EDITOR._pluginFacade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg          : 'Failed to create the process PDF: ' + e,
+                        msg          : ORYX.I18N.view.processPDFFail +': ' + e,
                         title        : ''
 
                     });
                 }
             }.createDelegate(this),
             failure: function(){
-                this.facade.raiseEvent({
+                ORYX.EDITOR._pluginFacade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Failed to create the process PDF.',
+                    msg         : ORYX.I18N.view.processPDFFail+'.',
                     title       : ''
 
                 });
             },
             params: {
                 profile: ORYX.PROFILE,
-                uuid : ORYX.UUID,
-                fsvg : formattedSvgDOM,
-                rsvg : rawSvgDOM,
+                uuid :  window.btoa(encodeURI(ORYX.UUID)),
+                fsvg : Base64.encode(formattedSvgDOM),
+                svgheight: svgHeight,
+                svgwidth: svgWidth,
                 transformto : "pdf",
                 respaction : "showurl"
             }
@@ -845,61 +966,67 @@ ORYX.Plugins.View = {
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Creating the process image...',
+            msg         : ORYX.I18N.view.processCreatingImg,
             title       : ''
 
         });
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-        var rawSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getRootNode().cloneNode(true));
+
+        var svg = ORYX.EDITOR.getCanvas().getSVGRepresentation(true, true);
+        var formattedSvgDOM = DataManager.serialize(svg);
+        var svgHeight = svg.getAttributeNS(null, 'height');
+        var svgWidth = svg.getAttributeNS(null, 'width');
 
         Ext.Ajax.request({
             url: ORYX.PATH + "transformer",
             method: 'POST',
             success: function(request){
                 try {
+                    var dialogSize = ORYX.Utils.getDialogSize(250, 400);
                     var cf = new Ext.form.TextArea({
                         id:"sharedImageArea",
-                        fieldLabel:"Process Image URL",
-                        width:400,
-                        height:250,
+                        fieldLabel:ORYX.I18N.view.processImgUrl,
+                        width:dialogSize.width,
+                        height:dialogSize.height,
                         value:request.responseText
                     });
 
                     var win = new Ext.Window({
-                        width:400,
+                        width:dialogSize.width,
                         id:'sharedImageURL',
-                        height:250,
+                        height:dialogSize.height,
+                        layout: 'fit',
                         autoScroll:true,
-                        title:'Process Image URL',
+                        title:ORYX.I18N.view.processImgUrl,
                         items: [cf]
                     });
                     win.show();
                 } catch(e) {
-                    this.facade.raiseEvent({
+                    ORYX.EDITOR._pluginFacade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Failed to create the process image: ' + e,
+                        msg         : ORYX.I18N.view.processImgFail+': ' + e,
                         title       : ''
 
                     });
                 }
             }.createDelegate(this),
             failure: function(){
-                this.facade.raiseEvent({
+                ORYX.EDITOR._pluginFacade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Failed to create the process image.',
+                    msg         : ORYX.I18N.view.processImgFail+'.',
                     title       : ''
 
                 });
             },
             params: {
                 profile: ORYX.PROFILE,
-                uuid : ORYX.UUID,
-                fsvg : formattedSvgDOM,
-                rsvg : rawSvgDOM,
+                uuid :  window.btoa(encodeURI(ORYX.UUID)),
+                fsvg : Base64.encode(formattedSvgDOM),
                 transformto : "png",
-                respaction : "showurl"
+                respaction : "showurl",
+                svgheight: svgHeight,
+                svgwidth: svgWidth
             }
         });
     },
@@ -934,7 +1061,7 @@ ORYX.Plugins.View = {
                     this.facade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Failed to retrieve process version information:\n' + e,
+                        msg         : ORYX.I18N.view.versionsFail+':\n' + e,
                         title       : ''
 
                     });
@@ -944,7 +1071,7 @@ ORYX.Plugins.View = {
                 this.facade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Failed to retrieve process version information.',
+                    msg         : ORYX.I18N.view.versionsFail+'.',
                     title       : ''
 
                 });
@@ -952,7 +1079,7 @@ ORYX.Plugins.View = {
             params: {
                 action: 'versions',
                 profile: ORYX.PROFILE,
-                uuid : ORYX.UUID
+                uuid :  window.btoa(encodeURI(ORYX.UUID))
             }
         });
     },
@@ -972,7 +1099,7 @@ ORYX.Plugins.View = {
             this.facade.raiseEvent({
                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                 ntype		: 'error',
-                msg         : 'Unable to find proces versions.',
+                msg         : ORYX.I18N.view.versionsNotfound+'.',
                 title       : 'Diff'
 
             });
@@ -988,10 +1115,10 @@ ORYX.Plugins.View = {
             });
 
             var versionCombo = new Ext.form.ComboBox({
-                fieldLabel: 'Select process version',
+                fieldLabel: ORYX.I18N.view.versionsSelect,
                 labelStyle: 'width:180px',
                 hiddenName: 'version_name',
-                emptyText: 'Select process version...',
+                emptyText: ORYX.I18N.view.versionsSelect+'...',
                 store: versionStore,
                 displayField: 'name',
                 valueField: 'name',
@@ -1019,7 +1146,7 @@ ORYX.Plugins.View = {
                                                     this.facade.raiseEvent({
                                                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                                         ntype		: 'info',
-                                                        msg         : 'Creating diff...',
+                                                        msg         : ORYX.I18N.view.creatingDiff+'...',
                                                         title       : ''
 
                                                     });
@@ -1053,7 +1180,7 @@ ORYX.Plugins.View = {
                                                     this.facade.raiseEvent({
                                                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                                         ntype		: 'error',
-                                                        msg         : 'Failed to retrieve process version source:' + e,
+                                                        msg         : ORYX.I18N.view.failRetrieveVersionsSource+':' + e,
                                                         title       : ''
 
                                                     });
@@ -1063,7 +1190,7 @@ ORYX.Plugins.View = {
                                                 this.facade.raiseEvent({
                                                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                                     ntype		: 'error',
-                                                    msg         : 'Failed to retrieve process version source.',
+                                                    msg         : ORYX.I18N.view.failRetrieveVersionsSource+'.',
                                                     title       : ''
 
                                                 });
@@ -1072,14 +1199,14 @@ ORYX.Plugins.View = {
                                                 action: 'getversion',
                                                 version: combo.getValue(),
                                                 profile: ORYX.PROFILE,
-                                                uuid : ORYX.UUID
+                                                uuid :  window.btoa(encodeURI(ORYX.UUID))
                                             }
                                         });
                                     } catch(e){
                                         this.facade.raiseEvent({
                                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                             ntype		: 'error',
-                                            msg         : 'Converting to BPMN2 failed:' + e,
+                                            msg         : ORYX.I18N.view.convertingToBPMN2Fail+':' + e,
                                             title       : ''
 
                                         });
@@ -1089,7 +1216,7 @@ ORYX.Plugins.View = {
                                     this.facade.raiseEvent({
                                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                         ntype		: 'error',
-                                        msg         : 'Converting to BPMN2 failed.',
+                                        msg         : ORYX.I18N.view.convertingToBPMN2Fail+'.',
                                         title       : ''
 
                                     });
@@ -1127,7 +1254,7 @@ ORYX.Plugins.View = {
                 autoScroll: false,
                 plain:		true,
                 bodyStyle: 	'padding:5px;',
-                title: 		'Compare process BPMN2 with previous versions',
+                title: 		ORYX.I18N.view.compareBPMN2PReviousVersions,
                 height: 	410,
                 width:		550,
                 modal:		true,
@@ -1139,7 +1266,7 @@ ORYX.Plugins.View = {
                 tbar: [versionCombo],
                 buttons:[
                     {
-                        text : 'Close',
+                        text : ORYX.I18N.Save.close,
                         handler:function(){
                             this.diffDialog.hide();
                         }.bind(this)
@@ -1155,23 +1282,93 @@ ORYX.Plugins.View = {
      * Loads JSON into the editor
      *
      */
-    _loadJSON: function( jsonString ){
+    _loadJSON: function( jsonString, mtype, checkExporter ){
         if (jsonString) {
             Ext.MessageBox.confirm(
                 'Import',
-                'Replace existing model?',
+                ORYX.I18N.view.replaceExistingModel,
                 function(btn){
                     if (btn == 'yes') {
                         this.facade.setSelection(this.facade.getCanvas().getChildShapes(true));
 
+                        var currentJSON = ORYX.EDITOR.getSerializedJSON();
                         var selection = this.facade.getSelection();
                         var clipboard = new ORYX.Plugins.Edit.ClipBoard();
                         clipboard.refresh(selection, this.getAllShapesToConsider(selection, true));
                         var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
                         this.facade.executeCommands([command]);
-                        this.facade.importJSON(jsonString);
+                        try {
+                            this.facade.importJSON(jsonString);
+                            ORYX.PROCESS_SAVED = false;
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'success',
+                                msg         : ORYX.I18N.view.importSuccess+' ' + mtype,
+                                title       : ''
+
+                            });
+
+                            if(typeof checkExporter !== 'undefined' && checkExporter === true) {
+                                var processJSON = ORYX.EDITOR.getSerializedJSON();
+                                var processExporter = jsonPath(processJSON.evalJSON(), "$.properties.exporter");
+                                if (processExporter && processExporter != "jBPM Designer") {
+                                    this.facade.setSelection(this.facade.getCanvas().getChildShapes(true));
+                                    var exporterCurrentJSON = ORYX.EDITOR.getSerializedJSON();
+                                    var exporterSelection = this.facade.getSelection();
+                                    var exporterClipboard = new ORYX.Plugins.Edit.ClipBoard();
+                                    exporterClipboard.refresh(exporterSelection, this.getAllShapesToConsider(exporterSelection, true));
+                                    var exporterCommand = new ORYX.Plugins.Edit.DeleteCommand(exporterClipboard, this.facade);
+                                    this.facade.executeCommands([exporterCommand]);
+
+                                    this.facade.raiseEvent({
+                                        type: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                        ntype: 'info',
+                                        msg: ORYX.I18N.view.exporterUpdate,
+                                        title: ''
+
+                                    });
+
+                                    // import updated json
+                                    this.facade.importJSON(exporterCurrentJSON);
+
+                                    // set as updated
+                                    ORYX.JSON_UPDATED = true;
+
+                                    // deselect nodes on canvas
+                                    this.facade.setSelection([]);
+
+                                }
+                            }
+
+                        } catch(err) {
+                            this.facade.importJSON(currentJSON);
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'error',
+                                msg         : ORYX.I18N.view.unableImportProvided+' ' + mtype,
+                                title       : ''
+
+                            });
+                        }
                     } else {
-                        this.facade.importJSON(jsonString);
+                        try {
+                            this.facade.importJSON(jsonString);
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'success',
+                                msg         : ORYX.I18N.view.importSuccess+' ' + mtype,
+                                title       : ''
+
+                            });
+                        } catch(err) {
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'error',
+                                msg         : ORYX.I18N.view.unableImportProvided+' ' + mtype,
+                                title       : ''
+
+                            });
+                        }
                     }
                 }.bind(this)
             );
@@ -1248,14 +1445,92 @@ ORYX.Plugins.View = {
         });
     },
 
+    showAsSVG : function() {
+        var processJSON = ORYX.EDITOR.getSerializedJSON();
+        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(true));
+        var processName = jsonPath(processJSON.evalJSON(), "$.properties.processn");
+        var processPackage = jsonPath(processJSON.evalJSON(), "$.properties.package");
+        var processVersion = jsonPath(processJSON.evalJSON(), "$.properties.version");
+        var fileName = "";
+        if(processPackage && processPackage != "") {
+            fileName += processPackage;
+        }
+        if(processName && processName != "") {
+            if(fileName != "") {
+                fileName += ".";
+            }
+            fileName += processName;
+        }
+        if(processVersion && processVersion != "") {
+            if(fileName != "") {
+                fileName += ".";
+            }
+            fileName += "v" + processVersion;
+        }
+        if(fileName == "") {
+            fileName = "processsvg";
+        }
+        var method ="post";
+        var form = document.createElement("form");
+        form.setAttribute("name", "storetofileform");
+        form.setAttribute("method", method);
+        form.setAttribute("action", ORYX.PATH + "filestore");
+        form.setAttribute("target", "_blank");
+
+        var fnameInput = document.createElement("input");
+        fnameInput.setAttribute("type", "hidden");
+        fnameInput.setAttribute("name", "fname");
+        fnameInput.setAttribute("value", fileName);
+        form.appendChild(fnameInput);
+
+        var fextInput = document.createElement("input");
+        fextInput.setAttribute("type", "hidden");
+        fextInput.setAttribute("name", "fext");
+        fextInput.setAttribute("value", "svg");
+        form.appendChild(fextInput);
+
+        var fstoreInRepoInput = document.createElement("input");
+        fstoreInRepoInput.setAttribute("type", "hidden");
+        fstoreInRepoInput.setAttribute("name", "storeinrepo");
+        fstoreInRepoInput.setAttribute("value", "true");
+        form.appendChild(fstoreInRepoInput);
+
+        var hfUUID = document.createElement("input");
+        hfUUID.setAttribute("type", "hidden");
+        hfUUID.setAttribute("name", "uuid");
+        hfUUID.setAttribute("value", ORYX.UUID);
+        form.appendChild(hfUUID);
+
+        var hfPROFILE = document.createElement("input");
+        hfPROFILE.setAttribute("type", "hidden");
+        hfPROFILE.setAttribute("name", "profile");
+        hfPROFILE.setAttribute("value", ORYX.PROFILE);
+        form.appendChild(hfPROFILE);
+
+        var processJSON = ORYX.EDITOR.getSerializedJSON();
+        var processId = jsonPath(processJSON.evalJSON(), "$.properties.id");
+        var hfPROCESSID = document.createElement("input");
+        hfPROCESSID.setAttribute("type", "hidden");
+        hfPROCESSID.setAttribute("name", "processid");
+        hfPROCESSID.setAttribute("value", processId);
+        form.appendChild(hfPROCESSID);
+
+        var fdataInput = document.createElement("input");
+        fdataInput.setAttribute("type", "hidden");
+        fdataInput.setAttribute("name", "data_encoded");
+        fdataInput.setAttribute("value", Base64.encode(formattedSvgDOM));
+        form.appendChild(fdataInput);
+        document.body.appendChild(form);
+        form.submit();
+    },
+
     /**
      * Converts the process to pdf format.
      *
      */
     showAsPDF : function() {
         var transformval = 'pdf';
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-        var rawSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getRootNode().cloneNode(true));
+        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(true, true));
         var method ="post";
         var form = document.createElement("form");
         form.setAttribute("name", "transformerform");
@@ -1268,12 +1543,6 @@ ORYX.Plugins.View = {
         hfFSVG.setAttribute("name", "fsvg");
         hfFSVG.setAttribute("value", Base64.encode(formattedSvgDOM));
         form.appendChild(hfFSVG);
-
-        var hfRSVG = document.createElement("input");
-        hfRSVG.setAttribute("type", "hidden");
-        hfRSVG.setAttribute("name", "rsvg");
-        hfRSVG.setAttribute("value", Base64.encode(rawSvgDOM));
-        form.appendChild(hfRSVG);
 
         var hfUUID = document.createElement("input");
         hfUUID.setAttribute("type", "hidden");
@@ -1309,10 +1578,10 @@ ORYX.Plugins.View = {
      * Displays the process SVG sources (formatted)
      */
     showProcessSVG : function() {
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
+        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(true));
         var cf = new Ext.form.TextArea({
             id:"svgSourceTextArea",
-            fieldLabel:"SVG Source",
+            fieldLabel:ORYX.I18N.view.processSVGSource,
             value:formattedSvgDOM,
             autoScroll:true
         });
@@ -1322,10 +1591,10 @@ ORYX.Plugins.View = {
             id:'processSVGSource',
             height:550,
             layout: 'fit',
-            title:'Process SVG Source',
+            title:ORYX.I18N.view.processSVGSource,
             items: [cf],
             buttons:[{
-                text : 'Close',
+                text : ORYX.I18N.Save.close,
                 handler:function(){
                     win.close();
                     win = null;
@@ -1348,7 +1617,7 @@ ORYX.Plugins.View = {
         var processERDF = ORYX.EDITOR.getERDF();
         var cf = new Ext.form.TextArea({
             id:"erdfSourceTextArea",
-            fieldLabel:"ERDF Source",
+            fieldLabel:ORYX.I18N.view.erdfSource,
             value:processERDF,
             autoScroll:true,
             height:'80%'
@@ -1359,10 +1628,10 @@ ORYX.Plugins.View = {
             id:'processERDFSource',
             height:550,
             layout: 'fit',
-            title:'ERDF Source',
+            title:ORYX.I18N.view.erdfSource,
             items: [cf],
             buttons:[{
-                text : 'Close',
+                text : ORYX.I18N.Save.close,
                 handler:function(){
                     win.close();
                     win = null;
@@ -1385,7 +1654,7 @@ ORYX.Plugins.View = {
         var processJSON = ORYX.EDITOR.getSerializedJSON();
         var cf = new Ext.form.TextArea({
             id:"jsonSourceTextArea",
-            fieldLabel:"JSON Source",
+            fieldLabel:ORYX.I18N.view.jsonSource,
             value:processJSON,
             autoScroll:true
         });
@@ -1395,10 +1664,10 @@ ORYX.Plugins.View = {
             id:'processJSONSource',
             height:550,
             layout: 'fit',
-            title:'JSON Source',
+            title:ORYX.I18N.view.jsonSource,
             items: [cf],
             buttons:[{
-                text : 'Close',
+                text : ORYX.I18N.Save.close,
                 handler:function(){
                     win.close();
                     win = null;
@@ -1426,7 +1695,7 @@ ORYX.Plugins.View = {
                 try{
                     var cf = new Ext.form.TextArea({
                         id:"bpmnSourceTextArea",
-                        fieldLabel:"BPMN2 Source",
+                        fieldLabel:ORYX.I18N.view.bpmn2Source,
                         value:request.responseText,
                         autoScroll:true
                     });
@@ -1436,10 +1705,10 @@ ORYX.Plugins.View = {
                         id:'processBPMNSource',
                         height:550,
                         layout: 'fit',
-                        title:'BPMN2 Source',
+                        title:ORYX.I18N.view.bpmn2Source,
                         items: [cf],
                         buttons		: [{
-                            text: 'Save to file',
+                            text: ORYX.I18N.view.saveToFile,
                             handler: function(){
                                 var processJSON = ORYX.EDITOR.getSerializedJSON();
                                 var processName = jsonPath(processJSON.evalJSON(), "$.properties.processn");
@@ -1493,7 +1762,7 @@ ORYX.Plugins.View = {
                                 form.submit();
                             }
                         },{
-                            text : 'Close',
+                            text : ORYX.I18N.Save.close,
                             handler:function(){
                                 win.close();
                                 win = null;
@@ -1514,7 +1783,7 @@ ORYX.Plugins.View = {
                     ORYX.EDITOR._pluginFacade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Converting to BPMN2 failed:' + e,
+                        msg         : ORYX.I18N.view.convertingToBPMN2Fail+':' + e,
                         title       : ''
 
                     });
@@ -1524,7 +1793,7 @@ ORYX.Plugins.View = {
                 ORYX.EDITOR._pluginFacade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Converting to BPMN2 failed.',
+                    msg         : ORYX.I18N.view.convertingToBPMN2Fail+'.',
                     title       : ''
 
                 });
@@ -1542,7 +1811,7 @@ ORYX.Plugins.View = {
     showProcessSources : function() {
         var processJSON = ORYX.EDITOR.getSerializedJSON();
         var processERDF = ORYX.EDITOR.getERDF();
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
+        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(true));
 
         Ext.Ajax.request({
             url: ORYX.PATH + "uuidRepository",
@@ -1561,8 +1830,9 @@ ORYX.Plugins.View = {
                         layout:'fit',
                         border:false,
                         items: [bpmn2SourceArea],
+                        style: 'padding-bottom:20px',
                         listeners: {
-                            expand: function(p) {
+                            afterlayout: function(p) {
                                 this.bpmn2FoldFunc = CodeMirror.newFoldFunction(CodeMirror.tagRangeFinder);
                                 var bpmn2SourceEditor = CodeMirror.fromTextArea(document.getElementById("bpmnSourceTextArea"), {
                                     mode: "application/xml",
@@ -1586,8 +1856,9 @@ ORYX.Plugins.View = {
                         layout:'fit',
                         border:false,
                         items: [jsonSourceArea],
+                        style: 'padding-bottom:20px',
                         listeners: {
-                            expand: function(p) {
+                            afterlayout: function(p) {
                                 this.jsonFoldFunc = CodeMirror.newFoldFunction(CodeMirror.braceRangeFinder);
                                 var jsonSourceEditor = CodeMirror.fromTextArea(document.getElementById("jsonSourceTextArea"), {
                                     mode: "application/json",
@@ -1611,8 +1882,9 @@ ORYX.Plugins.View = {
                         layout:'fit',
                         border:false,
                         items: [erdfSourceArea],
+                        style: 'padding-bottom:20px',
                         listeners: {
-                            expand: function(p) {
+                            afterlayout: function(p) {
                                 this.erdfFoldFunc = CodeMirror.newFoldFunction(CodeMirror.tagRangeFinder);
                                 var erdfSourceEditor = CodeMirror.fromTextArea(document.getElementById("erdfSourceTextArea"), {
                                     mode: "application/xml",
@@ -1636,8 +1908,9 @@ ORYX.Plugins.View = {
                         layout:'fit',
                         border:false,
                         items: [svgSourceArea],
+                        style: 'padding-bottom:10px',
                         listeners: {
-                            expand: function(p) {
+                            afterlayout: function(p) {
                                 this.svgFoldFunc = CodeMirror.newFoldFunction(CodeMirror.tagRangeFinder);
                                 var svgSourceEditor = CodeMirror.fromTextArea(document.getElementById("svgSourceTextArea"), {
                                     mode: "application/xml",
@@ -1649,83 +1922,96 @@ ORYX.Plugins.View = {
                         }
                     });
 
-                    var sourcesPanel = new Ext.Panel({
-                        layout:'accordion',
+                    var sourcesPanel = new Ext.TabPanel({
+                        activeTab: 0,
+                        border: false,
+                        width:'100%',
+                        height:'100%',
+                        tabPosition: 'top',
+                        layoutOnTabChange: true,
+                        deferredRender : false,
+                        defaults:{autoHeight: true, autoScroll: true},
                         items: [ bpmn2SourceAreaPanel, jsonSourceAreaPanel, svgSourceAreaPanel, erdfSourceAreaPanel ]
                     });
 
-                    var win = new Ext.Window({
-                        width:600,
-                        id:'processSources',
-                        height:550,
-                        layout: 'fit',
-                        title:'Process Sources',
-                        items: [sourcesPanel],
-                        buttons		: [
-                            {
-                                text: 'Download BPMN2',
-                                handler: function(){
-                                    var processJSON = ORYX.EDITOR.getSerializedJSON();
-                                    var processName = jsonPath(processJSON.evalJSON(), "$.properties.processn");
-                                    var processPackage = jsonPath(processJSON.evalJSON(), "$.properties.package");
-                                    var processVersion = jsonPath(processJSON.evalJSON(), "$.properties.version");
-                                    var fileName = "";
-                                    if(processPackage && processPackage != "") {
-                                        fileName += processPackage;
-                                    }
-                                    if(processName && processName != "") {
-                                        if(fileName != "") {
-                                            fileName += ".";
-                                        }
-                                        fileName += processName;
-                                    }
-                                    if(processVersion && processVersion != "") {
-                                        if(fileName != "") {
-                                            fileName += ".";
-                                        }
-                                        fileName += "v" + processVersion;
-                                    }
-                                    if(fileName == "") {
-                                        fileName = "processbpmn2";
-                                    }
-                                    var toStoreValue = document.getElementById("bpmnSourceTextArea").getValue();
-                                    var method ="post";
-                                    var form = document.createElement("form");
-                                    form.setAttribute("name", "storetofileform");
-                                    form.setAttribute("method", method);
-                                    form.setAttribute("action", ORYX.PATH + "filestore");
-                                    form.setAttribute("target", "_blank");
-
-                                    var fnameInput = document.createElement("input");
-                                    fnameInput.setAttribute("type", "hidden");
-                                    fnameInput.setAttribute("name", "fname");
-                                    fnameInput.setAttribute("value", fileName);
-                                    form.appendChild(fnameInput);
-
-                                    var fextInput = document.createElement("input");
-                                    fextInput.setAttribute("type", "hidden");
-                                    fextInput.setAttribute("name", "fext");
-                                    fextInput.setAttribute("value", "bpmn2");
-                                    form.appendChild(fextInput);
-
-                                    var fdataInput = document.createElement("input");
-                                    fdataInput.setAttribute("type", "hidden");
-                                    fdataInput.setAttribute("name", "data");
-                                    fdataInput.setAttribute("value", toStoreValue);
-                                    form.appendChild(fdataInput);
-                                    document.body.appendChild(form);
-                                    form.submit();
+                    var dlBPMN2Button = new Ext.Button({
+                        text: ORYX.I18N.view.downloadBPMN2,
+                        handler: function(){
+                            var processJSON = ORYX.EDITOR.getSerializedJSON();
+                            var processName = jsonPath(processJSON.evalJSON(), "$.properties.processn");
+                            var processPackage = jsonPath(processJSON.evalJSON(), "$.properties.package");
+                            var processVersion = jsonPath(processJSON.evalJSON(), "$.properties.version");
+                            var fileName = "";
+                            if(processPackage && processPackage != "") {
+                                fileName += processPackage;
+                            }
+                            if(processName && processName != "") {
+                                if(fileName != "") {
+                                    fileName += ".";
                                 }
-                            },
-                            {
-                                text : 'Close',
-                                handler:function(){
-                                    win.close();
-                                    win = null;
-                                }.bind(this)
-                            }]
+                                fileName += processName;
+                            }
+                            if(processVersion && processVersion != "") {
+                                if(fileName != "") {
+                                    fileName += ".";
+                                }
+                                fileName += "v" + processVersion;
+                            }
+                            if(fileName == "") {
+                                fileName = "processbpmn2";
+                            }
+                            var toStoreValue = request.responseText;
+                            var method ="post";
+                            var form = document.createElement("form");
+                            form.setAttribute("name", "storetofileform");
+                            form.setAttribute("method", method);
+                            form.setAttribute("action", ORYX.PATH + "filestore");
+                            form.setAttribute("target", "_blank");
+
+                            var fnameInput = document.createElement("input");
+                            fnameInput.setAttribute("type", "hidden");
+                            fnameInput.setAttribute("name", "fname");
+                            fnameInput.setAttribute("value", fileName);
+                            form.appendChild(fnameInput);
+
+                            var fextInput = document.createElement("input");
+                            fextInput.setAttribute("type", "hidden");
+                            fextInput.setAttribute("name", "fext");
+                            fextInput.setAttribute("value", "bpmn2");
+                            form.appendChild(fextInput);
+
+                            var fdataInput = document.createElement("input");
+                            fdataInput.setAttribute("type", "hidden");
+                            fdataInput.setAttribute("name", "data_encoded");
+                            fdataInput.setAttribute("value", Base64.encode(toStoreValue));
+                            form.appendChild(fdataInput);
+                            document.body.appendChild(form);
+                            form.submit();
+                        }
                     });
-                    win.show();
+
+                    var dialogSize = ORYX.Utils.getDialogSize(550, 600);
+                    if(this.sourcewin != null && this.sourcewin !== undefined) {
+                        this.sourcewin.destroy();
+                    }
+
+                    this.sourcewin = new Ext.Window({
+                        id:'processSources',
+                        height:dialogSize.height,
+                        width:dialogSize.width,
+                        layout: 'fit',
+                        title: ORYX.I18N.view.processSources,
+                        items: [sourcesPanel],
+                        tbar: [
+                            dlBPMN2Button
+                        ],
+                        listeners:{
+                            hide: function(){
+                                this.sourcewin.destroy();
+                            }.bind(this)
+                        }
+                    });
+                    this.sourcewin.show();
                     this.bpmn2FoldFunc = CodeMirror.newFoldFunction(CodeMirror.tagRangeFinder);
                     var bpmn2SourceEditor = CodeMirror.fromTextArea(document.getElementById("bpmnSourceTextArea"), {
                         mode: "application/xml",
@@ -1737,7 +2023,7 @@ ORYX.Plugins.View = {
                     ORYX.EDITOR._pluginFacade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Converting to BPMN2 failed:' + e,
+                        msg         : ORYX.I18N.view.convertingToBPMN2Fail+':' + e,
                         title       : ''
 
                     });
@@ -1747,7 +2033,7 @@ ORYX.Plugins.View = {
                 ORYX.EDITOR._pluginFacade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Converting to BPMN2 failed.',
+                    msg         : ORYX.I18N.view.convertingToBPMN2Fail+'.',
                     title       : ''
 
                 });
@@ -1767,8 +2053,7 @@ ORYX.Plugins.View = {
      */
     showAsPNG : function() {
         var transformval = 'png';
-        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(false));
-        var rawSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getRootNode().cloneNode(true));
+        var formattedSvgDOM = DataManager.serialize(ORYX.EDITOR.getCanvas().getSVGRepresentation(true, true));
         var method ="post";
         var form = document.createElement("form");
         form.setAttribute("name", "transformerform");
@@ -1781,12 +2066,6 @@ ORYX.Plugins.View = {
         hfFSVG.setAttribute("name", "fsvg");
         hfFSVG.setAttribute("value", Base64.encode(formattedSvgDOM));
         form.appendChild(hfFSVG);
-
-        var hfRSVG = document.createElement("input");
-        hfRSVG.setAttribute("type", "hidden");
-        hfRSVG.setAttribute("name", "rsvg");
-        hfRSVG.setAttribute("value", Base64.encode(rawSvgDOM));
-        form.appendChild(hfRSVG);
 
         var hfUUID = document.createElement("input");
         hfUUID.setAttribute("type", "hidden");
@@ -1859,7 +2138,6 @@ ORYX.Plugins.View = {
         /* Update the zoom-level*/
         canvas.zoomLevel = this.zoomLevel;
     },
-
 
     /**
      * It calculates the zoom level to fit whole model into the visible area
@@ -1937,23 +2215,104 @@ ORYX.Plugins.View = {
             this.zoomLevel = this.maxZoomLevel;
         }
     },
-    goFullscreen : function() {
-        var docEle = document.documentElement;
-        if(docEle.requestFullScreen) {
-            docEle.requestFullScreen();
-        } else if(docEle.mozRequestFullScreen) {
-            docEle.mozRequestFullScreen();
-        } else if(docEle.webkitRequestFullScreen) {
-            docEle.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-        } else {
-            ORYX.EDITOR._pluginFacade.raiseEvent({
-                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                ntype		: 'error',
-                msg         : 'Browser does not support full screen mode.',
-                title       : ''
 
-            });
+    refreshCanvasForIE : function( options ) {
+        if ( (Object.hasOwnProperty.call(window, "ActiveXObject") && !window.ActiveXObject) ||
+                (navigator.appVersion.indexOf("MSIE 10") !== -1) ) {
+
+            // If there's no options.shape, set it with an invisid
+            if(!options.shape) {
+                var currentSelection = this.facade.getSelection();
+                if (currentSelection && currentSelection.length > 0 && currentSelection[0] instanceof ORYX.Core.Node) {
+                    var currentShape = currentSelection[0];
+                    currentShape.properties["oryx-invisid"] = Math.random();
+                    options.shape = currentShape;
+                }
+            }
+
+            var currentJSON = ORYX.EDITOR.getSerializedJSON();
+            this.facade.setSelection(this.facade.getCanvas().getChildShapes(true));
+            var selection = this.facade.getSelection();
+            var clipboard = new ORYX.Plugins.Edit.ClipBoard();
+            clipboard.refresh(selection, this.getAllShapesToConsider(selection, true));
+            var command = new ORYX.Plugins.Edit.DeleteCommand(clipboard , this.facade);
+            this.facade.executeCommands([command]);
+            this.facade.importJSON(currentJSON);
+
+           var foundShape = false;
+           foundShape = this.findSelectedShape(options.shape, options);
+           if(foundShape) {
+               this.facade.setSelection([foundShape]);
+           }
+           else {
+               this.facade.setSelection([]);
+           }
+
+           this.reapplyLockedNodesProperties();
+
         }
+    },
+
+    showDocElementInModel : function( options ) {
+        this.shapeFromDoc = undefined;
+        ORYX.EDITOR._canvas.getChildren().each((function(child) {
+            this.findShapeWithId(child, options.eleid);
+        }).bind(this));
+
+        if(this.shapeFromDoc !== undefined) {
+            // set selection
+            this.facade.setSelection([this.shapeFromDoc]);
+            this.facade.getCanvas().update();
+            this.facade.updateSelection();
+        }
+    },
+
+    findShapeWithId : function(shape, nodeid) {
+        if(shape instanceof ORYX.Core.Node || shape instanceof ORYX.Core.Edge) {
+            if(shape.resourceId == nodeid) {
+                this.shapeFromDoc = shape;
+            }
+        }
+        if(shape.getChildren().size() > 0) {
+            for (var i = 0; i < shape.getChildren().size(); i++) {
+                if(shape.getChildren()[i] instanceof ORYX.Core.Node || shape.getChildren()[i] instanceof ORYX.Core.Edge) {
+                    this.findShapeWithId(shape.getChildren()[i], nodeid);
+                }
+            }
+        }
+    },
+
+    findSelectedShape: function(shape, options) {
+        var foundShape = false;
+        if(options && options.shape) {
+            ORYX.EDITOR._canvas.getChildren().each((function(child) {
+                if(child instanceof ORYX.Core.Node || child instanceof ORYX.Core.Edge) {
+                    if(options.shape.properties["oryx-invisid"] == child.properties["oryx-invisid"]) {
+                        foundShape = child;
+                    }
+                }
+ // BZ1203382: This next part should work, but results in an 'Out of stack space' error when you add nodes in sub-process or swimlane
+ //               if(child.getChildren().size() > 0) {
+ //                   for (var i = 0; i < child.getChildren().size(); i++) {
+ //                       if(child.getChildren()[i] instanceof ORYX.Core.Node || child.getChildren()[i] instanceof ORYX.Core.Edge) {
+ //                           this.findSelectedShape(child.getChildren()[i], options);
+ //                       }
+ //                   }
+ //               }
+            }).bind(this));
+        }
+        return foundShape;
+    },
+
+    reapplyLockedNodesProperties: function() {
+        ORYX.EDITOR._canvas.getChildren().each((function(child) {
+            if(child instanceof ORYX.Core.Node || child instanceof ORYX.Core.Edge) {
+                if(child.properties["oryx-isselectable"] !== undefined && child.properties["oryx-isselectable"] == "false") {
+                    child.setSelectable(false);
+                    child.setMovable(false);
+                }
+            }
+        }).bind(this));
     }
 };
 

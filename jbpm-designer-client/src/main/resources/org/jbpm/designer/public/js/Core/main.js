@@ -77,12 +77,14 @@ ORYX.Editor = {
 		this._eventsQueue 	= [];
 		this.loadedPlugins 	= [];
 		this.pluginsData 	= [];
-		
+
+        this.simulationChartTimeUnit = "";
 		this.simulationChartData = "";
 		this.simulationEventData = "";
 		this.simulationEventAggregationData = "";
 		this.simulationInstancesData = "";
         this.simulationHTCostData = "";
+        this.simulationHTResourceData = "";
 		this.simulationChartTitle = "";
 		this.simulationChartId = "";
 		this.simulationChartNodeName = "";
@@ -101,7 +103,18 @@ ORYX.Editor = {
 		if(config.model) {
 			model = config.model;
 		}
-		
+
+        this.updateViewLockState(false);
+
+        if(config.error) {
+            Ext.Msg.show({
+                title   : 'Unable to open Process',
+                msg     : "Process will be opened with XML Editor",
+                buttons: Ext.MessageBox.OK,
+                fn      : function(text,btn) { parent.designeropeninxmleditortab(ORYX.UUID); }
+                });
+        }
+
 		this.id = model.resourceId;
         if(!this.id) {
         	this.id = model.id;
@@ -124,7 +137,6 @@ ORYX.Editor = {
 			var ssUrl = model.stencilset.url;
         	ORYX.Core.StencilSet.loadStencilSet(ssUrl, this.id);
 		}
-		
         
         //load the extensions
         if(!!ORYX.CONFIG.SSEXTS){
@@ -165,7 +177,35 @@ ORYX.Editor = {
 			initFinished();
 		}.bind(this), 200);
 	},
-	
+
+	updateViewLockState: function(canReload) {
+		if(ORYX.INSTANCE_VIEW_MODE != true) {
+			if ( (typeof parent.isLocked === "function") && (typeof parent.isLockedByCurrentUser === "function") ) {
+				var isEditorLocked = parent.isLocked();
+				var isEditorLockedByCurrentUser = parent.isLockedByCurrentUser();
+				var isReadOnly = ( ORYX.READONLY == true ) || ( ORYX.VIEWLOCKED == true );
+
+				if(!isEditorLocked) {
+					ORYX.VIEWLOCKED = false;
+				} else {
+					if(isEditorLocked && !isEditorLockedByCurrentUser) {
+						ORYX.VIEWLOCKED = true;
+					} else if(isEditorLocked && isEditorLockedByCurrentUser) {
+						ORYX.VIEWLOCKED = false;
+					}
+				}
+
+				// We're in read only mode, but got the lock, so let's reload to enter edit mode.
+				if (isReadOnly && !ORYX.VIEWLOCKED && canReload) {
+					if (typeof parent.reload === "function") {
+						ORYX.PROCESS_SAVED = true;
+						parent.reload();
+					}
+				}
+			}
+		}
+	},	
+
 	_finishedLoading: function() {
 		if(Ext.getCmp('oryx-loading-panel')){
 			Ext.getCmp('oryx-loading-panel').hide()
@@ -186,8 +226,28 @@ ORYX.Editor = {
 		}
 		
 		// Raise Loaded Event
-		this.handleEvents( {type:ORYX.CONFIG.EVENT_LOADED} )
-		
+		this.handleEvents( {type:ORYX.CONFIG.EVENT_LOADED} );
+		// register on props edit
+		this._getPluginFacade().registerOnEvent(ORYX.CONFIG.EVENT_EDIT_PROPS, this._handleEditProps.bind(this));
+
+	},
+
+	_handleEditProps: function() {
+		if(ORYX.CONFIG.PANEL_RIGHT_COLLAPSED_SWITCH == true) {
+			this.layout_regions.east.expand();
+		} else {
+			this.layout_regions.east.collapse();
+		}
+		ORYX.CONFIG.PANEL_RIGHT_COLLAPSED_SWITCH = !ORYX.CONFIG.PANEL_RIGHT_COLLAPSED_SWITCH;
+	},
+
+	_handleEditMenu: function() {
+		if(ORYX.CONFIG.PANEL_LEFT_COLLAPSED_SWITCH == true) {
+			this.layout_regions.west.expand();
+		} else {
+			this.layout_regions.west.collapse();
+		}
+		ORYX.CONFIG.PANEL_LEFT_COLLAPSED_SWITCH = !ORYX.CONFIG.PANEL_LEFT_COLLAPSED_SWITCH;
 	},
 	
 	_initEventListener: function(){
@@ -274,21 +334,27 @@ ORYX.Editor = {
         this.simInfoPanel = new Ext.Panel({
             bodyStyle:'background:#ffff;font-size:9px;font-family:Verdana, Geneva, Arial, Helvetica, sans-serif;padding-left:5px;',
             id: "siminfopanel",
-            title: "Simulation Info",
+            title: ORYX.I18N.View.sim.resultsInfo,
             autoScroll: true,
-            autoheight: true,
+            autoheight: false,
+            height: 300,
             border: false,
             html: ""
         });
 
 		this.simResultsTree = new Ext.tree.TreePanel({
 			id: "simresultscharts",
-			title: "Simulation Graphs",
-			autoheight: true, 
+			title: ORYX.I18N.View.sim.resultsGraphs,
+            //layout: 'fit',
 			animate:true,
 			loader: new Ext.tree.TreeLoader(),
 			rootVisible: false,
-			autoScroll:false,
+            scroll: true,
+            autoScroll: true,
+            autoheight: true,
+            viewConfig : {
+                style : { overflow: 'scroll', overflowY: 'scroll', overflowX: 'scroll' }
+            },
 			lines: true,
 			listeners: {
 		        click: {
@@ -304,28 +370,32 @@ ORYX.Editor = {
 
 		this.simResultsContentPanelLayout = new Ext.Panel({
 		    width: "100%",
-            height: 1000,
+            autoscroll: true,
+            //sheight: 1000,
+            //autoheight: true,
 		    layout: 'border',
 		    items: [{
 		    	xtype:'panel',
 		        region:'east',
 		        margins: '5 0 0 5',
-		        layout	: 'anchor',
+		        layout	: 'fit',
 		        anchor:'100%',
 		        width: 300,
 		        border: false,
 		        collapsible: true,  
 		        autoscroll: true,
-		        split: true,
-		        minSize: 100,
-		        maxSize: 500,
-		        autoheight: true,
-		        cmargins: '5 5 0 5', 
-		        items: [this.simInfoPanel, this.simResultsTree]
+		        split: false,
+		        //minSize: 100,
+		        //maxSize: 500,
+		        //autoheight: true,
+		        cmargins: '5 5 0 5',
+                bodyCfg : { style: {'overflow':'auto'} },
+                autoScroll : true,
+		        items: [this.simResultsTree, this.simInfoPanel]
 		    },{
 		    	xtype:'panel',
 		        region: 'center',  
-		        layout	: 'anchor',
+		        layout	: 'fit',
 		        anchor:'100%',
 		        border: false,
 		        autoscroll: true,
@@ -333,6 +403,46 @@ ORYX.Editor = {
 		        margins: '5 5 0 0',
 		        items: [this.simResultsContentPanel]
 		    }]
+		});
+
+		this.processDocContentPanel = new Ext.Panel({
+			id: "processdoccontent",
+			autoScroll: true,
+			autoheight: true,
+			border: false,
+			items	: [{
+				xtype : "component",
+				id    : 'processdocframe',
+				anchor: '100%',
+				autoScroll: true,
+				autoEl : {
+					tag : "iframe",
+					src : ORYX.BASE_FILE_PATH + 'processdoc/default.jsp',
+					width: "100%",
+					height: "500",
+					frameborder: "0",
+					scrolling: "auto"
+				}
+			}]
+		});
+
+		this.processDocPanelLayout = new Ext.Panel({
+			width: "100%",
+			autoscroll: true,
+			//sheight: 1000,
+			//autoheight: true,
+			layout: 'border',
+			items: [{
+				xtype:'panel',
+				region: 'center',
+				layout	: 'fit',
+				anchor:'100%',
+				border: false,
+				autoscroll: true,
+				autoheight: true,
+				margins: '5 5 0 0',
+				items: [this.processDocContentPanel]
+			}]
 		});
 		
 		var tabs_config = {
@@ -348,37 +458,63 @@ ORYX.Editor = {
 		        deferredRender : false,
 		        listeners: {
 	             	tabchange: function(tabpanel, tab) {
+	            		if (tab.id == 'processdoctab') {
+	            			document.getElementById('processdocframe').contentWindow.showProcessDocs();
+	            		}
 	            		this.centerContentTabPannel.doLayout();
 	            		this.simResultsContentPanelLayout.doLayout();
+						this.processDocPanelLayout.doLayout();
 	            		tabpanel.doLayout();
 	             	}.bind(this)
 	            },
 		        items: [{
 		        	layout: "fit",
-		            title: 'Process Modelling',
+		            title: ORYX.I18N.View.tabs.modelling,
                     id: 'processmodellingtab',
 	                items	: [this.centerContentPanel]
 		        },
 		        {
 		        	layout: "fit",
-		        	title: 'Simulation Results',
+		        	title: ORYX.I18N.View.tabs.simResults,
                     id: 'simulationtab',
 	                autoScroll   : false,
 	                items	: [this.simResultsContentPanelLayout]
-		        }
+		        },
+				{
+					layout: "fit",
+					title: ORYX.I18N.View.tabs.processDoc,
+					id: 'processdoctab',
+					autoScroll   : false,
+					items	: [this.processDocPanelLayout]
+				}
 		        ]
 			};
 		this.centerContentTabPannel = new Ext.TabPanel(tabs_config);
 
         if(ORYX.READONLY == true) {
             Ext.getCmp('maintabs').remove("simulationtab");
+			Ext.getCmp('maintabs').remove("processdoctab");
         }
+
+        if(ORYX.VIEWLOCKED == true) {
+            Ext.getCmp('maintabs').remove("simulationtab");
+			Ext.getCmp('maintabs').remove("processdoctab");
+        }
+
+        if(ORYX.BPSIMDISPLAY != true) {
+            Ext.getCmp('maintabs').remove("simulationtab");
+		}
 
 		// DEFINITION OF THE VIEWPORT AREAS
         var eastWidth = ORYX.CONFIG.PANEL_LEFT_WIDTH || 400;
         if(ORYX.READONLY == true) {
             eastWidth = 10;
         }
+
+        if(ORYX.VIEWLOCKED == true) {
+            eastWidth = 10;
+        }
+
 		this.layout_regions = {
 				
 				// DEFINES TOP-AREA
@@ -398,7 +534,7 @@ ORYX.Editor = {
                     cls		: 'x-panel-editor-east',
                     width	: eastWidth,
                     autoScroll:true,
-                    split	: true,
+                    split	: false,
                     animate: true,
                     collapsible : true,
                     titleCollapse: true,
@@ -424,11 +560,11 @@ ORYX.Editor = {
 					cls		: 'x-panel-editor-west',
 					width	: ORYX.CONFIG.PANEL_LEFT_WIDTH || 200,
 					autoScroll:true,
-					split	: true,
+					split	: false,
 					animate: true,
 					collapsible : true,
 					titleCollapse: true,
-					title: "Shape Repository",
+					title: ORYX.I18N.main.shapeRepo,
 					plugins: new Ext.ux.PanelCollapsedTitlePlugin()
 				}),
 				
@@ -439,7 +575,7 @@ ORYX.Editor = {
 		
 		// Hide every region except the center
 		for (region in this.layout_regions) {
-			if ( region != "center" && ORYX.READONLY == true) {
+			if ( (region != "center" && region != "north") && (ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
                 this.layout_regions[ region ].setVisible(false);
 			}
 		}
@@ -524,7 +660,7 @@ ORYX.Editor = {
 			// trigger doLayout() and show the pane
 			current_region.ownerCt.doLayout();
 
-            if(ORYX.READONLY == true && current_region.region != "center") {
+            if((ORYX.VIEWLOCKED == true || ORYX.READONLY == true) && current_region.region != "center" ) {
             } else {
                 current_region.show();
             }
@@ -821,7 +957,10 @@ ORYX.Editor = {
 				eventCoordinates:		this.eventCoordinates.bind(this),
 				addToRegion:			this.addToRegion.bind(this),
 				
-				getModelMetaData:		this.getModelMetaData.bind(this)
+				getModelMetaData:		this.getModelMetaData.bind(this),
+
+				resetAllShapeColors:    this.resetAllShapeColors.bind(this),
+				resetShapeColors:       this.resetShapeColors.bind(this)
 			};
 
 		// return it.
@@ -856,6 +995,30 @@ ORYX.Editor = {
 		    return ret;
 		}
 	},
+
+    resetAllShapeColors: function() {
+        this.getCanvas().children.each(function(shape) {
+            this.resetShapeColors(shape);
+        }.bind(this));
+
+        this.getCanvas().update();
+	},
+
+    resetShapeColors: function(shape) {
+        if(shape) {
+            if(shape instanceof ORYX.Core.Node || shape instanceof ORYX.Core.Edge) {
+                shape.setProperty("oryx-bordercolor", shape.properties["oryx-origbordercolor"]);
+                shape.refresh();
+            }
+            if(shape.getChildren().size() > 0) {
+                for (var i = 0; i < shape.getChildren().size(); i++) {
+                    if(shape.getChildren()[i] instanceof ORYX.Core.Node || shape.getChildren()[i] instanceof ORYX.Core.Edge) {
+                        this.resetShapeColors(shape.getChildren()[i]);
+                    }
+                }
+            }
+        }
+    },
 	
     /**
      * Returns JSON of underlying canvas (calls ORYX.Canvas#toJSON()).
@@ -902,7 +1065,7 @@ ORYX.Editor = {
                         this.facade.raiseEvent({
                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                             ntype		: 'error',
-                            msg         : 'Failed to save process SVG.',
+                            msg         : ORYX.I18N.main.failSave,
                             title       : ''
 
                         });
@@ -925,7 +1088,7 @@ ORYX.Editor = {
     
     showParsingErrors : function() {
     	Ext.Msg.minWidth = 360;
-    	Ext.MessageBox.alert( "Unable to perform action", "Unable to perform user action due to error(s).<br/>Validate your process before saving, and view server logs to see error details." );
+    	Ext.MessageBox.alert( ORYX.I18N.main.unableUserAction );
     },
 	
     /**
@@ -1169,7 +1332,7 @@ ORYX.Editor = {
                 this.facade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Error: ' + e,
+                    msg         : ORYX.I18N.BPELSupport.error+': ' + e,
                     title       : ''
 
                 });
@@ -1583,6 +1746,11 @@ ORYX.Editor = {
 			newShapeObject.alignDockers();
 		}
 
+		this._getPluginFacade().raiseEvent({
+			type 		: ORYX.CONFIG.EVENT_SHAPE_CREATED,
+			value		: newShapeObject
+		});
+
 		return newShapeObject;
 	},
 	
@@ -1615,10 +1783,10 @@ ORYX.Editor = {
 			docker.setDockedShape(undefined);
 		});
                 
-                this._getPluginFacade().raiseEvent({
-                    type 		: ORYX.CONFIG.EVENT_SHAPE_DELETED, 
-                    value		: shape
-                });
+		this._getPluginFacade().raiseEvent({
+			type 		: ORYX.CONFIG.EVENT_SHAPE_DELETED,
+			value		: shape
+		});
 	},
 	
 	/**
@@ -2154,7 +2322,15 @@ ORYX.Editor.setMissingClasses = function() {
 }
 
 ORYX.Editor.checkIfSaved = function() {
-    return ORYX.PROCESS_SAVED;
+    if(ORYX.READONLY == true || ORYX.VIEWLOCKED == true) {
+        return true;
+    } else {
+		if(ORYX.PROCESS_SAVED === undefined) {
+			return true;
+		} else {
+			return ORYX.PROCESS_SAVED;
+		}
+    }
 };
 
 ORYX.Editor.checkClassType = function( classInst, classType ) {

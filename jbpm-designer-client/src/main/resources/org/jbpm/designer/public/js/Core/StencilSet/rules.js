@@ -311,6 +311,9 @@ ORYX.Core.StencilSet.Rules = {
 	
 	_getStencilById: function(id) {
 		return this._stencils.find(function(stencil) {
+            if(!stencil) {
+                return false;
+            }
 			return stencil.id()==id;
 		});
 	},
@@ -425,6 +428,9 @@ ORYX.Core.StencilSet.Rules = {
 			
 			if(this._morphingRules.keys().include(role)) {
 				morphs = this._stencils.select(function(stencil) {
+                    if(!stencil) {
+                        return false;
+                    }
 					return stencil.roles().include(role);
 				});
 			}
@@ -462,7 +468,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// test each edge, if it can connect to source
 		this._stencils.each((function(stencil) {
-			if(stencil.type() === "edge") {
+			if(stencil && stencil.type() === "edge") {
 				var newArgs = Object.clone(args);
 				newArgs.edgeStencil = stencil;
 				if(this.canConnect(newArgs)) {
@@ -500,7 +506,7 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// test each edge, if it can connect to source
 		this._stencils.each((function(stencil) {
-			if(stencil.type() === "edge") {
+			if(stencil && stencil.type() === "edge") {
 				var newArgs = Object.clone(args);
 				newArgs.edgeStencil = stencil;
 				if(this.canConnect(newArgs)) {
@@ -545,11 +551,13 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// check each stencil, if it can be a source
 		this._stencils.each((function(stencil) {
-			var newArgs = Object.clone(args);
-			newArgs.sourceStencil = stencil;
-			if(this.canConnect(newArgs)) {
-				_sources.push(stencil);
-			}
+            if(stencil) {
+                var newArgs = Object.clone(args);
+                newArgs.sourceStencil = stencil;
+                if(this.canConnect(newArgs)) {
+                    _sources.push(stencil);
+                }
+            }
 		}).bind(this));
 
 		return _sources;
@@ -588,11 +596,13 @@ ORYX.Core.StencilSet.Rules = {
 		
 		// check stencil, if it can be a target
 		this._stencils.each((function(stencil) {
-			var newArgs = Object.clone(args);
-			newArgs.targetStencil = stencil;
-			if(this.canConnect(newArgs)) {
-				_targets.push(stencil);
-			}
+            if(stencil) {
+                var newArgs = Object.clone(args);
+                newArgs.targetStencil = stencil;
+                if(this.canConnect(newArgs)) {
+                    _targets.push(stencil);
+                }
+            }
 		}).bind(this));
 
 		return _targets;
@@ -963,7 +973,9 @@ ORYX.Core.StencilSet.Rules = {
 		var _morphStencils = [];
 		args.stencil.roles().each(function(role) {
 			this._cacheMorph(role).each(function(stencil) {
-				_morphStencils.push(stencil);
+                if(stencil) {
+				    _morphStencils.push(stencil);
+                }
 			})
 		}.bind(this));
 
@@ -1146,6 +1158,9 @@ ORYX.Core.StencilSet.Rules = {
 	 */
 	_stencilsWithRole: function(role) {
 		return this._stencils.findAll(function(stencil) {
+            if(!stencil) {
+                return false;
+            }
 			return (stencil.roles().member(role)) ? true : false;
 		});
 	},
@@ -1160,6 +1175,9 @@ ORYX.Core.StencilSet.Rules = {
 	 */
 	_edgesWithRole: function(role) {
 		return this._stencils.findAll(function(stencil) {
+            if(!stencil) {
+                return false;
+            }
 			return (stencil.roles().member(role) && stencil.type() === "edge") ? true : false;
 		});
 	},
@@ -1174,6 +1192,9 @@ ORYX.Core.StencilSet.Rules = {
 	 */
 	_nodesWithRole: function(role) {
 		return this._stencils.findAll(function(stencil) {
+            if(!stencil) {
+                return false;
+            }
 			return (stencil.roles().member(role) && stencil.type() === "node") ? true : false;
 		});
 	},

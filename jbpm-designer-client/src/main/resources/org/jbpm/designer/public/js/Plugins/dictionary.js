@@ -43,26 +43,28 @@ ORYX.Plugins.Dictionary = Clazz.extend({
 		this.initDictionary();
 		
 		/* Register dictionary to model */
-		this.facade.offer({
-			'name': 'Dictionary',
-			'functionality': this.initAndShowDictionary.bind(this),
-			'group': ORYX.I18N.View.jbpmgroup,
-			'icon': ORYX.BASE_FILE_PATH + "images/dictionary.png",
-			'description': 'Process dictionary',
-			'index': 8,
-			'minShape': 0,
-			'maxShape': 0,
-			'isEnabled': function(){
-                return true;
-//				profileParamName = "profile";
-//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//		        regexa = new RegExp( regexSa );
-//		        profileParams = regexa.exec( window.location.href );
-//		        profileParamValue = profileParams[1];
-//				return profileParamValue == "jbpm";
-			}.bind(this)
-		});
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            this.facade.offer({
+                'name': ORYX.I18N.Dictionary.dictionary,
+                'functionality': this.initAndShowDictionary.bind(this),
+                'group': ORYX.I18N.View.jbpmgroup,
+                'icon': ORYX.BASE_FILE_PATH + "images/dictionary.png",
+                'description': ORYX.I18N.Dictionary.processDictionary,
+                'index': 8,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //				profileParamName = "profile";
+    //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //		        regexa = new RegExp( regexSa );
+    //		        profileParams = regexa.exec( window.location.href );
+    //		        profileParamValue = profileParams[1];
+    //				return profileParamValue == "jbpm";
+                }.bind(this)
+            });
+        }
 	},
 	initAndShowDictionary : function(options) {
 		this.initDictionary(this.showDictionary, options);
@@ -100,7 +102,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                                     ORYX.EDITOR._pluginFacade.raiseEvent({
                                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                         ntype		: 'error',
-                                        msg         : 'Error reading Process Dictionary. Invalid item: ' + attrName,
+                                        msg         : ORYX.I18N.Dictionary.errorReadingProcDic+': ' + attrName,
                                         title       : ''
 
                                     });
@@ -130,7 +132,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                        ORYX.EDITOR._pluginFacade.raiseEvent({
                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                            ntype		: 'error',
-                           msg         : 'Error loading Process Dictionary: ' + e,
+                           msg         : ORYX.I18N.Dictionary.errorLoadingProcDic+ ': ' + e,
                            title       : ''
 
                        });
@@ -140,7 +142,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                 ORYX.EDITOR._pluginFacade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Error loading Process Dictionary.',
+                    msg         : ORYX.I18N.Dictionary.errorLoadingProcDic + '.',
                     title       : ''
 
                 });
@@ -148,12 +150,19 @@ ORYX.Plugins.Dictionary = Clazz.extend({
             params: {
             	action: 'load',
             	profile: ORYX.PROFILE,
-            	uuid : ORYX.UUID
+            	uuid :  window.btoa(encodeURI(ORYX.UUID))
             }
         });
 	},
 	showDictionary : function() {
-    	var itemDeleter = new Extensive.grid.ItemDeleter();
+		var dialogSize = ORYX.Utils.getDialogSize(400, 700);
+		var gridProportion = 0.5;
+		var extractionPanelProportion = 0.5;
+		var gridWidth = dialogSize.width * gridProportion;
+		var itemDeleterWidth = 70;
+		var gridColWidth = (gridWidth - itemDeleterWidth) / 3;
+
+		var itemDeleter = new Extensive.grid.ItemDeleter();
     	var gridId = Ext.id();
 //    	var dictionaryPaging = new Ext.PagingToolbar({
 //    	    pageSize: 10,
@@ -170,20 +179,20 @@ ORYX.Plugins.Dictionary = Clazz.extend({
             //bbar: dictionaryPaging,
             cm: new Ext.grid.ColumnModel([new Ext.grid.RowNumberer(), {
             	id: 'name',
-                header: 'Name',
-                width: 100,
+                header: ORYX.I18N.Dictionary.header_name,
+                width: gridColWidth,
                 dataIndex: 'name',
                 editor: new Ext.form.TextField({ allowBlank: false })
             }, {
             	id: 'aliases',
-                header: 'Aliases',
-                width: 100,
+                header: ORYX.I18N.Dictionary.headerAliases,
+                width: gridColWidth,
                 dataIndex: 'aliases',
                 editor: new Ext.form.TextField({ allowBlank: true })
             }, {
             	id: 'description',
-                header: 'Description',
-                width: 100,
+                header: ORYX.I18N.Dictionary.headerDesc,
+                width: gridColWidth,
                 dataIndex: 'description',
                 editor: new Ext.form.TextField({ allowBlank: true })
             }, 
@@ -191,7 +200,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
     		selModel: itemDeleter,
             autoHeight: true,
             tbar: [{
-                text: 'Add New Entry',
+                text: ORYX.I18N.Dictionary.addNewEntry,
                 handler : function(){
                 	ORYX.Dictionary.Dictionaryitems.add(new ORYX.Dictionary.DictionaryDef({
                         name: '',
@@ -210,17 +219,17 @@ ORYX.Plugins.Dictionary = Clazz.extend({
     	if(processDocumentation && processDocumentation[0].length > 0) {
     		docText = processDocumentation[0];
     	} else {
-    		docText = "No process documentation specified.";
+    		docText = ORYX.I18N.Dictionary.noProcDoc;
     	}
 
     	var extractFromDocsButton = new Ext.Button({
-    		text: 'Process Documentation',
+    		text: ORYX.I18N.Dictionary.procDoc,
     	    handler: function(){ 
     	    	Ext.getCmp('processdocs').setValue(docText);
     	    }
     	});
     	var extractImportFormFromDocs = new Ext.Panel({
-    			title: '<center>From Documentation</center>',
+    			title: ORYX.I18N.Dictionary.fromDoc,
     			bodyStyle:'padding:5px',
     			autoScroll: false,
     			height: 60,
@@ -237,17 +246,17 @@ ORYX.Plugins.Dictionary = Clazz.extend({
 			autoScroll: false,
 	        items: [
 	        {
-	            fieldLabel: 'Select',
+	            fieldLabel: ORYX.I18N.Dictionary.select,
 	            name: 		'subject',
 				inputType : 'file',
-				style : 	'margin-bottom:10px;display:block;width:100px',
+				style : 	'margin-bottom:10px;display:block;width:150px',
 				itemCls :	'ext_specific_window_overflow'
 	        }
 	        ]
     	});
 
     	var extractImportFormFromDocsWrapper = new Ext.Panel({
-			title: '<center>From File</center>',
+			title: ORYX.I18N.Dictionary.fromFile,
 			bodyStyle:'padding:5px',
 			autoScroll: false,
 			height: 60,
@@ -271,17 +280,17 @@ ORYX.Plugins.Dictionary = Clazz.extend({
     		},
     	    items: [
     	            {
-    	              columnWidth: .3,
+    	              columnWidth: .5,
     	              items: extractImportFormFromDocs
     	            },{
-    	              columnWidth: .7,
+    	              columnWidth: .5,
     	              items: extractImportFormFromDocsWrapper
     	            }
     	          ]
     	});
 
     	var textPannel = new Ext.Panel({
-    		title: '<center>Highlight text and click on "Add"</center>',
+    		title: ORYX.I18N.Dictionary.highlightText,
     		width: '100%',
     		height: 350,
     	    layout:'column',
@@ -301,7 +310,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
     		        }
                   ],
             tbar: [{
-            	text: 'Add',
+            	text: ORYX.I18N.Dictionary.add,
                 handler : function(){
                 	var e = document.getElementById('processdocs'); 
                     var selected = e.value.substring(e.selectionStart, e.selectionEnd);
@@ -318,7 +327,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
 
     	var extractionPanel = new Ext.Panel({
     		id: 'processdocspanel',
-    		title: '<center>Extract Dictionary entries</center>',
+    		title: ORYX.I18N.Dictionary.extractDicEntries,
     		layout:'column',
     		items:[
     		       dictionaryInnerPanel,textPannel
@@ -334,23 +343,23 @@ ORYX.Plugins.Dictionary = Clazz.extend({
     	var dictionaryOutterPanel = new Ext.Panel({
     		header: false,
     	    layout:'column',
-    	    items: [
+			items: [
     	            {
-    	              columnWidth: .4,
+    	              columnWidth: gridProportion,
     	              items: grid
     	            },{
-    	              columnWidth: .6,
+    	              columnWidth: extractionPanelProportion,
     	              items: extractionPanel
     	            }
     	          ]
     	});
 
-		var dialog = new Ext.Window({
+        var dialog = new Ext.Window({
 			layout		: 'anchor',
 			autoCreate	: true, 
-			title		: 'Process Dictionary Editor', 
-			height		: 530, 
-			width		: 960, 
+			title		: ORYX.I18N.Dictionary.procDicEditor,
+			height		: dialogSize.height,
+			width		: dialogSize.width,
 			modal		: true,
 			collapsible	: false,
 			fixedcenter	: true, 
@@ -370,7 +379,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
 				}.bind(this)				
 			},
 			buttons		: [{
-                text: 'Save',
+                text: ORYX.I18N.Dictionary.Save,
                 handler: function(){
                 	// commit locally
                 	ORYX.Dictionary.Dictionaryitems.commitChanges();
@@ -386,7 +395,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                     ORYX.EDITOR._pluginFacade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'info',
-                        msg         : 'Storing Process Dictionary.',
+                        msg         : ORYX.I18N.Dictionary.storingDic,
                         title       : ''
 
                     });
@@ -400,7 +409,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                                    ORYX.EDITOR._pluginFacade.raiseEvent({
                                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                        ntype		: 'error',
-                                       msg         : 'Error saving Process Dictionary :\n' + e,
+                                       msg         : ORYX.I18N.Dictionary.errorSavingDic+' :\n' + e,
                                        title       : ''
 
                                    });
@@ -410,7 +419,7 @@ ORYX.Plugins.Dictionary = Clazz.extend({
                             ORYX.EDITOR._pluginFacade.raiseEvent({
                                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                 ntype		: 'error',
-                                msg         : 'Error saving Process Dictionary',
+                                msg         : ORYX.I18N.Dictionary.errorSavingDic+'.',
                                 title       : ''
 
                             });
@@ -418,13 +427,13 @@ ORYX.Plugins.Dictionary = Clazz.extend({
         	            params: {
         	            	action: 'save',
         	            	profile: ORYX.PROFILE,
-        	            	uuid : ORYX.UUID,
+        	            	uuid :  window.btoa(encodeURI(ORYX.UUID)),
         	            	dvalue : jsonDataEncode
         	            }
         	        });
                 }.bind(this)
             }, {
-                text: 'Cancel',
+                text: ORYX.I18N.Dictionary.cancel,
                 handler: function(){
                 	dialog.hide()
                 }.bind(this)

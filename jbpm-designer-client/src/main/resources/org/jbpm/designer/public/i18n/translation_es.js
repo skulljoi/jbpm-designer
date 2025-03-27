@@ -1,4 +1,4 @@
-﻿/**
+/**
  * @author Anna Luebbe
  * 
  * Contains all strings for Spanish language.
@@ -288,6 +288,35 @@ ORYX.I18N.PropertyWindow.ok = "Ok";
 ORYX.I18N.PropertyWindow.cancel = "Cancelar";
 ORYX.I18N.PropertyWindow.dateFormat = "dia/mes/año";
 
+if (!ORYX.I18N.ConditionExpressionEditorField) ORYX.I18N.ConditionExpressionEditorField = {};
+
+ORYX.I18N.ConditionExpressionEditorField.simpleTitle = "Editor de Expresiones - Pulse [Ctrl-Z] para activar auto-completar";
+ORYX.I18N.ConditionExpressionEditorField.sequenceFlowTitle = "Sequence Flow Conditions";
+ORYX.I18N.ConditionExpressionEditorField.sequenceFlowFullTitle = "Sequence Flow Conditions - Pulse [Ctrl-Z] para activar auto-completar";
+ORYX.I18N.ConditionExpressionEditorField.scriptTab = "Script";
+ORYX.I18N.ConditionExpressionEditorField.editorTab = "Editor";
+ORYX.I18N.ConditionExpressionEditorField.editorDescription = "Ejecuta flujo si se cumplen las siguientes condiciones."
+ORYX.I18N.ConditionExpressionEditorField.processVariable = "Variable del proceso::"
+ORYX.I18N.ConditionExpressionEditorField.condition = "Condición:"
+ORYX.I18N.ConditionExpressionEditorField.between = "Entre";
+ORYX.I18N.ConditionExpressionEditorField.contains = "Contiene";
+ORYX.I18N.ConditionExpressionEditorField.endsWith = "Termina con";
+ORYX.I18N.ConditionExpressionEditorField.equalsTo = "Es igual a";
+ORYX.I18N.ConditionExpressionEditorField.greaterThan = "Mayor que";
+ORYX.I18N.ConditionExpressionEditorField.greaterThanOrEqual = "Mayor o igual que";
+ORYX.I18N.ConditionExpressionEditorField.isEmpty = "Está vacío";
+ORYX.I18N.ConditionExpressionEditorField.isFalse = "Es falso";
+ORYX.I18N.ConditionExpressionEditorField.isNull = "Es nulo";
+ORYX.I18N.ConditionExpressionEditorField.isTrue = "Es verdadero";
+ORYX.I18N.ConditionExpressionEditorField.lessThan = "Menor que";
+ORYX.I18N.ConditionExpressionEditorField.lessThanOrEqual = "Menor o igual que";
+ORYX.I18N.ConditionExpressionEditorField.startsWith = "Empieza con";
+ORYX.I18N.ConditionExpressionEditorField.paramsError = "No se ha podido generar la expresión, por favor rellene los campos correctamente.";
+ORYX.I18N.ConditionExpressionEditorField.saveError = "No se ha podido guardar la propiedad, por favor revise el valor configurado y pruebe otra vez";
+ORYX.I18N.ConditionExpressionEditorField.scriptParseError = "Se ha encontrado un error parseando el script: <br/>{0}<br/><br/>Pulse OK para quedarse en el Editor de Expresiones y perder el Script o Cancelar para volver al Editor de Scripts.";
+ORYX.I18N.ConditionExpressionEditorField.scriptGenerationError = "Se ha encontrado un error generando el script: <br/>{0}<br/><br/>Por favor revise los datos insertados en el Editor de Expresiones.";
+ORYX.I18N.ConditionExpressionEditorField.nonExistingVariable = "El proceso no contiene ninguna variable llamada \"{0}\".";
+
 if(!ORYX.I18N.ShapeMenuPlugin) ORYX.I18N.ShapeMenuPlugin = {};
 
 ORYX.I18N.ShapeMenuPlugin.drag = "Tirar";
@@ -331,6 +360,54 @@ ORYX.I18N.View.zoomIn = "Engrandecer";
 ORYX.I18N.View.zoomInDesc = "Engrandecer";
 ORYX.I18N.View.zoomOut = "Reducir";
 ORYX.I18N.View.zoomOutDesc = "Reducir";
+
+if(!ORYX.I18N.View.tabs) ORYX.I18N.View.tabs = {};
+ORYX.I18N.View.tabs.modelling = "Process Modelling";
+ORYX.I18N.View.tabs.simResults = "Simulation Results";
+
+if(!ORYX.I18N.View.sim) ORYX.I18N.View.sim = {};
+ORYX.I18N.View.sim.processPaths = "Display Process Paths";
+ORYX.I18N.View.sim.runSim = "Run Process Simulation";
+ORYX.I18N.View.sim.calculatingPaths = "Calculating process paths.";
+ORYX.I18N.View.sim.dispColor = "Display Color";
+ORYX.I18N.View.sim.numElements = "Number of Elements";
+ORYX.I18N.View.sim.processPathsTitle = "Process Paths";
+ORYX.I18N.View.sim.subProcessPathsTitle = "Subprocess Paths";
+ORYX.I18N.View.sim.select = "Select ";
+ORYX.I18N.View.sim.display = " and click Show Path to display it.";
+ORYX.I18N.View.sim.showPath = "Show Path";
+ORYX.I18N.View.sim.selectPath = "Please select a process path.";
+ORYX.I18N.View.sim.numInstances = "Number of instances";
+ORYX.I18N.View.sim.interval = "Interval";
+ORYX.I18N.View.sim.intervalUnits = "Interval units";
+ORYX.I18N.View.sim.runSim = "Run Process Simulation";
+ORYX.I18N.View.sim.runningSim = "Running Process Simulation...";
+ORYX.I18N.View.sim.simNoResults = "Simulation engine did not return results: ";
+ORYX.I18N.View.sim.unableToPerform = "Unable to perform simulation:";
+ORYX.I18N.View.sim.resultsInfo = "Simulation Info";
+ORYX.I18N.View.sim.resultsGraphs = "Simulation Graphs";
+ORYX.I18N.View.sim.resultsProcessId = "Process id: ";
+ORYX.I18N.View.sim.resultsProcessName = "Process name: ";
+ORYX.I18N.View.sim.resultsProcessVersion = "Process version: ";
+ORYX.I18N.View.sim.resultsSimStartTime = "Simulation start: ";
+ORYX.I18N.View.sim.resultsSimEndTime = "Simulation end: ";
+ORYX.I18N.View.sim.resultsNumOfExecutions = "Num. of Executions: ";
+ORYX.I18N.View.sim.resultsInterval = "Interval "
+ORYX.I18N.View.sim.resultsGroupProcess = "Process";
+ORYX.I18N.View.sim.resultsGroupProcessElements = "Process Elements";
+ORYX.I18N.View.sim.resultsGroupProcessPaths = "Paths";
+ORYX.I18N.View.sim.resultsTitlesProcessSimResults = "Process Simulation Results";
+ORYX.I18N.View.sim.resultsTitlesTaskSimResults = "Task Simulation Results";
+ORYX.I18N.View.sim.resultsTitlesHumanTaskSimResults = "Human Task Simulation Results";
+ORYX.I18N.View.sim.resultsTitlesPathExecutionInfo = "Path Execution Info";
+ORYX.I18N.View.sim.chartsExecutionTimes = "Execution Times";
+ORYX.I18N.View.sim.chartsActivityInstances = "Activity Instances";
+ORYX.I18N.View.sim.chartsTotalCost = "Total Cost";
+ORYX.I18N.View.sim.chartsTotalResourceUtilization = "Total Resource Utilization";
+ORYX.I18N.View.sim.chartsResourceUtilization = "Resource Utilization";
+ORYX.I18N.View.sim.chartsResourceCost = "Resource Cost";
+ORYX.I18N.View.sim.chartsPathImage = "Path Image";
+ORYX.I18N.View.sim.chartsPathInstanceExecution = "Path Instance Execution";
 
 
 if(!ORYX.I18N.XFormsSerialization) ORYX.I18N.XFormsSerialization = {};

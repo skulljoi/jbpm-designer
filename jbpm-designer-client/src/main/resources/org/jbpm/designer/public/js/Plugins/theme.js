@@ -10,7 +10,7 @@ ORYX.Plugins.Theme = Clazz.extend({
 		
 		var ajaxObj = new XMLHttpRequest;
 		var url = ORYX.PATH + "themes";
-	    var params  = "action=getThemeNames&profile=" + ORYX.PROFILE + "&uuid=" + ORYX.UUID;
+	    var params  = "action=getThemeNames&profile=" + ORYX.PROFILE + "&uuid=" +  window.btoa(encodeURI(ORYX.UUID));
 	    ajaxObj.open("POST",url,false);
 	    ajaxObj.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
 	    ajaxObj.send(params);
@@ -18,27 +18,29 @@ ORYX.Plugins.Theme = Clazz.extend({
 	    if (ajaxObj.status == 200) {
 			var themeNamesArray = ajaxObj.responseText.split(",");
 			for (var i = 0; i < themeNamesArray.length; i++) {
-	   			 this.facade.offer({
-	   				'name': themeNamesArray[i],
-	   				'functionality': this.applyTheme.bind(this, themeNamesArray[i]),
-	   				'group': 'colorpickergroup',
-	   				dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/colorpicker.gif",
-	   				'icon': ORYX.BASE_FILE_PATH + "images/colorize.png",
-	   				'description': "Apply " + themeNamesArray[i] + " Color Theme",
-	   				'index': 10,
-	   				'minShape': 0,
-	   				'maxShape': 0,
-	   				'isEnabled': function(){
-                           return true;
-//	   					profileParamName = "profile";
-//	   					profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//	   					regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//	   			        regexa = new RegExp( regexSa );
-//	   			        profileParams = regexa.exec( window.location.href );
-//	   			        profileParamValue = profileParams[1];
-//	   					return profileParamValue == "jbpm";
-	   				}.bind(this)
-	   			});
+                if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+                     this.facade.offer({
+                        'name': themeNamesArray[i],
+                        'functionality': this.applyTheme.bind(this, themeNamesArray[i]),
+                        'group': 'colorpickergroup',
+                        dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/colorpicker.gif",
+                        'icon': ORYX.BASE_FILE_PATH + "images/colorize.png",
+                        'description':ORYX.I18N.theme.Apply +' '+ themeNamesArray[i] + " "+ ORYX.I18N.theme.ColorTheme,
+                        'index': 10,
+                        'minShape': 0,
+                        'maxShape': 0,
+                        'isEnabled': function(){
+                               return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //	   					profileParamName = "profile";
+    //	   					profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //	   					regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //	   			        regexa = new RegExp( regexSa );
+    //	   			        profileParams = regexa.exec( window.location.href );
+    //	   			        profileParamValue = profileParams[1];
+    //	   					return profileParamValue == "jbpm";
+                        }.bind(this)
+                    });
+                }
   			}
 		}
 	},
@@ -61,7 +63,7 @@ ORYX.Plugins.Theme = Clazz.extend({
                        this.facade.raiseEvent({
                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                            ntype		: 'error',
-                           msg         : 'Invalid Color Theme data.',
+                           msg         : ORYX.I18N.theme.invalidColorTheme,
                            title       : ''
                        });
     	   			}
@@ -69,7 +71,7 @@ ORYX.Plugins.Theme = Clazz.extend({
                    this.facade.raiseEvent({
                        type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                        ntype		: 'error',
-                       msg         : 'Error applying Color Theme: ' + e,
+                       msg         : ORYX.I18N.theme.errorApplying +": "+ e,
                        title       : ''
                    });
     	   		}
@@ -78,14 +80,14 @@ ORYX.Plugins.Theme = Clazz.extend({
                 this.facade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Error applying Color Theme.',
+                    msg         : ORYX.I18N.theme.errorApplying+". ",
                     title       : ''
                 });
             },
             params: {
             	action: 'getThemeJSON',
             	profile: ORYX.PROFILE,
-                uuid: ORYX.UUID
+                uuid:  window.btoa(encodeURI(ORYX.UUID))
             }
         });
 	},

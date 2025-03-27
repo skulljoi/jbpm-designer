@@ -14,99 +14,125 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         this.fail;
         this.uid;
         this.historyInterval;
+        this.mygrid;
 
         if(this.haveSupportForLocalHistory()) {
             this.setupAndLoadHistoryData();
-            this.startStoring();
+            this.enableLocalHistory();
+            //this.startStoring();
         }
 
-        this.facade.offer({
-            'name': "Display Local History",
-            'functionality': this.displayLocalHistory.bind(this),
-            'group': "localstorage",
-            'icon': ORYX.BASE_FILE_PATH + "images/view.png",
-             dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
-            'description': "Display Local History",
-            'index': 1,
-            'minShape': 0,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return ORYX.LOCAL_HISTORY_ENABLED;
-//                profileParamName = "profile";
-//                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//                regexa = new RegExp( regexSa );
-//                profileParams = regexa.exec( window.location.href );
-//                profileParamValue = profileParams[1];
-//                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
-            }.bind(this)
-        });
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            this.facade.offer({
+                'name': ORYX.I18N.LocalHistory.display,
+                'functionality': this.displayLocalHistory.bind(this),
+                'group': "localstorage",
+                'icon': ORYX.BASE_FILE_PATH + "images/view.png",
+                 dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
+                'description': ORYX.I18N.LocalHistory.display_desc,
+                'index': 1,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return ORYX.LOCAL_HISTORY_ENABLED && !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //                profileParamName = "profile";
+    //                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //                regexa = new RegExp( regexSa );
+    //                profileParams = regexa.exec( window.location.href );
+    //                profileParamValue = profileParams[1];
+    //                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
+                }.bind(this)
+            });
 
-        this.facade.offer({
-            'name': "Clear Local History",
-            'functionality': this.clearLocalHistory.bind(this),
-            'group': "localstorage",
-            'icon': ORYX.BASE_FILE_PATH + "images/clear.png",
-            dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
-            'description': "Clear Local History",
-            'index': 2,
-            'minShape': 0,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return ORYX.LOCAL_HISTORY_ENABLED;
-//                profileParamName = "profile";
-//                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//                regexa = new RegExp( regexSa );
-//                profileParams = regexa.exec( window.location.href );
-//                profileParamValue = profileParams[1];
-//                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
-            }.bind(this)
-        });
+            this.facade.offer({
+                'name': ORYX.I18N.LocalHistory.clear,
+                'functionality': this.clearLocalHistory.bind(this),
+                'group': "localstorage",
+                'icon': ORYX.BASE_FILE_PATH + "images/clear.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
+                'description': ORYX.I18N.LocalHistory.clear_desc,
+                'index': 2,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return ORYX.LOCAL_HISTORY_ENABLED && !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //                profileParamName = "profile";
+    //                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //                regexa = new RegExp( regexSa );
+    //                profileParams = regexa.exec( window.location.href );
+    //                profileParamValue = profileParams[1];
+    //                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
+                }.bind(this)
+            });
 
-        this.facade.offer({
-            'name': "Enable Local History",
-            'functionality': this.enableLocalHistory.bind(this),
-            'group': "localstorage",
-            'icon': ORYX.BASE_FILE_PATH + "images/enable.png",
-            dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
-            'description': "Enable Local History",
-            'index': 3,
-            'minShape': 0,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return !ORYX.LOCAL_HISTORY_ENABLED;
-//                profileParamName = "profile";
-//                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//                regexa = new RegExp( regexSa );
-//                profileParams = regexa.exec( window.location.href );
-//                profileParamValue = profileParams[1];
-//                return profileParamValue == "jbpm" && !ORYX.LOCAL_HISTORY_ENABLED;
-            }.bind(this)
-        });
+            this.facade.offer({
+                'name': ORYX.I18N.LocalHistory.config,
+                'functionality': this.configureSnapshotInterval.bind(this),
+                'group': "localstorage",
+                'icon': ORYX.BASE_FILE_PATH + "images/clock.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
+                'description': ORYX.I18N.LocalHistory.config_desc,
+                'index': 3,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return ORYX.LOCAL_HISTORY_ENABLED && !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //                profileParamName = "profile";
+    //                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //                regexa = new RegExp( regexSa );
+    //                profileParams = regexa.exec( window.location.href );
+    //                profileParamValue = profileParams[1];
+    //                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
+                }.bind(this)
+            });
 
-        this.facade.offer({
-            'name': "Disable Local History",
-            'functionality': this.disableLocalHistory.bind(this),
-            'group': "localstorage",
-            'icon': ORYX.BASE_FILE_PATH + "images/disable.png",
-            dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
-            'description': "Disable Local History",
-            'index': 4,
-            'minShape': 0,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return ORYX.LOCAL_HISTORY_ENABLED;
-//                profileParamName = "profile";
-//                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//                regexa = new RegExp( regexSa );
-//                profileParams = regexa.exec( window.location.href );
-//                profileParamValue = profileParams[1];
-//                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
-            }.bind(this)
-        });
+            this.facade.offer({
+                'name': ORYX.I18N.LocalHistory.enable,
+                'functionality': this.enableLocalHistory.bind(this),
+                'group': "localstorage",
+                'icon': ORYX.BASE_FILE_PATH + "images/enable.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
+                'description': ORYX.I18N.LocalHistory.enable_desc,
+                'index': 3,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !ORYX.LOCAL_HISTORY_ENABLED && !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //                profileParamName = "profile";
+    //                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //                regexa = new RegExp( regexSa );
+    //                profileParams = regexa.exec( window.location.href );
+    //                profileParamValue = profileParams[1];
+    //                return profileParamValue == "jbpm" && !ORYX.LOCAL_HISTORY_ENABLED;
+                }.bind(this)
+            });
+
+            this.facade.offer({
+                'name': ORYX.I18N.LocalHistory.disable,
+                'functionality': this.disableLocalHistory.bind(this),
+                'group': "localstorage",
+                'icon': ORYX.BASE_FILE_PATH + "images/disable.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/localhistory.png",
+                'description': ORYX.I18N.LocalHistory.disable_desc,
+                'index': 4,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return ORYX.LOCAL_HISTORY_ENABLED && !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //                profileParamName = "profile";
+    //                profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //                regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //                regexa = new RegExp( regexSa );
+    //                profileParams = regexa.exec( window.location.href );
+    //                profileParamValue = profileParams[1];
+    //                return profileParamValue == "jbpm" && ORYX.LOCAL_HISTORY_ENABLED;
+                }.bind(this)
+            });
+        }
 
         window.onbeforeunload = function(){
             this.stopStoring();
@@ -114,7 +140,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
     },
     displayLocalHistory : function() {
         var gridId = Ext.id();
-        var grid = new Ext.grid.EditorGridPanel({
+        this.mygrid = new Ext.grid.EditorGridPanel({
             autoScroll: true,
             autoHeight: true,
             store: this.historyStore,
@@ -123,48 +149,48 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
             cm: new Ext.grid.ColumnModel([new Ext.grid.RowNumberer(),
             {
                 id: 'pid',
-                header: 'Id',
+                header: ORYX.I18N.LocalHistory.headertxt.id,
                 width: 100,
                 dataIndex: 'processid',
                 editor: new Ext.form.TextField({ allowBlank: true, disabled: true })
             },
             {
                 id: 'pname',
-                header: 'Name',
+                header: ORYX.I18N.LocalHistory.headertxt.name,
                 width: 100,
                 dataIndex: 'processname',
                 editor: new Ext.form.TextField({ allowBlank: true, disabled: true })
             },
             {
                 id: 'ppkg',
-                header: 'Package',
+                header: ORYX.I18N.LocalHistory.headertxt.Package,
                 width: 100,
                 dataIndex: 'processpkg',
                 editor: new Ext.form.TextField({ allowBlank: true, disabled: true })
             },
             {
                 id: 'pver',
-                header: 'Version',
+                header: ORYX.I18N.LocalHistory.headertxt.Version,
                 width: 100,
                 dataIndex: 'processversion',
                 editor: new Ext.form.TextField({ allowBlank: true, disabled: true })
             },
             {
                 id: 'tms',
-                header: 'Time Stamp',
+                header: ORYX.I18N.LocalHistory.headertxt.TimeStamp,
                 width: 200,
                 dataIndex: 'timestamp',
                 editor: new Ext.form.TextField({ allowBlank: true, disabled: true })
             },{
                 id: 'pim',
-                header: 'Process Image',
+                header: ORYX.I18N.LocalHistory.headertxt.ProcessImage,
                 width: 150,
                 dataIndex: 'svg',
                 renderer: function(val) {
                     if(val && val.length > 0) {
                         return '<center><img src="'+ ORYX.BASE_FILE_PATH +'images/page_white_picture.png" onclick="resetSVGView(\''+val+'\');new SVGViewer({title: \'Local History Process Image\', width: \'650\', height: \'450\', autoScroll: true, fixedcenter: true, src: \''+'\',hideAction: \'close\'}).show();" alt="Click to view Process Image"/></center>';
                     } else {
-                        return "<center>Process image not available.</center>";
+                        return ORYX.I18N.LocalHistory.headertxt.ProcessImage_NoAvailable;
                     }
                     return "";
                 }
@@ -173,10 +199,10 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
 
         var localHistoryPanel = new Ext.Panel({
             id: 'localHistoryPanel',
-            title: '<center>Select Process Id and click "Restore" to restore.</center>',
+            title: ORYX.I18N.LocalHistory.localHistoryPanel.title,
             layout:'column',
             items:[
-                grid
+                this.mygrid
             ],
             layoutConfig: {
                 columns: 1
@@ -189,7 +215,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         var dialog = new Ext.Window({
             layout		: 'anchor',
             autoCreate	: true,
-            title		: 'Local History View',
+            title		: ORYX.I18N.LocalHistory.LocalHistoryView.title,
             height		: 350,
             width		: 780,
             modal		: true,
@@ -212,10 +238,10 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
                 }.bind(this)
             },
             buttons		: [{
-                text: 'Restore',
+                text: ORYX.I18N.LocalHistory.LocalHistoryView.restore,
                 handler: function(){
-                    if(grid.getSelectionModel().getSelectedCell() != null) {
-                        var selectedIndex = grid.getSelectionModel().getSelectedCell()[0];
+                    if(this.mygrid.getSelectionModel().getSelectedCell() != null) {
+                        var selectedIndex = this.mygrid.getSelectionModel().getSelectedCell()[0];
                         var outValue = this.historyStore.getAt(selectedIndex).data['json'];
                         if(outValue && outValue.length > 0) {
                             outValue = Base64.decode(outValue);
@@ -226,7 +252,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
                             this.facade.raiseEvent({
                                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                 ntype		: 'error',
-                                msg         : 'Invalid Process info. Unable to restore.',
+                                msg         : ORYX.I18N.LocalHistory.LocalHistoryView.invalidProcessInfo,
                                 title       : ''
                             });
                         }
@@ -235,7 +261,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
                         this.facade.raiseEvent({
                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                             ntype		: 'info',
-                            msg         : 'Please select a process id.',
+                            msg         : ORYX.I18N.LocalHistory.LocalHistoryView.msg,
                             title       : ''
                         });
                     }
@@ -249,8 +275,8 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         });
 
         dialog.show();
-        grid.render();
-        grid.focus( false, 100 );
+        this.mygrid.render();
+        this.mygrid.focus( false, 100 );
     },
     setupAndLoadHistoryData : function() {
         this.historyEntry = Ext.data.Record.create(
@@ -266,7 +292,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         );
         this.historyProxy = new Ext.data.MemoryProxy({root: []});
         this.historyStore = new Ext.data.Store({
-            autoDestroy: true,
+            autoDestroy: false,
             reader: new Ext.data.JsonReader({
                 root: "root"
             }, this.historyEntry),
@@ -288,16 +314,34 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         }
     },
     addToStore : function(item) {
-        this.historyStore.insert(0, new this.historyEntry({
-            processid: item.processid,
-            processname: item.processname,
-            processpkg: item.processpkg,
-            processversion: item.processversion,
-            timestamp: new Date(item.timestamp).format("d.m.Y H:i:s"),
-            json: item.json,
-            svg:  item.svg
-        }));
-        this.historyStore.commitChanges();
+        if(this.historyStore.data.length > 0) {
+            if(this.historyStore.getAt(0).data['json'] != item.json) {
+                this.historyStore.insert(0, new this.historyEntry({
+                    processid: item.processid,
+                    processname: item.processname,
+                    processpkg: item.processpkg,
+                    processversion: item.processversion,
+                    timestamp: new Date(item.timestamp).format("d.m.Y H:i:s"),
+                    json: item.json,
+                    svg:  item.svg
+                }));
+                this.historyStore.commitChanges();
+                if(this.mygrid) {
+                    this.mygrid.getView().refresh(false);
+                }
+            }
+        } else {
+            this.historyStore.insert(0, new this.historyEntry({
+                processid: item.processid,
+                processname: item.processname,
+                processpkg: item.processpkg,
+                processversion: item.processversion,
+                timestamp: new Date(item.timestamp).format("d.m.Y H:i:s"),
+                json: item.json,
+                svg:  item.svg
+            }));
+            this.historyStore.commitChanges();
+        }
     },
     clearLocalHistory : function() {
         this.historyStore.removeAll();
@@ -309,7 +353,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Local History has been cleared.',
+            msg         : ORYX.I18N.LocalHistory.clearLocalHistory.msg,
             title       : ''
         });
     },
@@ -324,6 +368,13 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
             this.storage.removeItem(this.uid);
             this.fail && (this.storage = false);
         } catch(e) {}
+
+        var localHistoryCookieVal = this._readCookie("designerlocalhistory");
+        var enabledFromCookie = false;
+        if(localHistoryCookieVal != null && localHistoryCookieVal == "true") {
+            enabledFromCookie = true;
+            return this.storage && enabledFromCookie;
+        }
         return this.storage && ORYX.LOCAL_HISTORY_ENABLED;
     },
     addToHistory : function() {
@@ -360,7 +411,7 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
             this.facade.raiseEvent({
                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                 ntype		: 'info',
-                msg         : 'Local History quota exceeded. Clearing local history.',
+                msg         : ORYX.I18N.LocalHistory.addQuotaexceed,
                 title       : ''
             });
             this.clearLocalHistory();
@@ -378,24 +429,26 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
     },
     disableLocalHistory: function() {
         ORYX.LOCAL_HISTORY_ENABLED = false;
+        this._createCookie("designerlocalhistory", "false", 365);
         this.stopStoring();
         this.facade.raiseEvent({type: ORYX.CONFIG.EVENT_STENCIL_SET_LOADED});
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Local History has been disabled.',
+            msg         : ORYX.I18N.LocalHistory.historyDisabled,
             title       : ''
         });
     },
     enableLocalHistory: function() {
         ORYX.LOCAL_HISTORY_ENABLED = true;
+        this._createCookie("designerlocalhistory", "true", 365);
         this.setupAndLoadHistoryData();
         this.startStoring();
         this.facade.raiseEvent({type: ORYX.CONFIG.EVENT_STENCIL_SET_LOADED});
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Local History has been enabled.',
+            msg         : ORYX.I18N.LocalHistory.historyEnabled,
             title       : ''
         });
     },
@@ -404,6 +457,133 @@ ORYX.Plugins.LocalHistory = Clazz.extend({
     },
     stopStoring: function() {
         clearInterval(this.historyInterval);
+    },
+    _createCookie: function(name, value, days) {
+        if (days) {
+            var date = new Date();
+            date.setTime(date.getTime()+(days*24*60*60*1000));
+            var expires = "; expires="+date.toGMTString();
+        }
+        else {
+            var expires = "";
+        }
+
+        document.cookie = name+"="+value+expires+"; path=/";
+    },
+    _readCookie: function(name) {
+        var nameEQ = name + "=";
+        var ca = document.cookie.split(';');
+        for(var i=0;i < ca.length;i++) {
+            var c = ca[i];
+            while (c.charAt(0)==' ') c = c.substring(1,c.length);
+            if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        }
+        return null;
+    },
+    configureSnapshotInterval : function() {
+        var siform = new Ext.form.FormPanel({
+            baseCls: 		'x-plain',
+            labelWidth: 	150,
+            defaultType: 	'numberfield',
+            items: [
+                {
+                    fieldLabel: ORYX.I18N.View.sim.interval,
+                    name: 'interval',
+                    allowBlank:false,
+                    allowDecimals:false,
+                    minValue:1,
+                    width: 120
+                },
+                {
+                    xtype: 'combo',
+                    name: 'intervalunits',
+                    store: new Ext.data.SimpleStore({
+                        fields: ['units','value'],
+                        data: [['millisecond',ORYX.I18N.LocalHistory.unitsMillisecond],
+                               ['seconds',ORYX.I18N.LocalHistory.unitsSeconds],
+                               ['minutes',ORYX.I18N.LocalHistory.unitsMinutes],
+                               ['hours',ORYX.I18N.LocalHistory.unitsHours],
+                               ['days',ORYX.I18N.LocalHistory.unitsDays]]
+                    }),
+                    allowBlank: false,
+                    displayField: 'value',
+                    valueField: 'units',
+                    mode: 'local',
+                    typeAhead: true,
+                    value: "minutes",
+                    triggerAction: 'all',
+                    fieldLabel: ORYX.I18N.LocalHistory.intervalUnits,
+                    width: 120
+                }
+            ]
+        });
+
+        var dialog = new Ext.Window({
+            autoCreate: true,
+            layout: 	'fit',
+            plain:		true,
+            bodyStyle: 	'padding:5px;',
+            title: 		ORYX.I18N.LocalHistory.ConfigureSnapshotInterval,
+            height: 	300,
+            width:		350,
+            modal:		true,
+            fixedcenter:true,
+            shadow:		true,
+            proxyDrag: 	true,
+            resizable:	true,
+            items: 		[siform],
+            buttons:[
+                {
+                    text:ORYX.I18N.LocalHistory.set,
+                    handler:function(){
+                        dialog.hide();
+                        var intervalInput = siform.items.items[0].getValue();
+                        var intervalUnit = siform.items.items[1].getValue();
+                        if(intervalInput && intervalUnit && intervalInput > 0) {
+                            if(intervalUnit == "seconds") {
+                                intervalInput = intervalInput*1000;
+                            } else if(intervalUnit == "minutes") {
+                                intervalInput = intervalInput*1000*60;
+                            } else if(intervalUnit == "hours") {
+                                intervalInput = intervalInput*1000*60*60;
+                            } else if(intervalUnit == "days") {
+                                intervalInput = intervalInput*1000*60*60*24;
+                            } else {
+                                // default to milliseconds
+                            }
+                            this.stopStoring();
+                            ORYX.LOCAL_HISTORY_TIMEOUT = intervalInput;
+                            this.startStoring();
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'info',
+                                msg         : ORYX.I18N.LocalHistory.UpdatedSnapshotInterval,
+                                title       : ''
+                            });
+                        } else {
+                            this.facade.raiseEvent({
+                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+                                ntype		: 'error',
+                                msg         : ORYX.I18N.LocalHistory.InvalidInput,
+                                title       : ''
+                            });
+                        }
+
+                    }.bind(this)
+                },{
+                    text: ORYX.I18N.Save.close,
+                    handler:function(){
+                        dialog.hide();
+                    }.bind(this)
+                }
+            ]
+        });
+        dialog.on('hide', function(){
+            dialog.destroy(true);
+            delete dialog;
+        });
+        dialog.show();
+
     }
 });
 

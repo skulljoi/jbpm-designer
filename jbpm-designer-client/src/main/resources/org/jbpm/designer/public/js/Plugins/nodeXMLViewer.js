@@ -19,28 +19,30 @@ ORYX.Plugins.NodeXMLViewer = Clazz.extend({
 			var nextTAID = Ext.id();
 			var cf = new Ext.form.TextArea({
 				id: nextTAID,
-   	            fieldLabel:"Node Source",
+   	            fieldLabel:ORYX.I18N.lockNode.nodeSource,
    	            value:options.nodesource,
    	            autoScroll:true
    	            });
-			
+
+			var dialogSize = ORYX.Utils.getDialogSize(550, 600);
+
 			var nextWINID = Ext.id();
-			this.win = new Ext.Window({
-   				width:600,
+			var win = new Ext.Window({
+				height:dialogSize.height,
+   				width:dialogSize.width,
    				id: nextWINID,
-   				height:550,
    				layout: 'fit',
-   				title:'Node Source',
+   				title:ORYX.I18N.lockNode.nodeSource,
    				items: [cf],
    				buttons		: [{
-					text : 'Close',
+					text : ORYX.I18N.Save.close,
 					handler:function(){
-						this.win.hide();
+						win.destroy();
 						this.sourceEditor = undefined;
 					}.bind(this)
 				}]
    				});
-			this.win.show();
+			win.show();
 			this.foldFunc = CodeMirror.newFoldFunction(CodeMirror.tagRangeFinder);
    			this.sourceEditor = CodeMirror.fromTextArea(document.getElementById(nextTAID), {
    			  mode: "application/xml",
@@ -49,7 +51,7 @@ ORYX.Plugins.NodeXMLViewer = Clazz.extend({
    			  onGutterClick: this.foldFunc
    			});
 		} else {
-			Ext.Msg.alert('Node source was not specified.');
+			Ext.Msg.alert(ORYX.I18N.lockNode.nodeSourceNoSpecified);
 		}
 	}
 });

@@ -7,50 +7,38 @@ if (!ORYX.Config)
 ORYX.Plugins.Simulation = Clazz.extend({
 	construct: function(facade){
 		this.facade = facade;
-		
-		this.facade.offer({
-			'name': "Process Paths",
-			'functionality': this.findPaths.bind(this),
-			'group': "validationandsimulation",
-			'icon': ORYX.BASE_FILE_PATH + "images/path.png",
-			dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/simulation.png",
-			'description': "Display Process Paths",
-			'index': 1,
-			'minShape': 0,
-			'maxShape': 0,
-			'isEnabled': function(){
-                return true;
-//				profileParamName = "profile";
-//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//		        regexa = new RegExp( regexSa );
-//		        profileParams = regexa.exec( window.location.href );
-//		        profileParamValue = profileParams[1];
-//				return profileParamValue == "jbpm";
-			}.bind(this)
-		});
-		
-		this.facade.offer({
-			'name': "Run Simulation",
-			'functionality': this.runSimulation.bind(this),
-			'group': "validationandsimulation",
-			'icon': ORYX.BASE_FILE_PATH + "images/control_play.png",
-			dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/simulation.png",
-			'description': "Run Process Simulation",
-			'index': 2,
-			'minShape': 0,
-			'maxShape': 0,
-			'isEnabled': function(){
-                return true;
-//				profileParamName = "profile";
-//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//		        regexa = new RegExp( regexSa );
-//		        profileParams = regexa.exec( window.location.href );
-//		        profileParamValue = profileParams[1];
-//				return profileParamValue == "jbpm";
-			}.bind(this)
-		});
+
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            this.facade.offer({
+                'name': ORYX.I18N.View.sim.processPathsTitle,
+                'functionality': this.findPaths.bind(this),
+                'group': "validationandsimulation",
+                'icon': ORYX.BASE_FILE_PATH + "images/path.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/simulation.png",
+                'description': ORYX.I18N.View.sim.processPaths,
+                'index': 1,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true) && ORYX.BPSIMDISPLAY == true;
+                }.bind(this)
+            });
+
+            this.facade.offer({
+                'name': ORYX.I18N.View.sim.runSim,
+                'functionality': this.runSimulation.bind(this),
+                'group': "validationandsimulation",
+                'icon': ORYX.BASE_FILE_PATH + "images/control_play.png",
+                dropDownGroupIcon : ORYX.BASE_FILE_PATH + "images/simulation.png",
+                'description': ORYX.I18N.View.sim.runSim,
+                'index': 2,
+                'minShape': 0,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true) && ORYX.BPSIMDISPLAY == true;
+                }.bind(this)
+            });
+        }
 		this.facade.registerOnEvent(ORYX.CONFIG.EVENT_SIMULATION_BUILD_PATH_SVG, this.autoDisplayPath.bind(this));
 		this.facade.registerOnEvent(ORYX.CONFIG.EVENT_SIMULATION_CLEAR_PATH_SVG, this.resetNodeColors.bind(this));
 	},
@@ -61,7 +49,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
             this.facade.raiseEvent({
                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                 ntype		: 'info',
-                msg         : 'Creating path image.',
+                msg         : ORYX.I18N.View.sim.creatingPathImage,
                 title       : ''
 
             });
@@ -88,7 +76,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
                                this.facade.raiseEvent({
                                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                    ntype		: 'error',
-                                   msg         : 'Invalid Path data.',
+                                   msg         : ORYX.I18N.View.sim.errorInvalidData,
                                    title       : ''
 
                                });
@@ -97,7 +85,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
                            this.facade.raiseEvent({
                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                ntype		: 'error',
-                               msg         : 'Error finding Paths:\n' + e,
+                               msg         : ORYX.I18N.View.sim.errorFindingPath+':\n' + e,
                                title       : ''
 
                            });
@@ -107,15 +95,15 @@ ORYX.Plugins.Simulation = Clazz.extend({
                     this.facade.raiseEvent({
                         type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                         ntype		: 'error',
-                        msg         : 'Error finding Paths.',
+                        msg         : ORYX.I18N.View.sim.errorFindingPath + '.',
                         title       : ''
 
                     });
-	            },
+	            }.bind(this),
 	            params: {
 	            	action: 'getpathinfo',
 	            	profile: ORYX.PROFILE,
-	            	json: ORYX.EDITOR.getSerializedJSON(),
+	            	json: window.btoa(encodeURIComponent(ORYX.EDITOR.getSerializedJSON())),
 	            	ppdata: ORYX.PREPROCESSING,
 	            	sel: ""
 	            }
@@ -124,7 +112,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
             this.facade.raiseEvent({
                 type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                 ntype		: 'error',
-                msg         : 'Unknown path id.',
+                msg         : ORYX.I18N.View.sim.errorUnknownPathId,
                 title       : ''
 
             });
@@ -134,19 +122,19 @@ ORYX.Plugins.Simulation = Clazz.extend({
         this.facade.raiseEvent({
             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
             ntype		: 'info',
-            msg         : 'Calculating process paths.',
+            msg         : ORYX.I18N.View.sim.calculatingPaths,
             title       : ''
 
         });
 
 		var selection = this.facade.getSelection();
 		var selectedId = "";
-		var wintitle = "Process Paths";
+		var wintitle = ORYX.I18N.View.sim.processPathsTitle;
 		if(selection.length == 1) {
 			selection.each(function(shape) {
-				if(shape.getStencil().title() == "Embedded Subprocess") {
+				if(shape.getStencil().title() == "Embedded" || shape.getStencil().title() == "Event") {
 					selectedId = shape.resourceId;
-					wintitle = "Subprocess Paths";
+					wintitle = ORYX.I18N.View.sim.subProcessPathsTitle;
 				}
 			});
 		} 
@@ -196,7 +184,9 @@ ORYX.Plugins.Simulation = Clazz.extend({
     	   		    		cindex++;
     	   		    	}
     	   		    	processpathsStore.commitChanges();
-    		            
+
+						var dialogSize = ORYX.Utils.getDialogSize(200, 330);
+						var smallColWidth = (dialogSize.width - 80) / 5;
     		            var gridId = Ext.id();
     		        	var grid = new Ext.grid.EditorGridPanel({
     		                store: processpathsStore,
@@ -204,8 +194,8 @@ ORYX.Plugins.Simulation = Clazz.extend({
     		                stripeRows: true,
     		                cm: new Ext.grid.ColumnModel([new Ext.grid.RowNumberer(), {
     		                	id: 'display',
-    		                    header: 'Display Color',
-    		                    width: 90,
+    		                    header: ORYX.I18N.View.sim.dispColor,
+    		                    width: smallColWidth * 2,
     		                    dataIndex: 'display',
     		                    renderer: function(val) {
 		                    	  if(val) { 
@@ -216,8 +206,8 @@ ORYX.Plugins.Simulation = Clazz.extend({
 		                        }
     		                }, {
     		                	id: 'numele',
-    		                    header: 'Number of Elements',
-    		                    width: 130,
+    		                    header: ORYX.I18N.View.sim.numElements,
+    		                    width: smallColWidth * 3,
     		                    dataIndex: 'numele',
     		                    renderer: function(val) {
   		                    	  if(val) { 
@@ -232,7 +222,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
     		        	
     	   				var processPathsPanel = new Ext.Panel({
     		        		id: 'processPathsPanel',
-    		        		title: '<center>Select ' + wintitle + ' and click "Show Path" to display it.</center>',
+    		        		title: '<center>' + ORYX.I18N.View.sim.select + wintitle + ' ' + ORYX.I18N.View.sim.display + '</center>',
     		        		layout:'column',
     		        		items:[
     		        		       grid
@@ -250,8 +240,8 @@ ORYX.Plugins.Simulation = Clazz.extend({
     		    			layout		: 'anchor',
     		    			autoCreate	: true, 
     		    			title		: wintitle, 
-    		    			height		: 200, 
-    		    			width		: 300, 
+    		    			height		: dialogSize.height,
+    		    			width		: dialogSize.width,
     		    			modal		: true,
     		    			collapsible	: false,
     		    			fixedcenter	: true, 
@@ -273,7 +263,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
     		    				}.bind(this)				
     		    			},
     		    			buttons		: [{
-    		                    text: 'Show Path',
+    		                    text: ORYX.I18N.View.sim.showPath,
     		                    handler: function(){
     		                    	if(grid.getSelectionModel().getSelectedCell() != null) {
     		                    		var selectedIndex = grid.getSelectionModel().getSelectedCell()[0];
@@ -283,14 +273,14 @@ ORYX.Plugins.Simulation = Clazz.extend({
                                         this.facade.raiseEvent({
                                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                             ntype		: 'info',
-                                            msg         : 'Please select a process path.',
+                                            msg         : ORYX.I18N.View.sim.selectPath,
                                             title       : ''
 
                                         });
     		                    	}
     		                    }.bind(this)
     		                }, {
-    		                    text: 'Close',
+    		                    text: ORYX.I18N.Save.close,
     		                    handler: function(){
     		                    	this.resetNodeColors();
     		                    	dialog.hide();
@@ -303,7 +293,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
                            this.facade.raiseEvent({
                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                                ntype		: 'error',
-                               msg         : 'Invalid Path data.',
+                               msg         : ORYX.I18N.View.sim.errorInvalidData,
                                title       : ''
 
                            });
@@ -312,7 +302,7 @@ ORYX.Plugins.Simulation = Clazz.extend({
                        this.facade.raiseEvent({
                            type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                            ntype		: 'error',
-                           msg         : 'Error finding Paths:\n' + e,
+                           msg         : ORYX.I18N.View.sim.errorFindingPath+':\n' + e,
                            title       : ''
 
                        });
@@ -323,15 +313,15 @@ ORYX.Plugins.Simulation = Clazz.extend({
                 this.facade.raiseEvent({
                     type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                     ntype		: 'error',
-                    msg         : 'Error finding Paths.',
+                    msg         : ORYX.I18N.View.sim.errorFindingPath+'.',
                     title       : ''
 
                 });
-            },
+            }.bind(this),
             params: {
             	action: 'getpathinfo',
             	profile: ORYX.PROFILE,
-            	json: ORYX.EDITOR.getSerializedJSON(),
+            	json: window.btoa(encodeURIComponent(ORYX.EDITOR.getSerializedJSON())),
             	ppdata: ORYX.PREPROCESSING,
             	sel: selectedId
             }
@@ -341,12 +331,12 @@ ORYX.Plugins.Simulation = Clazz.extend({
 		var colors = ["#3399FF", "#FFCC33", "#FF99FF", "#6666CC", "#CCCCCC", "#66FF00", "#FFCCFF", "#0099CC", "#CC66FF", "#FFFF00", "#993300", "#0000CC", "#3300FF","#990000","#33CC00"];
 		return colors[cindex];
 	},
-	resetNodeColors : function() {
+	setDefaultColors : function() {
 		ORYX.EDITOR._canvas.getChildren().each((function(child) {
-				this.setOriginalValues(child);
+				this.setDefaultValues(child);
 		}).bind(this));
 	},
-	setOriginalValues : function(shape) {
+	setDefaultValues : function(shape) {
 		if(shape instanceof ORYX.Core.Node || shape instanceof ORYX.Core.Edge) {
     		shape.setProperty("oryx-bordercolor", shape.properties["oryx-origbordercolor"]);
     		shape.setProperty("oryx-bgcolor", shape.properties["oryx-origbgcolor"]);
@@ -355,13 +345,61 @@ ORYX.Plugins.Simulation = Clazz.extend({
 		if(shape.getChildren().size() > 0) {
 			for (var i = 0; i < shape.getChildren().size(); i++) {
 				if(shape.getChildren()[i] instanceof ORYX.Core.Node || shape.getChildren()[i] instanceof ORYX.Core.Edge) {
-					this.setOriginalValues(shape.getChildren()[i]);
+					this.setDefaultValues(shape.getChildren()[i]);
 				}
 			}
 		}
 	},
+    resetNodeColors : function() {
+        ORYX.EDITOR._canvas.getChildren().each((function(child) {
+            this.setOriginalValues(child);
+        }).bind(this));
+    },
+    setOriginalValues : function(shape) {
+        if(shape instanceof ORYX.Core.Node || shape instanceof ORYX.Core.Edge) {
+            if (shape.savedbordercolor !== undefined) {
+                shape.setProperty("oryx-bordercolor", shape.savedbordercolor);
+                delete shape.savedbordercolor;
+            }
+            if (shape.savedbgcolor !== undefined) {
+                shape.setProperty("oryx-bgcolor", shape.savedbgcolor);
+                delete shape.savedbgcolor;
+            }
+        }
+        shape.refresh();
+        if(shape.getChildren().size() > 0) {
+            for (var i = 0; i < shape.getChildren().size(); i++) {
+                if(shape.getChildren()[i] instanceof ORYX.Core.Node || shape.getChildren()[i] instanceof ORYX.Core.Edge) {
+                    this.setOriginalValues(shape.getChildren()[i]);
+                }
+            }
+        }
+    },
+    saveNodeColors : function() {
+        ORYX.EDITOR._canvas.getChildren().each((function(child) {
+            this.saveOriginalValues(child);
+        }).bind(this));
+    },
+    saveOriginalValues : function(shape) {
+        if(shape instanceof ORYX.Core.Node || shape instanceof ORYX.Core.Edge) {
+            if (shape.savedbordercolor === undefined) {
+                shape.savedbordercolor = shape.properties["oryx-bordercolor"];
+            }
+            if (shape.savedbgcolor === undefined) {
+                shape.savedbgcolor = shape.properties["oryx-bgcolor"];
+            }
+        }
+        if(shape.getChildren().size() > 0) {
+            for (var i = 0; i < shape.getChildren().size(); i++) {
+                if(shape.getChildren()[i] instanceof ORYX.Core.Node || shape.getChildren()[i] instanceof ORYX.Core.Edge) {
+                    this.saveOriginalValues(shape.getChildren()[i]);
+                }
+            }
+        }
+    },
 	setNodeColors : function(pathid, pathcolor, pathelements) {
-		this.resetNodeColors();
+        this.saveNodeColors();
+		this.setDefaultColors();
 		ORYX.EDITOR._canvas.getChildren().each((function(child) {
 				this.applyPathColors(child, pathcolor, pathelements);
 		}).bind(this));
@@ -387,55 +425,62 @@ ORYX.Plugins.Simulation = Clazz.extend({
 		}
 	},
 	runSimulation : function() {
+		var dialogSize = ORYX.Utils.getDialogSize(300, 350);
+		var labelWidth = dialogSize.width / 2;
+		var fieldWidth = dialogSize.width / 3;
+
 		var simform = new Ext.form.FormPanel({
 			baseCls: 		'x-plain',
-	        labelWidth: 	150,
+	        labelWidth: 	labelWidth,
 	        defaultType: 	'numberfield',
 	        items: [{
-	        	fieldLabel: 'Number of instances',
+	        	fieldLabel: ORYX.I18N.View.sim.numInstances,
 	            name: 'instances',
 	            allowBlank:false,
 	            allowDecimals:false,
 	            minValue:1,
-	            width: 120
+	            width: fieldWidth
 	        },
 	        {
-	        	fieldLabel: 'Inteval',
+	        	fieldLabel: ORYX.I18N.View.sim.interval,
 	            name: 'interval',
 	            allowBlank:false,
 	            allowDecimals:false,
 	            minValue:1,
-	            width: 120
+	            width: fieldWidth
 	        },
 	        {
                 xtype: 'combo',
                 name: 'intervalunits',
                 store: new Ext.data.SimpleStore({
-                    fields: ['units'],
-                    data: [['millisecond'], ['seconds'], ['minutes'], ['hours'], ['days']]
+                    fields: ['units','value'],
+                    data: [['millisecond',ORYX.I18N.LocalHistory.unitsMillisecond],
+                        ['seconds',ORYX.I18N.LocalHistory.unitsSeconds],
+                        ['minutes',ORYX.I18N.LocalHistory.unitsMinutes],
+                        ['hours',ORYX.I18N.LocalHistory.unitsHours],
+                        ['days',ORYX.I18N.LocalHistory.unitsDays]]
                 }),
                 allowBlank: false,
-                displayField: 'units',
+                displayField: 'value',
                 valueField: 'units',
                 mode: 'local',
                 typeAhead: true,
                 value: "minutes",
                 triggerAction: 'all',
-                fieldLabel: 'Interval units',
-                width: 120
+                fieldLabel: ORYX.I18N.View.sim.intervalUnits,
+                width: fieldWidth
             }
 	        ]
 	    });
-		
-		
-		var dialog = new Ext.Window({ 
+
+		var dialog = new Ext.Window({
 			autoCreate: true, 
 			layout: 	'fit',
 			plain:		true,
 			bodyStyle: 	'padding:5px;',
-			title: 		"Run Process Simulation", 
-			height: 	300,
-			width:		350,
+			title: 		ORYX.I18N.View.sim.runSim,
+			height: 	dialogSize.height,
+			width:		dialogSize.width,
 			modal:		true,
 			fixedcenter:true, 
 			shadow:		true, 
@@ -444,14 +489,14 @@ ORYX.Plugins.Simulation = Clazz.extend({
 			items: 		[simform],
 			buttons:[
 				{
-					text:"Run Simulation",
+					text: ORYX.I18N.View.sim.runSim,
 					handler:function(){
 						dialog.hide();
 
                         this.facade.raiseEvent({
                             type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
                             ntype		: 'info',
-                            msg         : 'Running Process Simulation...',
+                            msg         : ORYX.I18N.View.sim.runningSim,
                             title       : ''
 
                         });
@@ -464,52 +509,75 @@ ORYX.Plugins.Simulation = Clazz.extend({
 				            method: 'POST',
 				            success: function(response) {
 				    	   		try {
-				    	   			if(response.responseText && response.responseText.length > 0 && response.responseText != "{}") {
+				    	   			if(response.responseText && response.responseText.length > 0 && response.status == 200) {
 				    	   				this.facade.raiseEvent({
 				    	   		            type: ORYX.CONFIG.EVENT_SIMULATION_SHOW_RESULTS,
-				    	   		            results: response.responseText
+				    	   		            results: decodeURIComponent(window.atob(response.responseText))
 				    	   		        });
 				    	   			} else {
                                            this.facade.raiseEvent({
                                                type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                               ntype		: 'info',
-                                               msg         : 'Simulation engine did not return results.',
+                                               ntype		: 'error',
+                                               msg         : ORYX.I18N.View.sim.simNoResults + response.statusText,
                                                title       : ''
 
                                            });
 				    	   			}
 				    	   		} catch(e) {
-                                       this.facade.raiseEvent({
-                                           type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                           ntype		: 'error',
-                                           msg         : 'Unable to perform simulation:\n' + e,
-                                           title       : ''
+									this.facade.raiseEvent({
+										type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+										ntype		: 'error',
+										msg         : ORYX.I18N.View.sim.unableToPerform + e,
+										title       : ''
 
-                                       });
+									});
 				    	   		}
 				            }.bind(this),
-				            failure: function(){
-                                this.facade.raiseEvent({
-                                    type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
-                                    ntype		: 'error',
-                                    msg         : 'Unable to perform simulation.',
-                                    title       : ''
+				            failure: function(response){
+								if(response.responseText && response.responseText == "showinvalid") {
+									var dialogSize = ORYX.Utils.getDialogSize(250, 400);
+									var cf = new Ext.form.TextArea({
+										id:"unabletorunsim",
+										fieldLabel:ORYX.I18N.View.sim.unableToPerform,
+										width:dialogSize.width,
+										height:dialogSize.height,
+										value:ORYX.I18N.View.sim.unableToPerformMsg
+									});
 
-                                });
-				            },
+									var win = new Ext.Window({
+										width:dialogSize.width,
+										id:'unabletorunsimwin',
+										height:dialogSize.height,
+										layout: 'fit',
+										autoScroll:true,
+										title:ORYX.I18N.View.sim.unableToPerform,
+										items: [cf]
+									});
+									win.show();
+								} else {
+									this.facade.raiseEvent({
+										type 		: ORYX.CONFIG.EVENT_NOTIFICATION_SHOW,
+										ntype		: 'error',
+										msg         : ORYX.I18N.View.sim.unableToPerform + response.responseText,
+										title       : ''
+
+									});
+								}
+				            }.bind(this),
 				            params: {
 				            	action: 'runsimulation',
 				            	profile: ORYX.PROFILE,
-				            	json: ORYX.EDITOR.getSerializedJSON(),
+				            	json: window.btoa(encodeURIComponent(ORYX.EDITOR.getSerializedJSON())),
 				            	ppdata: ORYX.PREPROCESSING,
 				            	numinstances: instancesInput,
 				            	interval: intervalInput,
-				            	intervalunit: intervalUnit
+				            	intervalunit: intervalUnit,
+								language: ORYX.I18N.Language
 				            }
 				        });
 					}.bind(this)
 				},{
-					text:ORYX.I18N.FromBPMN2Support.close,
+					text: ORYX.I18N.Save.close,
 					handler:function(){
 						dialog.hide();
 					}.bind(this)

@@ -1,3 +1,19 @@
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jbpm.designer.repository.vfs;
 
 import java.io.File;
@@ -11,13 +27,14 @@ import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
-import org.jboss.solder.core.Veto;
 import org.jbpm.designer.server.service.PathEvent;
-import org.kie.commons.java.nio.file.FileSystem;
-import org.kie.commons.java.nio.file.Path;
+import org.jbpm.designer.util.Utils;
+import org.uberfire.java.nio.file.FileSystem;
+import org.uberfire.java.nio.file.Path;
+import org.uberfire.spaces.Space;
 
 @RequestScoped
-public class  RepositoryDescriptor {
+public class RepositoryDescriptor {
 
     private static final String SEP = File.separator;
 
@@ -25,7 +42,6 @@ public class  RepositoryDescriptor {
     private Instance<HttpServletRequest> httpRequest;
     @Inject
     private RepositoryDescriptorProvider provider;
-
 
     private URI repositoryRoot;
     private Path repositoryRootPath;
@@ -37,7 +53,9 @@ public class  RepositoryDescriptor {
 
     }
 
-    public RepositoryDescriptor(URI repositoryRoot, FileSystem fileSystem, Path repositoryRootPath) {
+    public RepositoryDescriptor(URI repositoryRoot,
+                                FileSystem fileSystem,
+                                Path repositoryRootPath) {
         this.repositoryRoot = repositoryRoot;
         this.fileSystem = fileSystem;
         this.repositoryRootPath = repositoryRootPath;
@@ -52,7 +70,8 @@ public class  RepositoryDescriptor {
     public String getStringRepositoryRoot() {
         String repo = this.repositoryRoot.toString();
         if (repo.endsWith("/")) {
-            return repo.substring(0, repo.length() - 2);
+            return repo.substring(0,
+                                  repo.length() - 1);
         }
 
         return repo;
@@ -85,11 +104,13 @@ public class  RepositoryDescriptor {
         this.fileSystem = fileSystem;
     }
 
-    private void configure() {
+    void configure() {
+        Space space = null;
         String repositoryAlias = "";
+        String branchName = "";
         if (!this.configured) {
 
-            String uuid = httpRequest.get().getParameter("uuid");
+            String uuid = Utils.getUUID(httpRequest.get());
             if (uuid == null) {
                 uuid = httpRequest.get().getParameter("assetId");
             }
@@ -97,19 +118,34 @@ public class  RepositoryDescriptor {
                 uuid = path;
             }
             if (uuid != null) {
-                // git based pattern
-                Pattern pattern = Pattern.compile("@(.*?)/");
+
                 if (uuid.indexOf("@") == -1) {
                     // simple fs pattern
-                    pattern = Pattern.compile(SEP + "(.*?)" + SEP);
-                }
-                Matcher matcher = pattern.matcher(uuid);
-                if (matcher.find()) {
-                    repositoryAlias = matcher.group(1);
+                    Pattern pattern = Pattern.compile(SEP + "(.*?)" + SEP + "(.*?)" + SEP);
+                    Matcher matcher = pattern.matcher(uuid);
+                    if (matcher.find()) {
+                        space = new Space(matcher.group(1));
+                        repositoryAlias = matcher.group(2);
+                    }
+                } else {
+                    // git based pattern
+                    Pattern pattern = Pattern.compile("(://)(.*?)@(.*?)/(.*?)/");
+                    Matcher matcher = pattern.matcher(uuid);
+                    if (matcher.find()) {
+                        branchName = matcher.group(2);
+                        space = new Space(matcher.group(3));
+                        repositoryAlias = matcher.group(4);
+                    }
                 }
             }
 
-            RepositoryDescriptor found = provider.getRepositoryDescriptor(repositoryAlias);
+            if (space == null) {
+                throw new IllegalStateException("Cannot parse space from uuid in request: " + uuid);
+            }
+
+            RepositoryDescriptor found = provider.getRepositoryDescriptor(space,
+                                                                          repositoryAlias,
+                                                                          branchName);
             this.fileSystem = found.getFileSystem();
             this.repositoryRoot = found.getRepositoryRoot();
             this.repositoryRootPath = found.getRepositoryRootPath();

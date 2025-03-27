@@ -7,47 +7,50 @@ if (!ORYX.Config)
 ORYX.Plugins.LockNode = Clazz.extend({
     construct: function(facade){
         this.facade = facade;
-        this.facade.registerOnEvent(ORYX.CONFIG.EVENT_LOADED, this.checkLocksOnLoad.bind(this));
-        this.facade.offer({
-            'name': 'Lock',
-            'functionality': this.locknodes.bind(this),
-            'group': 'lockunlockgroup',
-            'icon': ORYX.BASE_FILE_PATH + "images/lock.png",
-            'description': 'Lock Elements',
-            'index': 1,
-            'minShape': 1,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return true;
-//				profileParamName = "profile";
-//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//		        regexa = new RegExp( regexSa );
-//		        profileParams = regexa.exec( window.location.href );
-//		        profileParamValue = profileParams[1];
-//				return profileParamValue == "jbpm";
-            }.bind(this)
-        });
-        this.facade.offer({
-            'name': 'Unlock',
-            'functionality': this.unlocknodes.bind(this),
-            'group': 'lockunlockgroup',
-            'icon': ORYX.BASE_FILE_PATH + "images/unlock.png",
-            'description': 'Unlock Elements',
-            'index': 2,
-            'minShape': 1,
-            'maxShape': 0,
-            'isEnabled': function(){
-                return true;
-//				profileParamName = "profile";
-//				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
-//				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
-//		        regexa = new RegExp( regexSa );
-//		        profileParams = regexa.exec( window.location.href );
-//		        profileParamValue = profileParams[1];
-//				return profileParamValue == "jbpm";
-            }.bind(this)
-        });
+
+        if(!(ORYX.READONLY == true || ORYX.VIEWLOCKED == true)) {
+            this.facade.registerOnEvent(ORYX.CONFIG.EVENT_LOADED, this.checkLocksOnLoad.bind(this));
+            this.facade.offer({
+                'name': ORYX.I18N.lockNode.lock,
+                'functionality': this.locknodes.bind(this),
+                'group': 'lockunlockgroup',
+                'icon': ORYX.BASE_FILE_PATH + "images/lock.png",
+                'description': ORYX.I18N.lockNode.lock_desc,
+                'index': 1,
+                'minShape': 1,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //				profileParamName = "profile";
+    //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //		        regexa = new RegExp( regexSa );
+    //		        profileParams = regexa.exec( window.location.href );
+    //		        profileParamValue = profileParams[1];
+    //				return profileParamValue == "jbpm";
+                }.bind(this)
+            });
+            this.facade.offer({
+                'name': ORYX.I18N.lockNode.unlock,
+                'functionality': this.unlocknodes.bind(this),
+                'group': 'lockunlockgroup',
+                'icon': ORYX.BASE_FILE_PATH + "images/unlock.png",
+                'description': ORYX.I18N.lockNode.unlock_desc,
+                'index': 2,
+                'minShape': 1,
+                'maxShape': 0,
+                'isEnabled': function(){
+                    return !(ORYX.READONLY == true || ORYX.VIEWLOCKED == true);
+    //				profileParamName = "profile";
+    //				profileParamName = profileParamName.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
+    //				regexSa = "[\\?&]"+profileParamName+"=([^&#]*)";
+    //		        regexa = new RegExp( regexSa );
+    //		        profileParams = regexa.exec( window.location.href );
+    //		        profileParamValue = profileParams[1];
+    //				return profileParamValue == "jbpm";
+                }.bind(this)
+            });
+        }
     },
     checkLocksOnLoad: function() {
         ORYX.EDITOR._canvas.getChildren().each((function(child) {
@@ -79,13 +82,14 @@ ORYX.Plugins.LockNode = Clazz.extend({
         selection.each(function(shape) {
             this.lockShape(shape);
         }.bind(this));
-
+        this.facade.setSelection([]);
     },
     unlocknodes: function() {
         var selection = this.facade.getSelection();
         selection.each(function(shape) {
             this.unlockShape(shape);
         }.bind(this));
+        this.facade.setSelection([]);
     },
     unlockShape: function(shape) {
         if(shape) {

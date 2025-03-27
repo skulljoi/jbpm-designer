@@ -434,9 +434,9 @@ ORYX.Core.AbstractShape = ORYX.Core.UIObject.extend(
         }
         
         if(this.bounds){
-            json.bounds = { 
-                lowerRight: this.bounds.lowerRight(), 
-                upperLeft: this.bounds.upperLeft() 
+            json.bounds = {
+                lowerRight: this.bounds.lowerRight(),
+                upperLeft: this.bounds.upperLeft()
             };
         }
         

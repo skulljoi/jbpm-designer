@@ -2,9 +2,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.drools</groupId>
-    <artifactId>droolsjbpm-parent</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <groupId>org.kie</groupId>
+    <artifactId>kie-parent</artifactId>
+    <version>7.74.0-SNAPSHOT</version>
     <!-- relativePath causes out-of-date problems on hudson slaves -->
     <!--<relativePath>../droolsjbpm-build-bootstrap/pom.xml</relativePath>-->
   </parent>
@@ -14,47 +14,134 @@
 
   <name>jBPM Designer</name>
   <description>jBPM Designer - web-based BPMN2 modeller</description>
-  <url>https://github.com/droolsjbpm/jbpm-designer</url>
+  <url>https://github.com/kiegroup/jbpm-designer</url>
 
   <scm>
-    <connection>scm:git:git@github.com:droolsjbpm/jbpm-designer.git</connection>
-    <developerConnection>scm:git:git@github.com:droolsjbpm/jbpm-designer.git</developerConnection>
-    <url>https://github.com/droolsjbpm/jbpm-designer</url>
+    <connection>scm:git:git@github.com:kiegroup/jbpm-designer.git</connection>
+    <developerConnection>scm:git:git@github.com:kiegroup/jbpm-designer.git</developerConnection>
+    <url>https://github.com/kiegroup/jbpm-designer</url>
   </scm>
+
+  <properties>
+    <port>8888</port>
+    <checkstyle.failOnViolation>true</checkstyle.failOnViolation>
+    <checkstyle.logViolationsToConsole>true</checkstyle.logViolationsToConsole>
+    <spotbugs.failOnViolation>true</spotbugs.failOnViolation>
+    <checkstyle.header.template><![CDATA[
+^\/\*$\n^
+\* Copyright \d\d\d\d Red Hat, Inc\. and\/or its affiliates\.$\n^
+\*$\n^
+\* Licensed under the Apache License, Version 2\.0 \(the &quot;License&quot;\);$\n^
+\* you may not use this file except in compliance with the License\.$\n^
+\* You may obtain a copy of the License at$\n^
+\*$\n^
+\*     http:\/\/www\.apache\.org\/licenses\/LICENSE-2\.0$\n^
+\*$\n^
+\* Unless required by applicable law or agreed to in writing, software$\n^
+\* distributed under the License is distributed on an &quot;AS IS&quot; BASIS,$\n^
+\* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied\.$\n^
+\* See the License for the specific language governing permissions and$\n^
+\* limitations under the License\.$\n^
+\*\/$
+]]>
+    </checkstyle.header.template>
+  </properties>
 
   <modules>
     <module>jbpm-designer-api</module>
     <module>jbpm-designer-backend</module>
     <module>jbpm-designer-client</module>
-    <module>jbpm-designer-standalone</module>
+    <module>jbpm-designer-utilities</module>
   </modules>
 
-  <properties>
-    <port>8888</port>
-  </properties>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.errai.bom</groupId>
+        <artifactId>errai-internal-bom</artifactId>
+        <version>${version.org.jboss.errai}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.uberfire</groupId>
+        <artifactId>uberfire-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.soup</groupId>
+        <artifactId>kie-soup-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jbpm</groupId>
+        <artifactId>jbpm-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.kie.uberfire</groupId>
+        <artifactId>kie-uberfire-extensions-bom</artifactId>
+        <version>${version.org.kie}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
 
   <build>
     <plugins>
+      <!--Fix translations from Zanata -->
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>prepare-package</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
             <configuration>
-              <outputDirectory>${basedir}/target/classes</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>target/generated-sources/annotations</directory>
-                </resource>
-              </resources>
+                <includes>
+                    <include>**/DesignerEditor*.properties</include>
+                </includes>
+                <excludes>
+                    <exclude>**/ErraiApp.properties</exclude>
+                </excludes>
             </configuration>
-          </execution>
-        </executions>
+        </plugin>
+
+      <!-- Zanata - translations -->
+      <plugin>
+        <groupId>org.zanata</groupId>
+        <artifactId>zanata-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>native2ascii-maven-plugin</artifactId>
+        <version>1.0-beta-1</version>
+        <!--executions>
+            <execution>
+                <goals>
+                    <goal>native2ascii</goal>
+                </goals>
+            </execution>
+        </executions-->
+          <configuration>
+              <includes>
+                  <include>**/DesignerEditorConstants*.properties</include>
+                  <include>**/DesignerConstants*.properties</include>
+                  <include>**/Constants*.properties</include>
+              </includes>
+              <workDir>.</workDir>
+              <tempDir>.</tempDir>
+          </configuration>
       </plugin>
     </plugins>
   </build>
@@ -67,21 +154,15 @@
           <name>full</name>
         </property>
       </activation>
-      <modules>
-        <module>jbpm-designer-distribution-wars</module>
-      </modules>
     </profile>
   </profiles>
 
   <repositories>
+    <!-- Bootstrap repository to locate the parent pom when the parent pom has not been build locally. -->
     <repository>
-      <id>jboss-thirdparty-uploads</id>
-      <name>JBoss ThirdParty Uploads</name>
-      <url>https://repository.jboss.org/nexus/content/repositories/thirdparty-uploads/</url>
-    </repository>
-    <repository>
-      <id>intalio</id>
-      <url>http://www.intalio.org/public/maven2/</url>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
       <layout>default</layout>
       <releases>
         <enabled>true</enabled>
@@ -89,9 +170,9 @@
       </releases>
       <snapshots>
         <enabled>true</enabled>
-        <updatePolicy>never</updatePolicy>
+        <updatePolicy>daily</updatePolicy>
       </snapshots>
     </repository>
   </repositories>
-</project>
 
+</project>

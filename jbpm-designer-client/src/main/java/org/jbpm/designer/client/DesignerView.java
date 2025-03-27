@@ -1,120 +1,65 @@
+/*
+ * Copyright 2017 Red Hat, Inc. and/or its affiliates.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.jbpm.designer.client;
 
-import javax.annotation.PostConstruct;
+import java.util.Map;
 
-import com.google.gwt.core.client.GWT;
-import com.google.gwt.dom.client.DivElement;
-import com.google.gwt.dom.client.Style;
-import com.google.gwt.event.dom.client.LoadEvent;
-import com.google.gwt.event.dom.client.LoadHandler;
-import com.google.gwt.i18n.client.LocaleInfo;
-import com.google.gwt.user.client.DOM;
-import com.google.gwt.user.client.Event;
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.ui.*;
-import org.uberfire.client.annotations.OnFocus;
-import org.uberfire.client.annotations.OnReveal;
+import com.google.gwt.user.client.ui.ProvidesResize;
+import com.google.gwt.user.client.ui.RequiresResize;
+import org.kie.workbench.common.widgets.metadata.client.KieEditorView;
+import org.uberfire.mvp.Command;
 
-public class DesignerView
-        extends Composite
-        implements DesignerPresenter.View,
-        RequiresResize {
+public interface DesignerView
+        extends KieEditorView,
+                RequiresResize,
+                ProvidesResize {
 
-    private DesignerPresenter presenter;
-    private Frame inlineFrame = new Frame() {{
-        addDomHandler(new LoadHandler() {
-            public void onLoad(LoadEvent event) {
+    boolean canClose();
 
-            }
-        }, LoadEvent.getType());
-    }};
+    boolean getIsReadOnly();
 
-    private String editorID = "";
+    boolean getIsViewLocked();
 
-    @PostConstruct
-    public void initPanel() {
-        setupInlineFrame();
-        initWidget(inlineFrame);
+    void raiseEventSave();
 
-    }
+    void raiseEventCheckSave(boolean saveWithComments,
+                             String pathURI);
 
-    @Override
-    public void init( final DesignerPresenter presenter ) {
-        this.presenter = presenter;
-        setupInlineFrame();
-        initWidget(inlineFrame);
-    }
+    void raiseEventSaveCancel();
 
-    private void setupInlineFrame() {
-        inlineFrame.setWidth("85%");
-        inlineFrame.setHeight("600");
-        inlineFrame.getElement().setPropertyBoolean("webkitallowfullscreen", true);
-        inlineFrame.getElement().setPropertyBoolean("mozallowfullscreen", true);
-        inlineFrame.getElement().setPropertyBoolean("allowfullscreen", true);
-        inlineFrame.getElement().getStyle().setBorderWidth(0, Style.Unit.PX);
-        inlineFrame.getElement().getStyle().setOverflowX(Style.Overflow.AUTO);
-        inlineFrame.getElement().getStyle().setOverflowY(Style.Overflow.AUTO);
-        inlineFrame.getElement().getStyle().setOverflow(Style.Overflow.AUTO);
-        inlineFrame.getElement().getStyle().setWidth(100, Style.Unit.PCT);
-        inlineFrame.getElement().getStyle().setHeight(680, Style.Unit.PX);
+    void raiseEventReload();
 
-        // fix locale if needed (for "default")
-        String locale = LocaleInfo.getCurrentLocale().getLocaleName();
-        if(locale == null) {
-            locale = "en";
-        } else if(locale.equals("default")) {
-            locale = "en";
-        }
+    void setup(String editorID,
+               Map<String, String> editorParameters);
 
-        inlineFrame.setUrl(GWT.getModuleBaseURL() + "inlineeditor.jsp?locale=" + locale);
-    }
+    void setProcessUnSaved();
 
-    @Override
-    public void setEditorID( final String editorID ) {
-        this.editorID = editorID;
-        inlineFrame.getElement().setId(editorID);
-    }
+    void askOpenInXMLEditor();
 
-    @Override
-    public String getEditorID() {
-        return this.editorID;
-    }
+    void raiseEventUpdate();
 
-    @Override
-    public void startDesignerInstance(String editorId) {
-        initDesigner(editorId);
-        startDesigner(editorId);
-        kickstartEditor(editorId);
-    }
+    void raiseEventUpdateLock();
 
-    public void startEditorInstance(String editorId) {
-        startDesignerInstance(editorId);
-    }
+    boolean canSaveDesignerModel();
 
-    public boolean confirmClose() {
-        return Window.confirm( "Business Process may contain unsaved changes. Are you sure you would like to close the editor?" );
-    }
+    void showYesNoCancelPopup(String title,
+                              String message,
+                              Command yesCommand,
+                              Command noCommand);
 
-    public native boolean canSaveDesignerModel(String editorID) /*-{
-        return $doc.getElementById(editorID).contentWindow.ORYX.Editor.checkIfSaved();
-    }-*/;
-
-    private native void startDesigner(String editorid)  /*-{
-        $doc.getElementById(editorid).contentWindow.startEditorInstance();
-    }-*/;
-
-    private native void initDesigner(String editorid)  /*-{
-        $doc.getElementById(editorid).contentWindow.initEditorInstance();
-    }-*/;
-
-    private native void kickstartEditor(String editorid)  /*-{
-        $doc.getElementById(editorid).contentWindow.Kickstart.load();
-    }-*/;
-
-    @Override
-    public void onResize() {
-        final Widget w = getParent();
-        final int width = w.getOffsetWidth();
-        inlineFrame.setWidth(width + "px");
-    }
+    void onClose();
 }
